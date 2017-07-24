@@ -1,7 +1,5 @@
 package forpdateam.ru.forpda.api.devdb;
 
-import com.annimon.stream.Stream;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -35,13 +33,13 @@ public class Parser {
         Elements con = doc.getElementsByClass("word-list");
         Elements con1 = con.select("li");
 
-        Stream.of(con1).forEach(value -> {
-            String brandsLink = value.getElementsByTag("a").attr("href");
-            String brandsName = value.text();
-            DevCatalog f = new DevCatalog(brandsLink, brandsName);
-            f.setType(DevCatalog.DEVICE_BRAND);
-            res.add(f);
-        });
+//        Stream.of(con1).forEach(value -> {
+//            String brandsLink = value.getElementsByTag("a").attr("href");
+//            String brandsName = value.text();
+//            DevCatalog f = new DevCatalog(brandsLink, brandsName);
+//            f.setType(DevCatalog.DEVICE_BRAND);
+//            res.add(f);
+//        });
 
         return res;
     }

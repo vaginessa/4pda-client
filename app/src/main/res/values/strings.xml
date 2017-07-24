@@ -65,4 +65,20 @@
     <string name="msg_panel_tooltip_useful">Полезное</string>
     <string name="msg_panel_tooltip_btn_acccept">Принято</string>
     <string name="test_topic_section_title">Topic section title</string>
+
+
+    <!--Comments item-->
+    <string name="comment_replay_title">Ответить</string>
+    <string name="comment_show_more_text">показать больше</string>
+
+    <!--Timeline News Fragment-->
+    <string name="hello_text">Привет.</string>
+    <string name="downloads_from_network_text">Загрузка из сети…</string>
+    <string name="working_with_data_text">Обработка данных…</string>
+    <string name="downloads_network_error">Не удалось загрузить данные из сети.</string>
+    <string name="working_with_data_error">Не удалось обработать данные.</string>
+
+
+    <!--For test-->
+    <string name="test_comment">На большом воздушном шаре мы летали и хуйню в комментах на 4 пда писали.\nМы писали, мы писали, наши пальчики устали. О Божечки, какую хуйню мы тут понаписали.\nТипичный юзер 4пда. (с)</string>
 </resources>

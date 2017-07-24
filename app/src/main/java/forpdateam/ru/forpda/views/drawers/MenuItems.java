@@ -12,6 +12,7 @@ import forpdateam.ru.forpda.fragments.forum.ForumFragment;
 import forpdateam.ru.forpda.fragments.mentions.MentionsFragment;
 import forpdateam.ru.forpda.fragments.qms.QmsContactsFragment;
 import forpdateam.ru.forpda.fragments.search.SearchFragment;
+import forpdateam.ru.forpda.news.main.NewsParentFragment;
 
 /**
  * Created by radiationx on 02.05.17.
@@ -23,7 +24,7 @@ public class MenuItems {
 
     public MenuItems() {
         createdMenuItems.add(new MenuItem("Авторизация", R.drawable.ic_person_add, AuthFragment.class));
-        //createdMenuItems.add(new MenuItem("Новости", R.drawable.ic_newspaper, NewsListFragment.class));
+        createdMenuItems.add(new MenuItem("Новости", R.drawable.ic_newspaper, NewsParentFragment.class));
         createdMenuItems.add(new MenuItem("Избранное", R.drawable.ic_star, FavoritesFragment.class));
         createdMenuItems.add(new MenuItem("Контакты", R.drawable.ic_contacts, QmsContactsFragment.class));
         createdMenuItems.add(new MenuItem("Ответы", R.drawable.ic_notifications, MentionsFragment.class));

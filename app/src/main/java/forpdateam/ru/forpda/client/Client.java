@@ -9,6 +9,8 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import android.webkit.WebSettings;
 
+import com.readystatesoftware.chuck.ChuckInterceptor;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,6 +48,8 @@ import okio.BufferedSink;
 import okio.ForwardingSink;
 import okio.Okio;
 import okio.Sink;
+
+import static forpdateam.ru.forpda.ext.LogExtKt.logger;
 
 public class Client implements IWebClient {
     private final static String userAgent = WebSettings.getDefaultUserAgent(App.getContext());
@@ -176,10 +180,10 @@ public class Client implements IWebClient {
     };
 
     private final OkHttpClient client = new OkHttpClient.Builder()
-            .connectTimeout(60, TimeUnit.SECONDS)
-            .writeTimeout(60, TimeUnit.SECONDS)
-            .readTimeout(60, TimeUnit.SECONDS)
-            //.addInterceptor(new ChuckInterceptor(App.getContext()))
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .addInterceptor(new ChuckInterceptor(App.getContext()))
             .cookieJar(cookieJar)
             .build();
 
@@ -194,6 +198,7 @@ public class Client implements IWebClient {
     //Network
     @Override
     public NetworkResponse get(String url) throws Exception {
+        logger("Client " + url, null);
         return request(new NetworkRequest.Builder().url(url).build());
     }
 

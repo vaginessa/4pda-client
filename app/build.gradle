@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'realm-android'
 
@@ -33,7 +35,7 @@ android {
         applicationId "ru.forpdateam.forpda"
         versionCode versionNumber
         versionName "${versionMajor}.${versionMinor}.${versionPatch} (${versionBuild})"
-        minSdkVersion 19
+        minSdkVersion 17
         targetSdkVersion 25
         vectorDrawables.useSupportLibrary = true
         ndk {
@@ -61,10 +63,9 @@ android {
     }
 
 
-    dexOptions {
-        dexInProcess = true
-        preDexLibraries = true
-    }
+//    dexOptions {
+//        dexInProcess = true
+//    }
     compileOptions {
         targetCompatibility 1.8
         sourceCompatibility 1.8
@@ -83,7 +84,7 @@ android {
     }
     splits {
         abi {
-            enable false
+            enable gradle.startParameter.taskNames.contains(":app:assembleRelease")
             reset()
             include 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
             universalApk false
@@ -92,14 +93,45 @@ android {
     lintOptions {
         disable 'RestrictedApi'
     }
+    sourceSets {
+        main {
+            java {
+                srcDirs += 'src/main/java'
+                srcDirs += 'src/main/kotlin'
+                srcDirs += 'build/generated-src/kotlin'
+            }
+            res {
+                srcDirs =
+                        [
+                        'src/main/res/layouts/other',
+                        'src/main/res/layouts/drawer',
+                        'src/main/res/layouts/base',
+                        'src/main/res/layouts/forum',
+                        'src/main/res/layouts/auth',
+                        'src/main/res/layouts/imgviewer',
+                        'src/main/res/layouts/reputation',
+                        'src/main/res/layouts/activitys',
+                        'src/main/res/layouts/panel',
+                        'src/main/res/layouts/search',
+                        'src/main/res/layouts/profile',
+                        'src/main/res/layouts/qms',
+                        'src/main/res/layouts/theme',
+                        'src/main/res/layouts/fortest',
+                        'src/main/res/layouts/topic',
+                        'src/main/res/layouts/news',
+                        'src/main/res/layouts',
+                        'src/main/res'
+                        ]
+            }
+        }
+    }
 }
 
 ext {
     supportLibVersion = '25.3.1'
-    okHttpVersion = '3.8.0'
-    rxbindingVersion = '0.4.0'
-    rxlifecycleVersion = '2.0.1'
-    rxCoreVersion = '2.0.1'
+    okHttpVersion = '3.8.1'
+    rxCoreVersion = '2.1.0'
+    rxAndroidVersion = '2.0.1'
 }
 
 dependencies {
@@ -110,18 +142,19 @@ dependencies {
     compile "com.android.support:cardview-v7:${supportLibVersion}"
     compile "com.android.support:recyclerview-v7:${supportLibVersion}"
     compile "com.android.support:preference-v7:${supportLibVersion}"
+    compile 'com.google.android:flexbox:0.3.0'
+    compile "android.arch.lifecycle:runtime:1.0.0-alpha4"
+    compile "android.arch.lifecycle:extensions:1.0.0-alpha4"
+    compile "android.arch.persistence.room:runtime:1.0.0-alpha4"
+    compile "android.arch.persistence.room:rxjava2:1.0.0-alpha4"
+    kapt "android.arch.lifecycle:compiler:1.0.0-alpha4"
+    kapt "android.arch.persistence.room:compiler:1.0.0-alpha4"
     compile "com.squareup.okhttp3:okhttp:${okHttpVersion}"
     compile "com.squareup.okhttp3:okhttp-urlconnection:${okHttpVersion}"
-    compile 'com.annimon:stream:1.1.4'
-    compile "io.reactivex.rxjava2:rxandroid:${rxCoreVersion}"
+    compile "io.reactivex.rxjava2:rxandroid:${rxAndroidVersion}"
     compile "io.reactivex.rxjava2:rxjava:${rxCoreVersion}"
-    compile 'com.github.fcannizzaro:fast-event:0.1.4'
-    compile 'com.jakewharton.rxrelay2:rxrelay:2.0.0'
-    compile "com.trello.rxlifecycle2:rxlifecycle:${rxlifecycleVersion}"
-    compile "com.trello.rxlifecycle2:rxlifecycle-components:${rxlifecycleVersion}"
-    compile "com.trello.rxlifecycle2:rxlifecycle-android:${rxlifecycleVersion}"
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
-    compile 'org.jsoup:jsoup:1.10.1'
+    compile 'org.jsoup:jsoup:1.10.3'
     compile 'com.github.rahatarmanahmed:circularprogressview:2.5.0'
     compile 'de.hdodenhof:circleimageview:2.1.0'
     compile 'com.nineoldandroids:library:2.4.0'
@@ -130,11 +163,20 @@ dependencies {
     compile 'com.lapism:searchview:4.0'
     compile 'com.github.bmelnychuk:atv:1.2.9'
     compile 'com.afollestad:sectioned-recyclerview:0.2.3'
-    //compile 'ch.acra:acra:4.9.0'
     compile 'com.faendir:acra:4.10.0'
-
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     compile 'com.github.chrisbanes:PhotoView:2.0.0'
     compile 'com.wada811:android-material-design-colors:3.0.0'
     compile 'com.thebluealliance:spectrum:0.7.1'
     compile 'com.github.douglasjunior:android-simple-tooltip:0.2.0'
+
+
+    debugCompile 'com.readystatesoftware.chuck:library:1.0.4'
+    releaseCompile 'com.readystatesoftware.chuck:library-no-op:1.0.4'
+}
+
+kotlin {
+    experimental {
+        coroutines "enable"
+    }
 }

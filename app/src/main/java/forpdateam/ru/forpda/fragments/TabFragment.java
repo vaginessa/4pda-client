@@ -12,6 +12,7 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -24,8 +25,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import com.trello.rxlifecycle2.components.support.RxFragment;
 
 import java.util.Observer;
 
@@ -40,7 +39,8 @@ import forpdateam.ru.forpda.settings.Preferences;
 /**
  * Created by radiationx on 07.08.16.
  */
-public class TabFragment extends RxFragment {
+
+public class TabFragment extends Fragment {
     public final static String ARG_TITLE = "TAB_TITLE";
     public final static String TAB_SUBTITLE = "TAB_SUBTITLE";
     public final static String ARG_TAB = "TAB_URL";
@@ -170,9 +170,8 @@ public class TabFragment extends RxFragment {
         return coordinatorLayout;
     }
 
-
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         audioService = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
         if (savedInstanceState != null) {
@@ -187,6 +186,7 @@ public class TabFragment extends RxFragment {
         }
         setHasOptionsMenu(true);
     }
+
 
     @Nullable
     @Override
@@ -236,11 +236,11 @@ public class TabFragment extends RxFragment {
     }
 
     protected void setListsBackground() {
-        fragmentContent.setBackgroundColor(App.getColorFromAttr(getContext(), R.attr.background_for_lists));
+        fragmentContent.setBackgroundColor(App.getColorFromAttr(getActivity(), R.attr.background_for_lists));
     }
 
     protected void setCardsBackground() {
-        fragmentContent.setBackgroundColor(App.getColorFromAttr(getContext(), R.attr.background_for_cards));
+        fragmentContent.setBackgroundColor(App.getColorFromAttr(getActivity(), R.attr.background_for_cards));
     }
 
     protected void viewsReady() {
@@ -292,8 +292,8 @@ public class TabFragment extends RxFragment {
     }
 
     protected void refreshLayoutStyle(SwipeRefreshLayout refreshLayout) {
-        refreshLayout.setProgressBackgroundColorSchemeColor(App.getColorFromAttr(getContext(), R.attr.colorPrimary));
-        refreshLayout.setColorSchemeColors(App.getColorFromAttr(getContext(), R.attr.colorAccent));
+        refreshLayout.setProgressBackgroundColorSchemeColor(App.getColorFromAttr(getActivity(), R.attr.colorPrimary));
+        refreshLayout.setColorSchemeColors(App.getColorFromAttr(getActivity(), R.attr.colorAccent));
     }
 
     @Override

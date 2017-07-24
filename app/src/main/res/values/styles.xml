@@ -214,8 +214,6 @@
 
 
     <style name="ImageViewTheme" parent="Theme.AppCompat.NoActionBar">
-        <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:windowTranslucentNavigation">true</item>
     </style>
 
     <style name="ImageViewTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat">

@@ -19,4 +19,7 @@
     <dimen name="dp56">56dp</dimen>
     <dimen name="dp64">64dp</dimen>
     <dimen name="default_keyboard_height">250dp</dimen>
+
+    <!--News Category-->
+    <dimen name="news_title_size_18sp">18sp</dimen>
 </resources>

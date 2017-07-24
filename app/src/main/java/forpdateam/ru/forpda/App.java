@@ -49,6 +49,8 @@ import java.util.Observer;
 
 import biz.source_code.miniTemplator.MiniTemplator;
 import forpdateam.ru.forpda.client.Client;
+import forpdateam.ru.forpda.data.NewsRepository;
+import forpdateam.ru.forpda.data.local.DatabaseCreator;
 import forpdateam.ru.forpda.settings.Preferences;
 import forpdateam.ru.forpda.utils.SimpleObservable;
 import io.realm.Realm;
@@ -157,9 +159,13 @@ public class App extends android.app.Application {
         templates.put(TEMPLATE_QMS_CHAT, findTemplate(TEMPLATE_QMS_CHAT));
         templates.put(TEMPLATE_QMS_CHAT_MESS, findTemplate(TEMPLATE_QMS_CHAT_MESS));
 
-//        NewsRepository.Companion.createInstance();
-
         //init
+        /*
+         *
+         */
+        DatabaseCreator.createDb(this);
+        NewsRepository.createInstance();
+
         Realm.init(this);
         RealmConfiguration configuration = new RealmConfiguration.Builder()
                 .name("forpda.realm")
