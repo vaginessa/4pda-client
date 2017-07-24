@@ -1,5 +1,6 @@
 package forpdateam.ru.forpda;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -153,6 +154,7 @@ public class App extends android.app.Application {
         return webViewNotFound;
     }
 
+    @SuppressLint("NewApi")
     @Override
     public void onCreate() {
         super.onCreate();
@@ -175,13 +177,7 @@ public class App extends android.app.Application {
         DatabaseCreator.createDb(this);
         NewsRepository.createInstance();
 
-        Realm.init(this);
-        RealmConfiguration configuration = new RealmConfiguration.Builder()
-                .name("forpda.realm")
-                .schemaVersion(1)
-                .deleteRealmIfMigrationNeeded()
-                .build();
-        Realm.setDefaultConfiguration(configuration);
+
         Client.getInstance();
         initImageLoader(this);
 
