@@ -1,11 +1,10 @@
 package forpdateam.ru.forpda.views.messagepanel.attachments;
 
 import android.content.Context;
-import android.os.Build;
+import android.support.design.widget.BottomSheetDialog;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -30,7 +29,7 @@ import forpdateam.ru.forpda.views.messagepanel.MessagePanel;
  */
 
 public class AttachmentsPopup {
-    private CustomBottomSheetDialog dialog;
+    private BottomSheetDialog dialog;
     private MessagePanel messagePanel;
     private View bottomSheet;
     private AutoFitRecyclerView recyclerView;
@@ -46,9 +45,13 @@ public class AttachmentsPopup {
 
     public AttachmentsPopup(Context context, MessagePanel panel) {
         messagePanel = panel;
-        dialog = new CustomBottomSheetDialog(context);
-        dialog.setPeekHeight(App.getKeyboardHeight());
-        dialog.getWindow().getDecorView().setFitsSystemWindows(true);
+        dialog = new BottomSheetDialog(context);
+        WindowManager.LayoutParams lp = dialog.getWindow().getAttributes();
+        lp.dimAmount = 1.0f;
+        dialog.getWindow().setAttributes(lp);
+        dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+        //dialog.setPeekHeight(App.getKeyboardHeight());
+        //dialog.getWindow().getDecorView().setFitsSystemWindows(true);
 
         bottomSheet = View.inflate(context, R.layout.message_panel_attachments, null);
         recyclerView = (AutoFitRecyclerView) bottomSheet.findViewById(R.id.auto_fit_recycler_view);
@@ -94,7 +97,7 @@ public class AttachmentsPopup {
             dialog.show();
         });
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             Window window = dialog.getWindow();
             if (window != null) {
                 window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -102,7 +105,7 @@ public class AttachmentsPopup {
                     window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
                 }
             }
-        }
+        }*/
     }
 
     public void insertAttachment(List<AttachmentItem> items, boolean toSpoiler) {
@@ -183,8 +186,8 @@ public class AttachmentsPopup {
     }
 
     public void onUploadFiles(List<AttachmentItem> items) {
-        for(AttachmentItem item: items){
-            Log.d("SUKA", "LOADED ITEM "+item.getName());
+        for (AttachmentItem item : items) {
+            Log.d("SUKA", "LOADED ITEM " + item.getName());
         }
         for (AttachmentItem item : items) {
             Log.e("FORPDA_LOG", "LOADING ITEM " + " : " + item);
@@ -215,10 +218,10 @@ public class AttachmentsPopup {
 
     public void onDeleteFiles(List<AttachmentItem> deletedItems) {
         //unblock ui
-        Log.e("FORPDA_LOG", "ON DELETE FILES "+deletedItems);
+        Log.e("FORPDA_LOG", "ON DELETE FILES " + deletedItems);
         for (AttachmentItem item : deletedItems) {
-            Log.e("FORPDA_LOG", "DELETED FILE "+item);
-            messagePanel.setText(messagePanel.getMessage().replaceAll("\\[attachment=['\"]?" + item.getId() + ":[^\\]]*?]",""));
+            Log.e("FORPDA_LOG", "DELETED FILE " + item);
+            messagePanel.setText(messagePanel.getMessage().replaceAll("\\[attachment=['\"]?" + item.getId() + ":[^\\]]*?]", ""));
         }
         progressOverlay.setVisibility(View.GONE);
         adapter.deleteSelected();

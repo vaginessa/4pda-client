@@ -23,6 +23,7 @@ import java.util.List;
 
 import forpdateam.ru.forpda.client.NetworkStateReceiver;
 import forpdateam.ru.forpda.fragments.TabFragment;
+import forpdateam.ru.forpda.settings.Preferences;
 import forpdateam.ru.forpda.utils.IntentHandler;
 import forpdateam.ru.forpda.utils.WebViewsProvider;
 import forpdateam.ru.forpda.utils.permission.RxPermissions;
@@ -38,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements TabManager.TabLis
     private final View.OnClickListener toggleListener = view -> drawers.toggleMenu();
     private final View.OnClickListener removeTabListener = view -> backHandler(true);
     private List<SimpleTooltip> tooltips = new ArrayList<>();
-    private boolean currentThemeIsDark = false;
+    private boolean currentThemeIsDark = App.getInstance().isDarkTheme();
 
 
     public View.OnClickListener getToggleListener() {
@@ -161,16 +162,11 @@ public class MainActivity extends AppCompatActivity implements TabManager.TabLis
             //IntentHandler.handle("http://4pda.ru/forum/index.php?showuser=2556269");
         });
 
+        if (Preferences.Notifications.Update.isEnabled()) {
+            new SimpleChecker().checkFromGitHub(this);
+        }
         Log.e("FORPDA_LOG", "ON CREATE INTENT");
         checkIntent(getIntent());
-//        Intent serviceIntent = new Intent(this, WebSocketService.class);
-//        startService(serviceIntent);
-
-        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            NewWebSocketService.registerJob(this, 20); // for test interval 2 minute
-        } else {
-            startService(new Intent(this, NotificationsService.class));
-        }*/
     }
 
     @Override
@@ -239,6 +235,14 @@ public class MainActivity extends AppCompatActivity implements TabManager.TabLis
         Log.d("FORPDA_LOG", "onbackpressed activity");
         if (tooltips.size() > 0) {
             tooltips.get(tooltips.size() - 1).dismiss();
+            return;
+        }
+        if(drawers.isMenuOpen()){
+            drawers.closeMenu();
+            return;
+        }
+        if(drawers.isTabsOpen()){
+            drawers.closeTabs();
             return;
         }
         backHandler(false);

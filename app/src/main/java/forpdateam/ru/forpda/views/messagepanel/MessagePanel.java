@@ -14,10 +14,12 @@ import android.widget.ProgressBar;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observer;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.api.theme.editpost.models.AttachmentItem;
+import forpdateam.ru.forpda.settings.Preferences;
 import forpdateam.ru.forpda.utils.SimpleTextWatcher;
 import forpdateam.ru.forpda.views.messagepanel.advanced.AdvancedPopup;
 import forpdateam.ru.forpda.views.messagepanel.attachments.AttachmentsPopup;
@@ -28,7 +30,7 @@ import forpdateam.ru.forpda.views.messagepanel.attachments.AttachmentsPopup;
 
 @SuppressLint("ViewConstructor")
 public class MessagePanel extends CardView {
-    private ImageButton advancedButton, attachmentsButton, sendButton;
+    private ImageButton advancedButton, attachmentsButton, sendButton, fullButton, hideButton, editPollButton;
     private List<View.OnClickListener> advancedListeners = new ArrayList<>(), attachmentsListeners = new ArrayList<>(), sendListeners = new ArrayList<>();
     private EditText messageField;
     private MessagePanelBehavior panelBehavior;
@@ -41,6 +43,19 @@ public class MessagePanel extends CardView {
     private HeightChangeListener heightChangeListener;
     private boolean fullForm = false;
     private CoordinatorLayout.LayoutParams params;
+    boolean isMonospace = App.getInstance().getPreferences().getBoolean(Preferences.Main.IS_EDITOR_MONOSPACE, true);
+
+    protected Observer preferenceObserver = (observable, o) -> {
+        if (o == null) return;
+        String key = (String) o;
+        switch (key) {
+            case Preferences.Main.IS_EDITOR_MONOSPACE: {
+                isMonospace = App.getInstance().getPreferences().getBoolean(Preferences.Main.IS_EDITOR_MONOSPACE, true);
+                messageField.setTypeface(isMonospace ? Typeface.MONOSPACE : Typeface.DEFAULT);
+                break;
+            }
+        }
+    };
 
     public MessagePanel(Context context, ViewGroup fragmentContainer, ViewGroup targetContainer, boolean fullForm) {
         super(context);
@@ -53,9 +68,13 @@ public class MessagePanel extends CardView {
 
     private void init() {
         inflate(getContext(), fullForm ? R.layout.message_panel_full : R.layout.message_panel_quick, this);
+        setClickable(true);
         advancedButton = (ImageButton) findViewById(R.id.button_advanced_input);
         attachmentsButton = (ImageButton) findViewById(R.id.button_attachments);
         sendButton = (ImageButton) findViewById(R.id.button_send);
+        fullButton = (ImageButton) findViewById(R.id.button_full);
+        hideButton = (ImageButton) findViewById(R.id.button_hide);
+        editPollButton = (ImageButton) findViewById(R.id.button_edt_poll);
         messageField = (EditText) findViewById(R.id.message_field);
         sendProgress = (ProgressBar) findViewById(R.id.send_progress);
         formProgress = (ProgressBar) findViewById(R.id.form_load_progress);
@@ -67,7 +86,7 @@ public class MessagePanel extends CardView {
             params.setMargins(App.px8, App.px8, App.px8, App.px8);
         setLayoutParams(params);
         setClipToPadding(true);
-        setRadius(fullForm ? 0 : App.px24);
+        setRadius(fullForm ? 0 : App.px8);
         setPreventCornerOverlap(false);
         setCardBackgroundColor(App.getColorFromAttr(getContext(), R.attr.cards_background));
         //На случай, когда добавляются несколько слушателей
@@ -90,6 +109,7 @@ public class MessagePanel extends CardView {
             if (heightChangeListener == null) return;
             int newHeight = getHeight() + App.px16;
             if (newHeight != lastHeight) {
+                lastHeight = newHeight;
                 heightChangeListener.onChangedHeight(newHeight);
             }
         });
@@ -108,7 +128,16 @@ public class MessagePanel extends CardView {
                 }
             }
         });
-        messageField.setTypeface(Typeface.MONOSPACE);
+        messageField.setTypeface(isMonospace ? Typeface.MONOSPACE : Typeface.DEFAULT);
+        App.getInstance().addPreferenceChangeObserver(preferenceObserver);
+    }
+
+    public int getLastHeight() {
+        return lastHeight;
+    }
+
+    public HeightChangeListener getHeightChangeListener() {
+        return heightChangeListener;
     }
 
     public void disableBehavior() {
@@ -156,6 +185,7 @@ public class MessagePanel extends CardView {
     public boolean insertText(String startText, String endText) {
         return insertText(startText, endText, true);
     }
+
     public boolean insertText(String startText, String endText, boolean selectionInside) {
         show();
         int[] selectionRange = getSelectionRange();
@@ -236,6 +266,18 @@ public class MessagePanel extends CardView {
         return sendButton;
     }
 
+    public ImageButton getFullButton() {
+        return fullButton;
+    }
+
+    public ImageButton getHideButton() {
+        return hideButton;
+    }
+
+    public ImageButton getEditPollButton() {
+        return editPollButton;
+    }
+
     public EditText getMessageField() {
         return messageField;
     }
@@ -268,6 +310,7 @@ public class MessagePanel extends CardView {
     public void onDestroy() {
         if (advancedPopup != null)
             advancedPopup.onDestroy();
+        App.getInstance().removePreferenceChangeObserver(preferenceObserver);
     }
 
     public void onPause() {

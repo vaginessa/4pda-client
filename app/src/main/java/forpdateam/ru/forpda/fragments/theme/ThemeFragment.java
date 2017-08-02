@@ -7,10 +7,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.CallSuper;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -50,6 +53,7 @@ import forpdateam.ru.forpda.fragments.jsinterfaces.IPostFunctions;
 import forpdateam.ru.forpda.fragments.theme.editpost.EditPostFragment;
 import forpdateam.ru.forpda.rxapi.RxApi;
 import forpdateam.ru.forpda.settings.Preferences;
+import forpdateam.ru.forpda.utils.FabOnScroll;
 import forpdateam.ru.forpda.utils.FilePickHelper;
 import forpdateam.ru.forpda.utils.IntentHandler;
 import forpdateam.ru.forpda.utils.Utils;
@@ -67,6 +71,7 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
     //Указывают на произведенное действие: переход назад, обновление, обычный переход по ссылке
     protected final static int BACK_ACTION = 0, REFRESH_ACTION = 1, NORMAL_ACTION = 2;
     protected int loadAction = NORMAL_ACTION;
+    protected MenuItem toggleMessagePanelItem;
     protected MenuItem refreshMenuItem;
     protected MenuItem copyLinkMenuItem;
     protected MenuItem searchInThemeMenuItem;
@@ -104,6 +109,13 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
             case Preferences.Main.WEBVIEW_FONT_SIZE: {
                 setFontSize(Preferences.Main.getWebViewSize());
             }
+            case Preferences.Main.SCROLL_BUTTON_ENABLE: {
+                if (App.getInstance().getPreferences().getBoolean(Preferences.Main.SCROLL_BUTTON_ENABLE, false)) {
+                    fab.setVisibility(View.VISIBLE);
+                } else {
+                    fab.setVisibility(View.GONE);
+                }
+            }
         }
     };
 
@@ -132,10 +144,32 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
         }
     }
 
+    @Override
+    protected void initFabBehavior() {
+        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
+        FabOnScroll behavior = new FabOnScroll(fab.getContext(), null);
+        params.setBehavior(behavior);
+        params.gravity = Gravity.CENTER_VERTICAL | Gravity.END;
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
+            params.setMargins(App.px16, App.px16, App.px16, App.px16);
+        }
+        fab.requestLayout();
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
+        initFabBehavior();
+        fab.setSize(FloatingActionButton.SIZE_MINI);
+        if (App.getInstance().getPreferences().getBoolean(Preferences.Main.SCROLL_BUTTON_ENABLE, false)) {
+            fab.setVisibility(View.VISIBLE);
+        } else {
+            fab.setVisibility(View.GONE);
+        }
+        fab.setScaleX(0.0f);
+        fab.setScaleY(0.0f);
+        fab.setAlpha(0.0f);
         baseInflateFragment(inflater, R.layout.fragment_theme);
         refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_list);
         messagePanel = new MessagePanel(getContext(), fragmentContainer, coordinatorLayout, false);
@@ -147,6 +181,17 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
                 TabManager.getInstance().add(EditPostFragment.newInstance(createEditPostForm(), currentPage.getTitle()));
             }
             return true;
+        });
+        messagePanel.getFullButton().setVisibility(View.VISIBLE);
+        messagePanel.getFullButton().setOnClickListener(v -> {
+            EditPostForm form = createEditPostForm();
+            if (form != null) {
+                TabManager.getInstance().add(EditPostFragment.newInstance(createEditPostForm(), currentPage.getTitle()));
+            }
+        });
+        messagePanel.getHideButton().setVisibility(View.VISIBLE);
+        messagePanel.getHideButton().setOnClickListener(v -> {
+            hideMessagePanel();
         });
         attachmentsPopup = messagePanel.getAttachmentsPopup();
         attachmentsPopup.setAddOnClickListener(v -> tryPickFile());
@@ -194,7 +239,11 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
             App.getInstance().getPreferences().edit().putBoolean("theme.tooltip.long_click_send", false).apply();
         }
 
-
+        if (App.getInstance().getPreferences().getBoolean(Preferences.Main.IS_EDITOR_DEFAULT_HIDDEN, true)) {
+            hideMessagePanel();
+        } else {
+            showMessagePanel();
+        }
         return view;
     }
 
@@ -295,8 +344,13 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
         refreshLayout.setRefreshing(true);
 
         refreshToolbarMenuItems(false);
-
-        mainSubscriber.subscribe(RxApi.Theme().getTheme(tab_url, true, false, false), this::onLoadData, new ThemePage(), v -> loadData());
+        boolean hatOpen = false;
+        boolean pollOpen = false;
+        if (currentPage != null) {
+            hatOpen = currentPage.isHatOpen();
+            pollOpen = currentPage.isPollOpen();
+        }
+        mainSubscriber.subscribe(RxApi.Theme().getTheme(tab_url, true, hatOpen, pollOpen), this::onLoadData, new ThemePage(), v -> loadData());
     }
 
     protected void onLoadData(ThemePage newPage) throws Exception {
@@ -347,52 +401,93 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
         refreshToolbarMenuItems(true);
     }
 
+    private void toggleMessagePanel() {
+        if (messagePanel.getVisibility() == View.VISIBLE) {
+            hideMessagePanel();
+        } else {
+            showMessagePanel();
+        }
+    }
+
+    private void showMessagePanel() {
+        messagePanel.setVisibility(View.VISIBLE);
+        messagePanel.getHeightChangeListener().onChangedHeight(messagePanel.getLastHeight());
+        toggleMessagePanelItem.setIcon(App.getAppDrawable(getContext(), R.drawable.ic_toolbar_transcribe_close));
+    }
+
+    private void hideMessagePanel() {
+        messagePanel.setVisibility(View.GONE);
+        messagePanel.hidePopupWindows();
+        hidePopupWindows();
+        messagePanel.getHeightChangeListener().onChangedHeight(0);
+        toggleMessagePanelItem.setIcon(App.getAppDrawable(getContext(), R.drawable.ic_toolbar_create));
+    }
 
     @Override
     protected void addBaseToolbarMenu() {
         super.addBaseToolbarMenu();
-        refreshMenuItem = getMenu().add("Обновить").setIcon(App.getAppDrawable(getContext(), R.drawable.ic_toolbar_refresh)).setOnMenuItemClickListener(menuItem -> {
-            loadData(REFRESH_ACTION);
-            return false;
-        });
+        toggleMessagePanelItem = getMenu()
+                .add("Ответить")
+                .setIcon(App.getAppDrawable(getContext(), R.drawable.ic_toolbar_create))
+                .setOnMenuItemClickListener(menuItem -> {
+                    toggleMessagePanel();
+                    return false;
+                })
+                .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-        copyLinkMenuItem = getMenu().add("Скопировать ссылку").setOnMenuItemClickListener(menuItem -> {
-            Utils.copyToClipBoard(tab_url);
-            return false;
-        });
+        refreshMenuItem = getMenu().add("Обновить")
+                .setIcon(App.getAppDrawable(getContext(), R.drawable.ic_toolbar_refresh))
+                .setOnMenuItemClickListener(menuItem -> {
+                    loadData(REFRESH_ACTION);
+                    return false;
+                });
+
+        copyLinkMenuItem = getMenu().add("Скопировать ссылку")
+                .setOnMenuItemClickListener(menuItem -> {
+                    String url = tab_url;
+                    if (currentPage != null) {
+                        url = "http://4pda.ru/forum/index.php?showtopic=" + currentPage.getId();
+                    }
+                    Utils.copyToClipBoard(url);
+                    return false;
+                });
         addSearchOnPageItem(getMenu());
-        searchInThemeMenuItem = getMenu().add("Найти в теме").setOnMenuItemClickListener(menuItem -> {
-            IntentHandler.handle("http://4pda.ru/forum/index.php?forums=" + currentPage.getForumId() + "&topics=" + currentPage.getId() + "&act=search&source=pst");
-            return false;
-        });
+        searchInThemeMenuItem = getMenu().add("Найти в теме")
+                .setOnMenuItemClickListener(menuItem -> {
+                    IntentHandler.handle("http://4pda.ru/forum/index.php?forums=" + currentPage.getForumId() + "&topics=" + currentPage.getId() + "&act=search&source=pst");
+                    return false;
+                });
 
         SubMenu subMenu = getMenu().addSubMenu("Опции темы");
-        deleteFavoritesMenuItem = subMenu.add("Удалить из избранного").setOnMenuItemClickListener(menuItem -> {
-            if (currentPage.getFavId() == 0) {
-                Toast.makeText(App.getContext(), "ID темы не найден, попробуйте перезагрузить страницу", Toast.LENGTH_SHORT).show();
-                return false;
-            }
-            FavoritesHelper.delete(aBoolean -> {
-                Toast.makeText(App.getContext(), aBoolean ? "Тема удалена из избранного" : "Ошибка", Toast.LENGTH_SHORT).show();
-                currentPage.setInFavorite(!aBoolean);
-                refreshToolbarMenuItems(true);
-            }, currentPage.getFavId());
-            return false;
-        });
-        addFavoritesMenuItem = subMenu.add("Добавить в избранное").setOnMenuItemClickListener(menuItem -> {
-            new AlertDialog.Builder(getContext())
-                    .setItems(Favorites.SUB_NAMES, (dialog1, which1) -> FavoritesHelper.add(aBoolean -> {
-                        Toast.makeText(App.getContext(), aBoolean ? "Тема добавлена в избранное" : "Ошибка", Toast.LENGTH_SHORT).show();
-                        currentPage.setInFavorite(aBoolean);
+        deleteFavoritesMenuItem = subMenu.add("Удалить из избранного")
+                .setOnMenuItemClickListener(menuItem -> {
+                    if (currentPage.getFavId() == 0) {
+                        Toast.makeText(App.getContext(), "ID темы не найден, попробуйте перезагрузить страницу", Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+                    FavoritesHelper.delete(aBoolean -> {
+                        Toast.makeText(App.getContext(), aBoolean ? "Тема удалена из избранного" : "Ошибка", Toast.LENGTH_SHORT).show();
+                        currentPage.setInFavorite(!aBoolean);
                         refreshToolbarMenuItems(true);
-                    }, currentPage.getId(), Favorites.SUB_TYPES[which1]))
-                    .show();
-            return false;
-        });
-        openForumMenuItem = subMenu.add("Открыть форум темы").setOnMenuItemClickListener(menuItem -> {
-            IntentHandler.handle("http://4pda.ru/forum/index.php?showforum=" + currentPage.getForumId());
-            return false;
-        });
+                    }, currentPage.getFavId());
+                    return false;
+                });
+        addFavoritesMenuItem = subMenu.add("Добавить в избранное")
+                .setOnMenuItemClickListener(menuItem -> {
+                    new AlertDialog.Builder(getContext())
+                            .setItems(Favorites.SUB_NAMES, (dialog1, which1) -> FavoritesHelper.add(aBoolean -> {
+                                Toast.makeText(App.getContext(), aBoolean ? "Тема добавлена в избранное" : "Ошибка", Toast.LENGTH_SHORT).show();
+                                currentPage.setInFavorite(aBoolean);
+                                refreshToolbarMenuItems(true);
+                            }, currentPage.getId(), Favorites.SUB_TYPES[which1]))
+                            .show();
+                    return false;
+                });
+        openForumMenuItem = subMenu.add("Открыть форум темы")
+                .setOnMenuItemClickListener(menuItem -> {
+                    IntentHandler.handle("http://4pda.ru/forum/index.php?showforum=" + currentPage.getForumId());
+                    return false;
+                });
 
         refreshToolbarMenuItems(false);
     }
@@ -405,6 +500,7 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
             boolean pageNotNull = !(currentPage == null || currentPage.getId() == 0 || currentPage.getUrl() == null);
             Log.d("SUKA", "SADASD " + pageNotNull + " : " + currentPage + " : " + currentPage.getId() + " : " + currentPage.getUrl());
 
+            toggleMessagePanelItem.setEnabled(true);
             refreshMenuItem.setEnabled(true);
             copyLinkMenuItem.setEnabled(pageNotNull);
             searchInThemeMenuItem.setEnabled(pageNotNull);
@@ -422,6 +518,7 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
             }
             openForumMenuItem.setEnabled(pageNotNull);
         } else {
+            toggleMessagePanelItem.setEnabled(true);
             refreshMenuItem.setEnabled(true);
             copyLinkMenuItem.setEnabled(false);
             searchInThemeMenuItem.setEnabled(false);
@@ -534,10 +631,15 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
             messagePanel.setProgressState(true);
             mainSubscriber.subscribe(RxApi.EditPost().sendPost(form), s -> {
                 messagePanel.setProgressState(false);
-                onLoadData(s);
-                messagePanel.clearAttachments();
-                messagePanel.clearMessage();
-            }, currentPage, v -> loadData(NORMAL_ACTION));
+                if (s != currentPage) {
+                    onLoadData(s);
+                    messagePanel.clearAttachments();
+                    messagePanel.clearMessage();
+                    if (App.getInstance().getPreferences().getBoolean(Preferences.Main.IS_EDITOR_DEFAULT_HIDDEN, true)) {
+                        hideMessagePanel();
+                    }
+                }
+            }, currentPage);
         }
 
     }
@@ -627,6 +729,9 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
 
     @Override
     public void insertNick(IBaseForumPost post) {
+        if (messagePanel.getVisibility() != View.VISIBLE) {
+            showMessagePanel();
+        }
         String insert = String.format(Locale.getDefault(), "[snapback]%s[/snapback] [b]%s,[/b] \n", post.getId(), post.getNick());
         messagePanel.insertText(insert);
     }
@@ -637,6 +742,9 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
 
     @Override
     public void quotePost(String text, IBaseForumPost post) {
+        if (messagePanel.getVisibility() != View.VISIBLE) {
+            showMessagePanel();
+        }
         String date = Utils.getForumDateTime(Utils.parseForumDateTime(post.getDate()));
         String insert = String.format(Locale.getDefault(), "[quote name=\"%s\" date=\"%s\" post=%S]%s[/quote]\n", post.getNick(), date, post.getId(), text);
         messagePanel.insertText(insert);
@@ -745,4 +853,5 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
     public void changeReputation(IBaseForumPost post, boolean type) {
         ThemeDialogsHelper.changeReputation(getContext(), post, type);
     }
+
 }

@@ -92,9 +92,9 @@
 
         <activity
             android:name=".settings.SettingsActivity"
+            android:exported="true"
             android:label="Настройки"
-            android:theme="@style/LightAppTheme.NoActionBar"
-            android:exported="true">
+            android:theme="@style/LightAppTheme.NoActionBar">
             <meta-data
                 android:name="android.max_aspect"
                 android:value="2.1" />
@@ -110,12 +110,12 @@
             android:launchMode="singleTop"
             android:theme="@style/LightAppTheme.NoActionBar" />
 
+        <activity
+            android:name=".CheckerActivity"
+            android:launchMode="singleTop"
+            android:theme="@style/LightAppTheme.NoActionBar" />
+
         <service android:name=".NotificationsService" />
-        <service
-            android:name=".NewWebSocketService"
-            android:enabled="false"
-            android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <receiver
             android:name=".WakeUpReceiver"

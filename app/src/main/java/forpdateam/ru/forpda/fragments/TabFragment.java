@@ -15,6 +15,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -31,6 +32,7 @@ import java.util.Observer;
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.MainActivity;
 import forpdateam.ru.forpda.R;
+import forpdateam.ru.forpda.ScrollAwareFABBehavior;
 import forpdateam.ru.forpda.TabManager;
 import forpdateam.ru.forpda.client.Client;
 import forpdateam.ru.forpda.client.ClientHelper;
@@ -70,6 +72,9 @@ public class TabFragment extends Fragment {
     protected FloatingActionButton fab;
     private AudioManager audioService;
     private boolean showNotifyDot = App.getInstance().getPreferences().getBoolean(Preferences.Main.SHOW_NOTIFY_DOT, true);
+    private boolean notifyDotFav = App.getInstance().getPreferences().getBoolean(Preferences.Main.NOTIFY_DOT_FAV, true);
+    private boolean notifyDotQms = App.getInstance().getPreferences().getBoolean(Preferences.Main.NOTIFY_DOT_QMS, true);
+    private boolean notifyDotMentions = App.getInstance().getPreferences().getBoolean(Preferences.Main.NOTIFY_DOT_MENTIONS, true);
 
     protected Observer countsObserver = (observable, o) -> updateNotifyDot();
     protected Observer networkObserver = (observable, o) -> {
@@ -86,6 +91,21 @@ public class TabFragment extends Fragment {
         switch (key) {
             case Preferences.Main.SHOW_NOTIFY_DOT: {
                 showNotifyDot = App.getInstance().getPreferences().getBoolean(Preferences.Main.SHOW_NOTIFY_DOT, true);
+                updateNotifyDot();
+                break;
+            }
+            case Preferences.Main.NOTIFY_DOT_FAV: {
+                notifyDotFav = App.getInstance().getPreferences().getBoolean(Preferences.Main.NOTIFY_DOT_FAV, true);
+                updateNotifyDot();
+                break;
+            }
+            case Preferences.Main.NOTIFY_DOT_QMS: {
+                notifyDotQms = App.getInstance().getPreferences().getBoolean(Preferences.Main.NOTIFY_DOT_QMS, true);
+                updateNotifyDot();
+                break;
+            }
+            case Preferences.Main.NOTIFY_DOT_MENTIONS: {
+                notifyDotMentions = App.getInstance().getPreferences().getBoolean(Preferences.Main.NOTIFY_DOT_MENTIONS, true);
                 updateNotifyDot();
                 break;
             }
@@ -208,6 +228,13 @@ public class TabFragment extends Fragment {
         //// TODO: 20.03.17 удалить и юзать только там, где нужно
         fab = (FloatingActionButton) coordinatorLayout.findViewById(R.id.fab);
 
+        toolbarTitleView.setEllipsize(TextUtils.TruncateAt.MARQUEE);
+        toolbarTitleView.setHorizontallyScrolling(true);
+        toolbarTitleView.setMarqueeRepeatLimit(3);
+        toolbarTitleView.setSelected(true);
+        toolbarTitleView.setHorizontalFadingEdgeEnabled(true);
+        toolbarTitleView.setFadingEdgeLength(App.px16);
+
         //fragmentContainer.setPadding(0, App.getStatusBarHeight(), 0, 0);
 
         toolbar.setNavigationOnClickListener(configuration.isAlone() || configuration.isMenu() ? getMainActivity().getToggleListener() : getMainActivity().getRemoveTabListener());
@@ -253,14 +280,13 @@ public class TabFragment extends Fragment {
     }
 
 
-
     @CallSuper
     protected void addBaseToolbarMenu() {
 
     }
 
     @CallSuper
-    protected void refreshToolbarMenuItems(boolean enable){
+    protected void refreshToolbarMenuItems(boolean enable) {
 
     }
 
@@ -276,18 +302,38 @@ public class TabFragment extends Fragment {
             notifyDot.setVisibility(View.GONE);
             return;
         }
-        if (ClientHelper.getAllCounts() > 0) {
+        if (decideShowDot()) {
             notifyDot.setVisibility(View.VISIBLE);
         } else {
             notifyDot.setVisibility(View.GONE);
         }
     }
 
+    private boolean decideShowDot() {
+        if (ClientHelper.getAllCounts() > 0) {
+            Log.e("SUKA_DOT", "decideShowDot " + notifyDotFav + " : " + notifyDotQms + " : " + notifyDotMentions);
+            Log.e("SUKA_DOT", "decideShowDot " + (ClientHelper.getFavoritesCount() > 0) + " : " + (ClientHelper.getQmsCount() > 0) + " : " + (ClientHelper.getMentionsCount() > 0));
+            if (ClientHelper.getFavoritesCount() > 0 && notifyDotFav) {
+                return true;
+            }
+            if (ClientHelper.getQmsCount() > 0 && notifyDotQms) {
+                return true;
+            }
+            if (ClientHelper.getMentionsCount() > 0 && notifyDotMentions) {
+                return true;
+            }
+            return false;
+        } else {
+            return false;
+        }
+    }
+
     protected void initFabBehavior() {
-        CoordinatorLayout.LayoutParams params =
-                (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
+        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
         // TODO: 20.12.16 not work in 25.1.0
-        //params.setBehavior(new ScrollAwareFABBehavior(fab.getContext(), null));
+        ScrollAwareFABBehavior behavior = new ScrollAwareFABBehavior(fab.getContext(), null);
+        params.setBehavior(behavior);
+
         fab.requestLayout();
     }
 

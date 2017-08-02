@@ -15,38 +15,27 @@ import android.webkit.ConsoleMessage;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
-import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import forpdateam.ru.forpda.App;
-import forpdateam.ru.forpda.BuildConfig;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.api.IBaseForumPost;
 import forpdateam.ru.forpda.api.theme.Theme;
 import forpdateam.ru.forpda.api.theme.models.ThemePage;
 import forpdateam.ru.forpda.api.theme.models.ThemePost;
-import forpdateam.ru.forpda.client.Client;
 import forpdateam.ru.forpda.fragments.jsinterfaces.IBase;
 import forpdateam.ru.forpda.fragments.jsinterfaces.IPostFunctions;
 import forpdateam.ru.forpda.imageviewer.ImageViewerActivity;
 import forpdateam.ru.forpda.utils.ExtendedWebView;
 import forpdateam.ru.forpda.utils.IntentHandler;
-import forpdateam.ru.forpda.utils.MimeTypeUtil;
 import forpdateam.ru.forpda.utils.Utils;
 
 /**
@@ -78,10 +67,9 @@ public class ThemeFragmentWeb extends ThemeFragment implements IPostFunctions, I
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void addShowingView() {
+
         messagePanel.setHeightChangeListener(newHeight -> {
-            syncWithWebView(() -> {
-                webView.evalJs("setPaddingBottom(" + (newHeight / App.getInstance().getDensity()) + ");");
-            });
+            syncWithWebView(() -> webView.setPaddingBottom(newHeight));
         });
         webView = getMainActivity().getWebViewsProvider().pull(getContext());
         refreshLayout.addView(webView);
@@ -89,7 +77,20 @@ public class ThemeFragmentWeb extends ThemeFragment implements IPostFunctions, I
         webView.addJavascriptInterface(this, JS_POSTS_FUNCTIONS);
         webView.addJavascriptInterface(this, JS_BASE_INTERFACE);
         registerForContextMenu(webView);
-
+        fab.setOnClickListener(v -> {
+            if (webView.getDirection() == ExtendedWebView.DIRECTION_DOWN) {
+                webView.pageDown(true);
+            } else if (webView.getDirection() == ExtendedWebView.DIRECTION_UP) {
+                webView.pageUp(true);
+            }
+        });
+        webView.setOnDirectionListener(direction -> {
+            if (webView.getDirection() == ExtendedWebView.DIRECTION_DOWN) {
+                fab.setImageDrawable(App.getAppDrawable(fab.getContext(), R.drawable.ic_arrow_down));
+            } else if (webView.getDirection() == ExtendedWebView.DIRECTION_UP) {
+                fab.setImageDrawable(App.getAppDrawable(fab.getContext(), R.drawable.ic_arrow_up));
+            }
+        });
         //Кастомизация менюхи при выделении текста
         webView.setActionModeListener((actionMode, callback, type) -> {
             Menu menu = actionMode.getMenu();
@@ -144,6 +145,7 @@ public class ThemeFragmentWeb extends ThemeFragment implements IPostFunctions, I
             webView.setWebChromeClient(chromeClient);
         }
         webView.loadDataWithBaseURL("http://4pda.ru/forum/", currentPage.getHtml(), "text/html", "utf-8", null);
+        syncWithWebView(() -> webView.updatePaddingBottom());
     }
 
     @Override
@@ -584,6 +586,23 @@ public class ThemeFragmentWeb extends ThemeFragment implements IPostFunctions, I
             Utils.copyToClipBoard(s);
         });
     }
+
+    @JavascriptInterface
+    public void setPollOpen(String sValue) {
+        run(() -> {
+            boolean value = Boolean.parseBoolean(sValue);
+            currentPage.setPollOpen(value);
+        });
+    }
+
+    @JavascriptInterface
+    public void setHatOpen(String sValue) {
+        run(() -> {
+            boolean value = Boolean.parseBoolean(sValue);
+            currentPage.setHatOpen(value);
+        });
+    }
+
 
     public void run(final Runnable runnable) {
         if (getMainActivity() != null) {

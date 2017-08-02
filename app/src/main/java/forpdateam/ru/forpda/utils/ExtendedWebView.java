@@ -22,6 +22,16 @@ import forpdateam.ru.forpda.settings.Preferences;
  */
 
 public class ExtendedWebView extends NestedWebView {
+    public final static int DIRECTION_NONE = 0;
+    public final static int DIRECTION_UP = 1;
+    public final static int DIRECTION_DOWN = 2;
+    private int direction = DIRECTION_NONE;
+    private OnDirectionListener onDirectionListener;
+
+    public interface OnDirectionListener {
+        void onDirectionChanged(int direction);
+    }
+
     public ExtendedWebView(Context context) {
         super(context);
         init();
@@ -37,6 +47,27 @@ public class ExtendedWebView extends NestedWebView {
         init();
     }
 
+
+    public void setOnDirectionListener(OnDirectionListener onDirectionListener) {
+        this.onDirectionListener = onDirectionListener;
+    }
+
+    @Override
+    protected void onScrollChanged(int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+        super.onScrollChanged(scrollX, scrollY, oldScrollX, oldScrollY);
+        int newDirection = scrollY > oldScrollY ? DIRECTION_DOWN : DIRECTION_UP;
+        if (newDirection != direction) {
+            direction = newDirection;
+            if (onDirectionListener != null) {
+                onDirectionListener.onDirectionChanged(newDirection);
+            }
+        }
+    }
+
+    public int getDirection() {
+        return direction;
+    }
+
     @SuppressLint("SetJavaScriptEnabled")
     public void init() {
         WebSettings settings = getSettings();
@@ -49,25 +80,49 @@ public class ExtendedWebView extends NestedWebView {
         setBackgroundColor(App.getColorFromAttr(getContext(), R.attr.background_base));
     }
 
+    private int relativeScale = 100;
+    private float fontScale = 1.0f;
+    private int paddingBottom = 0;
+
+    public int getRelativeScale() {
+        return relativeScale;
+    }
+
+    public float getFontScale() {
+        return fontScale;
+    }
+
+
     @Deprecated
     @Override
     public void setInitialScale(int scaleInPercent) {
         super.setInitialScale(scaleInPercent);
         Log.e("SUKA", "SET INIT SCALE " + scaleInPercent);
+        setPaddingBottom(paddingBottom);
     }
+
 
     //0.0f, 1.0f, 2.3f, etc
     public void setRelativeScale(float scale) {
-        int scaleInPercent = 100;
         try {
-            scaleInPercent = (int) (scale * (App.getInstance().getDensity() * 100));
+            relativeScale = (int) (scale * (App.getInstance().getDensity() * 100));
+            fontScale = scale;
         } catch (Exception ignore) {
         }
-        setInitialScale(scaleInPercent);
+        setInitialScale(relativeScale);
     }
 
     public void setRelativeFontSize(int fontSize) {
         setRelativeScale(fontSize / 16f);
+    }
+
+    public void updatePaddingBottom(){
+        setPaddingBottom(paddingBottom);
+    }
+    public void setPaddingBottom(int padding) {
+        paddingBottom = padding;
+        Log.d("kurwa", "setPaddingBottom " + padding + " : " + App.getInstance().getDensity() + " : " + fontScale + " : " + relativeScale);
+        evalJs("setPaddingBottom(" + ((paddingBottom / App.getInstance().getDensity()) * (1 / fontScale)) + ");");
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)

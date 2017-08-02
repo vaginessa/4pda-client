@@ -29,7 +29,6 @@ import forpdateam.ru.forpda.api.IWebClient;
 import forpdateam.ru.forpda.api.NetworkRequest;
 import forpdateam.ru.forpda.api.NetworkResponse;
 import forpdateam.ru.forpda.api.Utils;
-import forpdateam.ru.forpda.utils.Html;
 import forpdateam.ru.forpda.utils.SimpleObservable;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
@@ -180,9 +179,9 @@ public class Client implements IWebClient {
     };
 
     private final OkHttpClient client = new OkHttpClient.Builder()
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .writeTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(30, TimeUnit.SECONDS)
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .writeTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
             .addInterceptor(new ChuckInterceptor(App.getContext()))
             .cookieJar(cookieJar)
             .build();

@@ -44,7 +44,6 @@ import forpdateam.ru.forpda.client.Client;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.fragments.TabFragment;
 import forpdateam.ru.forpda.fragments.jsinterfaces.IBase;
-import forpdateam.ru.forpda.rxapi.ForumUsersCache;
 import forpdateam.ru.forpda.rxapi.RxApi;
 import forpdateam.ru.forpda.rxapi.apiclasses.QmsRx;
 import forpdateam.ru.forpda.settings.Preferences;
@@ -96,7 +95,6 @@ public class QmsChatFragment extends TabFragment implements IBase, ChatThemeCrea
             }
         }
     };
-
 
 
     private WebSocket webSocket;
@@ -186,9 +184,7 @@ public class QmsChatFragment extends TabFragment implements IBase, ChatThemeCrea
         chatContainer = (FrameLayout) findViewById(R.id.qms_chat_container);
         messagePanel = new MessagePanel(getContext(), fragmentContainer, coordinatorLayout, false);
         messagePanel.setHeightChangeListener(newHeight -> {
-            syncWithWebView(() -> {
-                webView.evalJs("setPaddingBottom(" + (newHeight / getResources().getDisplayMetrics().density) + ");");
-            });
+            syncWithWebView(() -> webView.setPaddingBottom(newHeight));
         });
 
         webView = getMainActivity().getWebViewsProvider().pull(getContext());
@@ -261,14 +257,15 @@ public class QmsChatFragment extends TabFragment implements IBase, ChatThemeCrea
     @Override
     protected void addBaseToolbarMenu() {
         super.addBaseToolbarMenu();
-        blackListMenuItem = getMenu().add("В черный список").setOnMenuItemClickListener(item -> {
-            contactsSubscriber.subscribe(RxApi.Qms().blockUser(currentChat.getNick()), qmsContacts -> {
-                if (qmsContacts.size() > 0) {
-                    Toast.makeText(getContext(), "Пользователь добавлен в черный список", Toast.LENGTH_SHORT).show();
-                }
-            }, new ArrayList<>());
-            return false;
-        });
+        blackListMenuItem = getMenu().add("В черный список")
+                .setOnMenuItemClickListener(item -> {
+                    contactsSubscriber.subscribe(RxApi.Qms().blockUser(currentChat.getNick()), qmsContacts -> {
+                        if (qmsContacts.size() > 0) {
+                            Toast.makeText(getContext(), "Пользователь добавлен в черный список", Toast.LENGTH_SHORT).show();
+                        }
+                    }, new ArrayList<>());
+                    return false;
+                });
         refreshToolbarMenuItems(false);
     }
 

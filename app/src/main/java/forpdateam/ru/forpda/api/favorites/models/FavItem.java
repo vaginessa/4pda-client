@@ -10,7 +10,34 @@ public class FavItem implements IFavItem {
     private int favId;
     private int topicId, forumId, authorId, lastUserId, stParam, pages;
     private String trackType, info, infoColor, topicTitle, forumTitle, authorUserNick, lastUserNick, date, desc;
-    private boolean pin = false, isNewMessages = false;
+    private boolean pin = false, isNewMessages = false, isForum = false;
+
+    public FavItem() {
+    }
+
+    public FavItem(IFavItem item){
+        favId = item.getFavId();
+        topicId = item.getTopicId();
+        forumId = item.getForumId();
+        authorId = item.getAuthorId();
+        lastUserId = item.getLastUserId();
+        stParam = item.getStParam();
+        pages = item.getPages();
+
+        trackType = item.getTrackType();
+        info = item.getInfo();
+        infoColor = item.getInfoColor();
+        topicTitle = item.getTopicTitle();
+        forumTitle = item.getForumTitle();
+        authorUserNick = item.getAuthorUserNick();
+        lastUserNick = item.getLastUserNick();
+        date = item.getDate();
+        desc = item.getDesc();
+
+        pin = item.isPin();
+        isNewMessages = item.isNewMessages();
+        isForum = item.isForum();
+    }
 
     public String getDesc() {
         return desc;
@@ -154,5 +181,13 @@ public class FavItem implements IFavItem {
 
     public void setNewMessages(boolean newMessages) {
         isNewMessages = newMessages;
+    }
+
+    public boolean isForum() {
+        return isForum;
+    }
+
+    public void setForum(boolean forum) {
+        isForum = forum;
     }
 }

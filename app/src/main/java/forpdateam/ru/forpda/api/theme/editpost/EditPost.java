@@ -21,6 +21,7 @@ import forpdateam.ru.forpda.api.NetworkResponse;
 import forpdateam.ru.forpda.api.RequestFile;
 import forpdateam.ru.forpda.api.Utils;
 import forpdateam.ru.forpda.api.theme.editpost.models.AttachmentItem;
+import forpdateam.ru.forpda.api.theme.editpost.models.EditPoll;
 import forpdateam.ru.forpda.api.theme.editpost.models.EditPostForm;
 import forpdateam.ru.forpda.api.theme.models.ThemePage;
 
@@ -29,17 +30,39 @@ import forpdateam.ru.forpda.api.theme.models.ThemePage;
  */
 
 public class EditPost {
-    private final static Pattern postPattern = Pattern.compile("<div[^>]*?>[^<]*?<textarea[^>]*>([\\s\\S]*?)<\\/textarea>[^<]*?<\\/div>[\\s\\S]*?<input[^>]*?name=\"post_edit_reason\" value=\"([\\s\\S]*?)\" \\/>");
+    private final static Pattern formInfoPattern = Pattern.compile("is_mod\\s*?=\\s*?(\\d+)[\\s\\S]*?poll_questions\\s*?=\\s*?(\\{[\\s\\S]*?\\})\\n,[\\s\\S]*?poll_choices\\s*?=\\s*?(\\{[\\s\\S]*?\\})\\n[\\s\\S]*?poll_votes\\s*?=\\s*?(\\{[\\s\\S]*?\\})\\n[\\s\\S]*?poll_multi\\s*?=\\s*?(\\{[\\s\\S]*?\\})\\n[\\s\\S]*?max_poll_questions\\s*?=\\s*?(\\d+)[\\s\\S]*?max_poll_choices\\s*?=\\s*?(\\d+)[\\s\\S]*?<input[^>]*?name=\"poll_question\"[^>]*?value=\"([^\"]*?)\"");
+
+    private final static Pattern fckngInvalidJsonPattern = Pattern.compile("(?:\\{|\\,)[\\\"\\']?(\\d+)(?:_(\\d+))?[\\\"\\']?\\s*?\\:\\s*?[\\\"\\']([^\\'\\\"]*?)[\\\"\\'](?:\\})?");
+    //private final static Pattern pollIndicesPattern = Pattern.compile("(\\d+)_(\\d+)");
+
+
+    private final static Pattern postPattern = Pattern.compile("[^<]*?<textarea[^>]*>([\\s\\S]*?)<\\/textarea>[\\s\\S]*?<input[^>]*?name=\"post_edit_reason\" value=\"([^\"]*?)\"");
     private final static Pattern loadedAttachments = Pattern.compile("add_current_item\\([^'\"]*?['\"](\\d+)['\"],[^'\"]*?['\"]([^'\"]*\\.(\\w*))['\"],[^'\"]*?['\"]([^'\"]*?)['\"],[^'\"]*?['\"][^'\"]*\\/(\\w*)\\.[^\"']*?['\"]");
     private final static Pattern statusInfo = Pattern.compile("can_upload = parseInt\\([\"'](\\d+)'\\)[\\s\\S]*?status_msg_files = .([\\s\\S]*?).;[\\s\\S]*?status_msg = .([\\s\\S]*?).;[\\s\\S]*?status_is_error = ([\\s\\S]*?);");
 
     private final static Pattern attachmentsPattern = Pattern.compile("(\\d+)\u0002([^\u0002]*?)\u0002([^\u0002]*?)\u0002(\\/\\/[^\u0002]*?)\u0002(\\d+)\u0002([0-9a-fA-F]+)(?:(?:\u0002(\\/\\/[^\u0002]*?)\u0002(\\d+)\u0002(\\d+))?(?:\u0003\u0004(\\d+)\u0003\u0004([^\u0002]*?)\u0003\u0004([^\u0002]*?)\u0003)?)?");
 
+    public static void printPoll(EditPoll poll) {
+        if (poll != null) {
+            Log.d("POLL", "poll_question: " + poll.getTitle() + " : {" + poll.getMaxQuestions() + ":" + poll.getMaxChoices() + "} : " + poll.getBaseIndexOffset() + " +" + poll.getIndexOffset());
+            for (int i = 0; i < poll.getQuestions().size(); i++) {
+                EditPoll.Question question = poll.getQuestion(i);
+                int q_index = question.getIndex();
+                Log.d("POLL", "question[" + q_index + "]: " + question.getTitle() + " : " + question.getBaseIndexOffset() + " +" + question.getIndexOffset());
+                Log.d("POLL", "multi[" + q_index + "]: " + (question.isMulti() ? "1" : "0"));
+                for (int j = 0; j < question.getChoices().size(); j++) {
+                    EditPoll.Choice choice = question.getChoice(j);
+                    int c_index = choice.getIndex();
+                    Log.d("POLL", "choice[" + q_index + '_' + c_index + "]: " + choice.getTitle());
+                }
+            }
+        }
+    }
 
     public EditPostForm loadForm(int postId) throws Exception {
         Log.d("FORPDA_LOG", "START LOAD FORM");
         EditPostForm form = new EditPostForm();
-        String url = "http://4pda.ru/forum/index.php?s=&act=post&do=post-edit-show&p=".concat(Integer.toString(postId));
+        String url = "http://4pda.ru/forum/index.php?act=post&do=edit_post&p=".concat(Integer.toString(postId));
         //url = url.concat("&t=").concat(Integer.toString(topicId)).concat("&f=").concat(Integer.toString(forumId));
 
         NetworkResponse response = Api.getWebClient().get(url);
@@ -54,6 +77,13 @@ public class EditPost {
             Log.d("FORPDA_LOG", "REASON " + matcher.group(2));
             form.setEditReason(matcher.group(2));
         }
+        matcher = formInfoPattern.matcher(response.getBody());
+        if (matcher.find()) {
+            EditPoll poll = createPoll(matcher);
+            form.setPoll(poll);
+            EditPost.printPoll(poll);
+        }
+
 
         /*response = Api.getWebClient().get("http://4pda.ru/forum/index.php?&act=attach&code=attach_upload_show&attach_rel_id=".concat(Integer.toString(postId)));
         matcher = loadedAttachments.matcher(response);
@@ -70,6 +100,66 @@ public class EditPost {
         }
 
         return form;
+    }
+
+    private EditPoll createPoll(Matcher matcher) {
+        EditPoll poll = new EditPoll();
+
+        Matcher jsonMatcher = fckngInvalidJsonPattern.matcher(matcher.group(2));
+        while (jsonMatcher.find()) {
+            EditPoll.Question question = new EditPoll.Question();
+            int questionIndex = Integer.parseInt(jsonMatcher.group(1));
+            if (questionIndex > poll.getBaseIndexOffset()) {
+                poll.setBaseIndexOffset(questionIndex);
+            }
+            question.setIndex(questionIndex);
+            question.setTitle(Utils.fromHtml(jsonMatcher.group(3)));
+            poll.addQuestion(question);
+        }
+
+        jsonMatcher = jsonMatcher.reset(matcher.group(3));
+        while (jsonMatcher.find()) {
+            int questionIndex = Integer.parseInt(jsonMatcher.group(1));
+            EditPoll.Question question = EditPoll.findQuestionByIndex(poll, questionIndex);
+            if (question != null) {
+                EditPoll.Choice choice = new EditPoll.Choice();
+
+                int choiceIndex = Integer.parseInt(jsonMatcher.group(2));
+                if (choiceIndex > question.getBaseIndexOffset()) {
+                    question.setBaseIndexOffset(choiceIndex);
+                }
+                choice.setIndex(choiceIndex);
+                choice.setTitle(Utils.fromHtml(jsonMatcher.group(3)));
+                question.addChoice(choice);
+            }
+        }
+
+        jsonMatcher = jsonMatcher.reset(matcher.group(4));
+        while (jsonMatcher.find()) {
+            int questionIndex = Integer.parseInt(jsonMatcher.group(1));
+            EditPoll.Question question = EditPoll.findQuestionByIndex(poll, questionIndex);
+            if (question != null) {
+                int choiceIndex = Integer.parseInt(jsonMatcher.group(2));
+                EditPoll.Choice choice = EditPoll.findChoiceByIndex(question, choiceIndex);
+                if (choice != null) {
+                    choice.setVotes(Integer.parseInt(jsonMatcher.group(3)));
+                }
+            }
+        }
+
+        jsonMatcher = jsonMatcher.reset(matcher.group(5));
+        while (jsonMatcher.find()) {
+            int questionIndex = Integer.parseInt(jsonMatcher.group(1));
+            EditPoll.Question question = EditPoll.findQuestionByIndex(poll, questionIndex);
+            if (question != null) {
+                question.setMulti(jsonMatcher.group(3).equals("1"));
+            }
+        }
+
+        poll.setMaxQuestions(Integer.parseInt(matcher.group(6)));
+        poll.setMaxChoices(Integer.parseInt(matcher.group(7)));
+        poll.setTitle(Utils.fromHtml(matcher.group(8)));
+        return poll;
     }
 
     public List<AttachmentItem> uploadFiles(int postId, List<RequestFile> files) throws Exception {
@@ -297,6 +387,23 @@ public class EditPost {
                 .formHeader("editor_ids[]", "ed-0")
                 .formHeader("iconid", "0")
                 .formHeader("_upload_single_file", "1");
+        EditPoll poll = form.getPoll();
+        if (poll != null) {
+            EditPost.printPoll(poll);
+            builder.formHeader("poll_question", poll.getTitle().replaceAll("\n"," "));
+            for (int i = 0; i < poll.getQuestions().size(); i++) {
+                EditPoll.Question question = poll.getQuestion(i);
+                int q_index = i + 1;
+                builder.formHeader("question[" + q_index + "]", question.getTitle().replaceAll("\n"," "));
+                builder.formHeader("multi[" + q_index + "]", question.isMulti() ? "1" : "0");
+                for (int j = 0; j < question.getChoices().size(); j++) {
+                    EditPoll.Choice choice = question.getChoice(j);
+                    int c_index = j + 1;
+                    builder.formHeader("choice[" + q_index + '_' + c_index + "]", choice.getTitle().replaceAll("\n"," "));
+                }
+            }
+        }
+
         //.formHeader("file-list", addedFileList);
         if (form.getType() == EditPostForm.TYPE_EDIT_POST)
             builder.formHeader("post_edit_reason", form.getEditReason());

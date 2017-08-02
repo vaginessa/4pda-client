@@ -15,9 +15,16 @@ public class Preferences {
 
     public static final class Main {
         public final static String SHOW_NOTIFY_DOT = "main.show_notify_dot";
+        public final static String NOTIFY_DOT_FAV = "main.notify_dot_fav";
+        public final static String NOTIFY_DOT_QMS = "main.notify_dot_qms";
+        public final static String NOTIFY_DOT_MENTIONS = "main.notify_dot_mentions";
+
         public final static String WEBVIEW_FONT_SIZE = "main.webview.font_size";
         public final static String IS_SYSTEM_DOWNLOADER = "main.is_system_downloader";
         public final static String IS_TABS_BOTTOM = "main.drawers.tab_stack_bottom";
+        public final static String IS_EDITOR_MONOSPACE = "message_panel.is_monospace";
+        public final static String IS_EDITOR_DEFAULT_HIDDEN = "message_panel.is_default_hidden";
+        public final static String SCROLL_BUTTON_ENABLE = "main.scroll_button.enable";
 
         public static boolean isTabsBottom(){
             return preferences().getBoolean(Main.IS_TABS_BOTTOM, false);
@@ -118,6 +125,14 @@ public class Preferences {
 
         public static final class Mentions {
             private final static String PREFIX = Notifications.PREFIX + "mentions.";
+            public final static String ENABLED = PREFIX + "enabled";
+
+            public static boolean isEnabled() {
+                return preferences().getBoolean(ENABLED, true);
+            }
+        }
+        public static final class Update {
+            private final static String PREFIX = Notifications.PREFIX + "update.";
             public final static String ENABLED = PREFIX + "enabled";
 
             public static boolean isEnabled() {
