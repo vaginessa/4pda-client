@@ -19,7 +19,7 @@ data class Response<T>(val status: Status,
                        val message: String?) {
 
     companion object {
-
+        const val NO_NETWORK = "no.network"
         const val LOAD_DATA_FROM_NETWORK = "load.network.data"
         const val WORKING_WITH_DATA = "working.with.data"
         const val DATA_IS_EMPTY = "data.is.empty"

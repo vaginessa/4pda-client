@@ -12,7 +12,7 @@ import forpdateam.ru.forpda.fragments.forum.ForumFragment;
 import forpdateam.ru.forpda.fragments.mentions.MentionsFragment;
 import forpdateam.ru.forpda.fragments.qms.QmsContactsFragment;
 import forpdateam.ru.forpda.fragments.search.SearchFragment;
-import forpdateam.ru.forpda.news.main.NewsParentFragment;
+import forpdateam.ru.forpda.fragments.news.main.NewsParentFragment;
 
 /**
  * Created by radiationx on 02.05.17.

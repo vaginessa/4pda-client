@@ -22,6 +22,7 @@ class News {
     var moreNews: String = ""
     var navId: String = ""
     var comments: String = ""
+    var lastUpdate: Long = 0L
 
 
     // other

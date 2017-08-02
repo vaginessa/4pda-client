@@ -1,63 +1,23 @@
 package forpdateam.ru.forpda.data
 
+
 import forpdateam.ru.forpda.api.Api
 import forpdateam.ru.forpda.api.Utils
+import forpdateam.ru.forpda.api.news.Constants.*
 import forpdateam.ru.forpda.api.regex.RegexStorage
 import forpdateam.ru.forpda.ext.logger
-import java.util.ArrayList
+import forpdateam.ru.forpda.utils.html
+import io.reactivex.Single
+import java.util.*
 import java.util.regex.Pattern
 
-
-import forpdateam.ru.forpda.api.news.Constants.NEWS_CATEGORY_ALL
-import forpdateam.ru.forpda.api.news.Constants.NEWS_CATEGORY_ARTICLES
-import forpdateam.ru.forpda.api.news.Constants.NEWS_CATEGORY_GAMES
-import forpdateam.ru.forpda.api.news.Constants.NEWS_CATEGORY_REVIEWS
-import forpdateam.ru.forpda.api.news.Constants.NEWS_CATEGORY_SOFTWARE
-import forpdateam.ru.forpda.api.news.Constants.NEWS_SUBCATEGORY_ACCESSORIES_REVIEWS
-import forpdateam.ru.forpda.api.news.Constants.NEWS_SUBCATEGORY_ACOUSTICS_REVIEWS
-import forpdateam.ru.forpda.api.news.Constants.NEWS_SUBCATEGORY_ANDROID_GAME
-import forpdateam.ru.forpda.api.news.Constants.NEWS_SUBCATEGORY_ANDROID_SOFTWARE
-import forpdateam.ru.forpda.api.news.Constants.NEWS_SUBCATEGORY_DEVSTORY_GAMES
-import forpdateam.ru.forpda.api.news.Constants.NEWS_SUBCATEGORY_DEVSTORY_SOFTWARE
-import forpdateam.ru.forpda.api.news.Constants.NEWS_SUBCATEGORY_HOW_TO_ANDROID
-import forpdateam.ru.forpda.api.news.Constants.NEWS_SUBCATEGORY_HOW_TO_INTERVIEW
-import forpdateam.ru.forpda.api.news.Constants.NEWS_SUBCATEGORY_HOW_TO_IOS
-import forpdateam.ru.forpda.api.news.Constants.NEWS_SUBCATEGORY_HOW_TO_WP
-import forpdateam.ru.forpda.api.news.Constants.NEWS_SUBCATEGORY_IOS_GAME
-import forpdateam.ru.forpda.api.news.Constants.NEWS_SUBCATEGORY_IOS_SOFTWARE
-import forpdateam.ru.forpda.api.news.Constants.NEWS_SUBCATEGORY_NOTEBOOKS_REVIEWS
-import forpdateam.ru.forpda.api.news.Constants.NEWS_SUBCATEGORY_SMARTPHONES_REVIEWS
-import forpdateam.ru.forpda.api.news.Constants.NEWS_SUBCATEGORY_SMART_WATCH_REVIEWS
-import forpdateam.ru.forpda.api.news.Constants.NEWS_SUBCATEGORY_TABLETS_REVIEWS
-import forpdateam.ru.forpda.api.news.Constants.NEWS_SUBCATEGORY_WP7_GAME
-import forpdateam.ru.forpda.api.news.Constants.NEWS_SUBCATEGORY_WP7_SOFTWARE
-import forpdateam.ru.forpda.api.news.Constants.NEWS_URL_ACCESSORIES_REVIEWS
-import forpdateam.ru.forpda.api.news.Constants.NEWS_URL_ACOUSTICS_REVIEWS
-import forpdateam.ru.forpda.api.news.Constants.NEWS_URL_ALL
-import forpdateam.ru.forpda.api.news.Constants.NEWS_URL_ANDROID_GAME
-import forpdateam.ru.forpda.api.news.Constants.NEWS_URL_ANDROID_SOFTWARE
-import forpdateam.ru.forpda.api.news.Constants.NEWS_URL_ARTICLES
-import forpdateam.ru.forpda.api.news.Constants.NEWS_URL_DEVSTORY_GAMES
-import forpdateam.ru.forpda.api.news.Constants.NEWS_URL_DEVSTORY_SOFTWARE
-import forpdateam.ru.forpda.api.news.Constants.NEWS_URL_GAMES
-import forpdateam.ru.forpda.api.news.Constants.NEWS_URL_HOW_TO_ANDROID
-import forpdateam.ru.forpda.api.news.Constants.NEWS_URL_HOW_TO_INTERVIEW
-import forpdateam.ru.forpda.api.news.Constants.NEWS_URL_HOW_TO_IOS
-import forpdateam.ru.forpda.api.news.Constants.NEWS_URL_HOW_TO_WP
-import forpdateam.ru.forpda.api.news.Constants.NEWS_URL_IOS_GAME
-import forpdateam.ru.forpda.api.news.Constants.NEWS_URL_IOS_SOFTWARE
-import forpdateam.ru.forpda.api.news.Constants.NEWS_URL_NOTEBOOKS_REVIEWS
-import forpdateam.ru.forpda.api.news.Constants.NEWS_URL_REVIEWS
-import forpdateam.ru.forpda.api.news.Constants.NEWS_URL_SMARTPHONES_REVIEWS
-import forpdateam.ru.forpda.api.news.Constants.NEWS_URL_SMART_WATCH_REVIEWS
-import forpdateam.ru.forpda.api.news.Constants.NEWS_URL_SOFTWARE
-import forpdateam.ru.forpda.api.news.Constants.NEWS_URL_TABLETS_REVIEWS
-import forpdateam.ru.forpda.api.news.Constants.NEWS_URL_WP7_GAME
-import forpdateam.ru.forpda.api.news.Constants.NEWS_URL_WP7_SOFTWARE
 /**
  * Created by isanechek on 7/20/17.
  */
 object NewsApi4K {
+
+    private val TAG = NewsApi4K::class.java.simpleName
+    const val EMPTY_OR_NULL_RESPONSE_FROM_NETWORK = "newtrork.null"
 
     // public function
 
@@ -93,9 +53,38 @@ object NewsApi4K {
         return cache
     }
 
+    fun getNews(source: String?) : News {
+        val regex = RegexStorage.News.Details.getRootDetailsPattern()
+        val pattern = Pattern.compile(regex)
+        val matcher = pattern.matcher(source)
+        val model = News()
+        while (matcher.find()) {
+            model.body = transformationPage(matcher.group(1))
+            model.moreNews = matcher.group(2)
+            model.navId = matcher.group(3)
+            model.comments = matcher.group(5)
+        }
+        return model
+    }
+
+    private fun transformationPage(source: String?) : String {
+        logger("$TAG transformationPage source $source")
+        var response = ""
+        source?.let {
+           val re = html {
+              body { +source }
+           }
+
+            response = re.toString()
+        }
+        return response
+    }
+
     fun getTopCommentsNews(source: String?) {
 
     }
+
+    fun getSingleSource(request: Request): Single<String>  = Single.fromCallable { request.url?.let { getSource(it) } }
 
     fun getSource(category: String, pageNumber: Int = 0) : String? {
         var url = getUrl(category)
@@ -103,7 +92,8 @@ object NewsApi4K {
         return getSource(url)
     }
 
-    fun getSource(url: String) : String? = Api.getWebClient().get(url).body
+    // чтобы блядь не было null
+    fun getSource(url: String) : String = Api.getWebClient().get(url).body ?: EMPTY_OR_NULL_RESPONSE_FROM_NETWORK
 
     // private function
     private fun getUrl(category: String): String {
@@ -134,12 +124,4 @@ object NewsApi4K {
         }
         return NEWS_URL_ALL
     }
-
-//
-//    companion object {
-//        private const val TAG = "NewsApi4K"
-//        var INSTANCE: NewsApi4K? = null
-//        fun createInstance() { INSTANCE = NewsApi4K() }
-//        fun  getInstance(): NewsApi4K = INSTANCE ?: throw IllegalStateException("No Created News Api Instance!!!")
-//    }
 }

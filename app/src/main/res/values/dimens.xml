@@ -23,4 +23,5 @@
 
     <!--News Category-->
     <dimen name="news_title_size_18sp">18sp</dimen>
+    <dimen name="detail_backdrop_height">256dp</dimen>
 </resources>

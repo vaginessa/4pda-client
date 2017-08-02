@@ -225,8 +225,6 @@ public class App extends android.app.Application {
         templates.put(TEMPLATE_QMS_CHAT, findTemplate(TEMPLATE_QMS_CHAT));
         templates.put(TEMPLATE_QMS_CHAT_MESS, findTemplate(TEMPLATE_QMS_CHAT_MESS));
 
-//        NewsRepository.Companion.createInstance();
-
         //init
         Realm.init(this);
         RealmConfiguration configuration = new RealmConfiguration.Builder()

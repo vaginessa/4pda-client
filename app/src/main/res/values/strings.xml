@@ -78,6 +78,10 @@
     <string name="downloads_network_error">Не удалось загрузить данные из сети.</string>
     <string name="working_with_data_error">Не удалось обработать данные.</string>
 
+    <!--News Category Fragment-->
+    <string name="category_title_text">Новости</string>
+    <string name="category_header_title_text">Выбор категории </string>
+
 
     <!--For test-->
     <string name="test_comment">На большом воздушном шаре мы летали и хуйню в комментах на 4 пда писали.\nМы писали, мы писали, наши пальчики устали. О Божечки, какую хуйню мы тут понаписали.\nТипичный юзер 4пда. (с)</string>
