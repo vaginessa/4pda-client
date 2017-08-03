@@ -27,7 +27,7 @@ class NewsDetailsCommentsFragment : LifecycleFragment(), SwipeRefreshLayout.OnRe
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        refresh = view?.findViewById(R.id.news_details_content_refresh) as SwipeRefreshLayout
+        refresh = view?.findViewById(R.id.news_details_comments_refresh) as SwipeRefreshLayout
         refresh.setOnRefreshListener(this)
         refresh.setColorSchemeColors(ContextCompat.getColor(activity, R.color.colorAccent))
         list = view.findViewById(R.id.news_details_comments_list) as RecyclerView

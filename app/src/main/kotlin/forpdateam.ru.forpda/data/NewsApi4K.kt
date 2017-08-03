@@ -6,6 +6,7 @@ import forpdateam.ru.forpda.api.Utils
 import forpdateam.ru.forpda.api.news.Constants.*
 import forpdateam.ru.forpda.api.regex.RegexStorage
 import forpdateam.ru.forpda.ext.logger
+import forpdateam.ru.forpda.utils.NewsHtmlBuilder
 import forpdateam.ru.forpda.utils.html
 import io.reactivex.Single
 import java.util.*
@@ -59,7 +60,7 @@ object NewsApi4K {
         val matcher = pattern.matcher(source)
         val model = News()
         while (matcher.find()) {
-            model.body = transformationPage(matcher.group(1))
+            model.body = NewsHtmlBuilder.transformBody(matcher.group(1))
             model.moreNews = matcher.group(2)
             model.navId = matcher.group(3)
             model.comments = matcher.group(5)
@@ -93,7 +94,7 @@ object NewsApi4K {
     }
 
     // чтобы блядь не было null
-    fun getSource(url: String) : String = Api.getWebClient().get(url).body ?: EMPTY_OR_NULL_RESPONSE_FROM_NETWORK
+    fun getSource(url: String) : String = Api.getWebClient().get(url.replace("\"//".toRegex(), "\"http://")).body ?: EMPTY_OR_NULL_RESPONSE_FROM_NETWORK
 
     // private function
     private fun getUrl(category: String): String {

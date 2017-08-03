@@ -1,45 +1,28 @@
 package forpdateam.ru.forpda.fragments.news.details
 
 import android.os.Bundle
-import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
 import android.support.v4.view.ViewPager
-import android.view.LayoutInflater
 import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
 import forpdateam.ru.forpda.R
+import forpdateam.ru.forpda.base.BaseParentFragment
 import forpdateam.ru.forpda.ext.gone
-import forpdateam.ru.forpda.ext.logger
-import forpdateam.ru.forpda.fragments.TabFragment
 import forpdateam.ru.forpda.fragments.news.details.comments.main.NewsDetailsCommentsFragment
 import forpdateam.ru.forpda.fragments.news.details.content.NewsDetailsContentFragment
 
 /**
  * Created by isanechek on 7/30/17.
  */
-class NewsDetailsParentFragment : TabFragment() {
+class NewsDetailsParentFragment : BaseParentFragment() {
+    override fun getMenuId(): Int = R.menu.news_details_bn_menu
 
     private var prevMenuItem: MenuItem? = null
 
-    // view's
-    private lateinit var navigation: BottomNavigationView
-    private lateinit var pager: ViewPager
-
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        baseInflateFragment(inflater, LAYOUT)
-        navigation = findViewById(R.id.news_bottom_navigation) as BottomNavigationView
-        navigation.inflateMenu(R.menu.news_details_bn_menu)
-        pager = findViewById(R.id.news_bottom_viewpager) as ViewPager
-        val detailsAdapter = PagerAdapter(childFragmentManager)
-        pager.adapter = detailsAdapter
-        return view
-    }
-
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        pager.adapter = PagerAdapter(childFragmentManager)
         navigation.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.action_details_content -> pager.currentItem = 0
@@ -67,9 +50,9 @@ class NewsDetailsParentFragment : TabFragment() {
     internal inner class PagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm) {
 
         override fun getItem(position: Int): Fragment = when (position) {
-//            0 -> NewsDetailsContentFragment.createInstance(arguments)
-//            1 -> NewsDetailsCommentsFragment.createInstance(arguments)
-            else -> throw IllegalArgumentException("Fragment Not Found")
+            0 -> NewsDetailsContentFragment.createInstance(arguments)
+            1 -> NewsDetailsCommentsFragment.createInstance(arguments)
+            else -> NewsDetailsContentFragment.createInstance(arguments)
         }
 
         override fun getCount(): Int = 2
@@ -78,7 +61,6 @@ class NewsDetailsParentFragment : TabFragment() {
 
     companion object {
         private val TAG = NewsDetailsParentFragment::class.java.simpleName
-        private val LAYOUT: Int = R.layout.news_details_parent_layout
         const val NEWS_URL = "news.url"
         const val NEWS_IMG_URL = "news.img.url"
         const val NEWS_TITLE = "news.title"
@@ -89,6 +71,6 @@ class NewsDetailsParentFragment : TabFragment() {
     init {
         configuration.isAlone = true
         configuration.isUseCache = true
-//        appBarLayout.gone()
+        appBarLayout.gone()
     }
 }

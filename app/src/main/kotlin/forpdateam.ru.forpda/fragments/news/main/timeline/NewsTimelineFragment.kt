@@ -197,16 +197,12 @@ class NewsTimelineFragment : LifecycleFragment(), NewsAdapter.ItemClickListener,
     private fun openDetailsFragment(itemView: View, position: Int) {
         val model = rootAdapter.getItem(position)
         model.url.let {
-            logger("$TAG CLICK ON ITEM ${model.url}, ${model.imgUrl}")
-            logger("$TAG CLICK ON ITEM ${model.title}")
-            logger("$TAG CLICK ON ITEM ${model.author}, ${model.date}")
             val args = Bundle()
-//            args.putString(NewsDetailsParentFragment.NEWS_IMG_URL, model.imgUrl)
-//            args.putString(NewsDetailsParentFragment.NEWS_TITLE, model.title)
-//            args.putString(NewsDetailsParentFragment.NEWS_URL, model.url)
-//            args.putString(NewsDetailsParentFragment.NEWS_AUTHOR, model.author)
-//            args.putString(NewsDetailsParentFragment.NEWS_DATE, model.date)
-            args.putString("news.url.", model.url)
+            args.putString(NewsDetailsParentFragment.NEWS_IMG_URL, model.imgUrl)
+            args.putString(NewsDetailsParentFragment.NEWS_TITLE, model.title)
+            args.putString(NewsDetailsParentFragment.NEWS_URL, model.url)
+            args.putString(NewsDetailsParentFragment.NEWS_AUTHOR, model.author)
+            args.putString(NewsDetailsParentFragment.NEWS_DATE, model.date)
             TabManager.getInstance().add(TabFragment.Builder(NewsDetailsParentFragment::class.java).setArgs(args).build())
         }
     }

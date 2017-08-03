@@ -100,9 +100,9 @@ class NewsDetailsContentFragment : LifecycleFragment(), SwipeRefreshLayout.OnRef
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(NewsContentViewModel::class.java)
-//        infoTitle.text = arguments.getString(NewsDetailsParentFragment.NEWS_TITLE)
-//        infoAuthor.text = arguments.getString(NewsDetailsParentFragment.NEWS_AUTHOR)
-//        infoDate.text = arguments.getString(NewsDetailsParentFragment.NEWS_DATE)
+        infoTitle.text = arguments.getString(NewsDetailsParentFragment.NEWS_TITLE)
+        infoAuthor.text = arguments.getString(NewsDetailsParentFragment.NEWS_AUTHOR)
+        infoDate.text = arguments.getString(NewsDetailsParentFragment.NEWS_DATE)
 
         newsUrl?.let { url -> viewModel.loadData(Request(url, null)).observe(this, android.arch.lifecycle.Observer<Response<News>> {
             it?.let { item ->
@@ -110,6 +110,7 @@ class NewsDetailsContentFragment : LifecycleFragment(), SwipeRefreshLayout.OnRef
                 if (item.data != null) {
                     val data = item.data
                     logger("$TAG RESULT ${data.body}")
+                    webView.loadDataWithBaseURL("http://4pda.ru/", data.body, "text/html", "utf-8", null)
                 }
             }
         })}
@@ -126,7 +127,6 @@ class NewsDetailsContentFragment : LifecycleFragment(), SwipeRefreshLayout.OnRef
 
     companion object {
         private val TAG = NewsDetailsContentFragment::class.java.simpleName
-        private val NEWS_ID = "id.news"
         fun createInstance(args: Bundle) : NewsDetailsContentFragment {
             val fragment = NewsDetailsContentFragment()
             fragment.arguments = args
