@@ -154,6 +154,8 @@ public class App extends android.app.Application {
         return webViewNotFound;
     }
 
+    private RealmConfiguration newsConfiguration;
+
     @SuppressLint("NewApi")
     @Override
     public void onCreate() {
@@ -233,6 +235,13 @@ public class App extends android.app.Application {
                 .deleteRealmIfMigrationNeeded()
                 .build();
         Realm.setDefaultConfiguration(configuration);
+        // for news
+        // чтобы потом можно было спокойно мигрировать на Room b не сломать все к херам
+        newsConfiguration = new RealmConfiguration.Builder()
+                .name("news.realm")
+                .schemaVersion(1)
+                .deleteRealmIfMigrationNeeded()
+                .build();
         Client.getInstance();
 
 
@@ -260,6 +269,10 @@ public class App extends android.app.Application {
 
             registerReceiver(receiver, new IntentFilter(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED));
         }
+    }
+
+    public RealmConfiguration getNewsRealmConfiguration() {
+        return newsConfiguration;
     }
 
     public void addPreferenceChangeObserver(Observer observer) {

@@ -1,12 +1,16 @@
 package forpdateam.ru.forpda.data
 
+import io.realm.RealmObject
+import io.realm.annotations.PrimaryKey
+
 /**
  * Created by isanechek on 6/19/17.
  */
 //@Entity(tableName = "news")
-class News {
+open class News : RealmObject() {
 //    @PrimaryKey(autoGenerate = true)
-    var _id: Long = 0L
+//    var _id: Long = 0L
+    @PrimaryKey
     var url: String = ""
     var title: String = ""
     var description: String = ""

@@ -23,6 +23,7 @@ data class Response<T>(val status: Status,
         const val LOAD_DATA_FROM_NETWORK = "load.network.data"
         const val WORKING_WITH_DATA = "working.with.data"
         const val DATA_IS_EMPTY = "data.is.empty"
+        const val BAD_REQUEST = "is.request.bad"
         const val DATA_IS_EMPTY_NETWORK = "data.is.empty.network"
         // load more action
         const val LOAD_MORE_DATA = "load.more.date"
