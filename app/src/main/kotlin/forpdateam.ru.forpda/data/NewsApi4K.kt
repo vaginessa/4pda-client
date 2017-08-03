@@ -9,6 +9,9 @@ import forpdateam.ru.forpda.ext.logger
 import forpdateam.ru.forpda.utils.NewsHtmlBuilder
 import forpdateam.ru.forpda.utils.html
 import io.reactivex.Single
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+import org.jsoup.nodes.Element
 import java.util.*
 import java.util.regex.Pattern
 
@@ -81,8 +84,35 @@ object NewsApi4K {
         return response
     }
 
-    fun getTopCommentsNews(source: String?) {
-
+    /*Этот стыд нужно переписать. Ибо тормозит весь процесс движения к счастью.*/
+    private fun getMoreStuff(source: String) : List<OtherNews> {
+        val cache = mutableListOf<OtherNews>()
+        val doc: Document = Jsoup.parse(source)
+        val elements = doc.body().select("aside")
+        for(i in 0 until elements.size) {
+            val element = elements[i] as Element
+            for (j in 0 until element.children().size) {
+                val el = element.children()[j] as Element
+                for (l in 0 until el.children().size) {
+                    val tag = el.children()[l] as Element
+                    var category = ""
+                    when {
+                        tag.tagName() == "h2" -> category = tag.text()
+                        tag.tagName() == "ul" -> if (category == "Самые комментируемые") {
+                            for (q in 0 until tag.children().size) {
+                                val model = OtherNews()
+                                val e = tag.children()[q] as Element
+                                model.title = e.getElementsByClass("title").select("a").attr("title")
+                                model.url = e.getElementsByClass("title").select("a").attr("href")
+                                model.commentsCount = e.getElementsByClass("price-slider").select("a").text()
+                                cache.add(model)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return cache
     }
 
     fun getSingleSource(request: Request): Single<String>  = Single.fromCallable { request.url?.let { getSource(it) } }
@@ -124,5 +154,71 @@ object NewsApi4K {
             NEWS_SUBCATEGORY_HOW_TO_INTERVIEW -> return NEWS_URL_HOW_TO_INTERVIEW
         }
         return NEWS_URL_ALL
+    }
+
+    // DETAILS
+
+    // Делает что хорое и полезное
+    fun mappingDetailsMoreNews(html: String) : ArrayList<OtherNews> {
+        val cache = ArrayList<OtherNews>()
+        val doc: Document = Jsoup.parse(html)
+        val elements = doc.select("li")
+        (0 until elements.size).forEach { i ->
+            val element = elements[i] as Element
+            val model = OtherNews()
+            model.url = element.select("a").attr("href").replace("?utm_source=thematic1", "")
+            model.title = element.select("a").attr("title")
+            model.imgUrl = element.select("img").attr("src")
+            cache.add(model)
+        }
+        logger("getDetailsMoreNewsJ size cache ${cache.size}")
+        return cache
+    }
+
+    // В хорошую погоду возращает айди(id) next/prev page
+    fun getDetailsNavigation(html: String) : String? {
+        val pattern = RegexStorage.News.Details.getNavigationPattern().toRegex()
+        return pattern.matchEntire(html)?.groups?.get(1)?.value
+    }
+
+    // Да простит меня Бог Андроида.
+    // И даст сил переписать это на человеческий лад с регулярками и куртизанками.
+    fun getComments(source: String) : ArrayList<Comment> {
+        val cache = ArrayList<Comment>()
+        val doc: Document = Jsoup.parse(source)
+        val element = doc.body()
+
+        (0 until element.children().size)
+                .asSequence()
+                .map { element.child(it) }
+                .forEach {
+                    var nickname = ""
+                    var userUrl = ""
+                    var commentId = ""
+                    var commentDate = ""
+                    var commentText = ""
+                    var commentReplay = ""
+                    when {
+                        it.tagName().contains("div") -> (0 until it.children().size)
+                                .asSequence()
+                                .map { j -> it.child(j) }
+                                .forEach { ee ->
+                                    if (ee.getElementsByClass("heading") != null) {
+                                        val heading = it.getElementsByClass("heading").first()
+                                        userUrl = heading.getElementsByClass("nickname").first().attr("href")
+                                        nickname = heading.getElementsByClass("nickname").first().text()
+                                        commentDate = heading.getElementsByClass("h-meta").first().text()
+                                        commentId = heading.getElementsByClass("h-meta").first().select("a").attr("date-report-comment")
+                                    }
+                                    else if (ee.tagName().contains("p")) commentText = ee.html()
+                                }
+                        it.tagName().contains("ul") -> if (it.children().isNotEmpty()) {
+                            commentReplay = it.toString()
+                        }
+                    }
+                    cache.add(Comment(nickname, userUrl, commentId, commentDate, commentText, commentReplay))
+                }
+        logger("getComments size ${cache.size}")
+        return cache
     }
 }
