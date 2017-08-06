@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -147,7 +148,7 @@ public class App extends android.app.Application {
         return isDarkTheme() ? "dark" : "light";
     }
 
-    boolean webViewNotFound = true;
+    boolean webViewNotFound = false;
 
     public boolean isWebViewNotFound() {
         Log.e("check_wv", "isWebViewNotFound: "+webViewNotFound);
@@ -210,16 +211,21 @@ public class App extends android.app.Application {
         keyboardHeight = getPreferences().getInt("keyboard_height", getContext().getResources().getDimensionPixelSize(R.dimen.default_keyboard_height));
         savedKeyboardHeight = keyboardHeight;
 
-        try {
-            WebSettings.getDefaultUserAgent(App.getContext());
-            webViewNotFound = false;
-        } catch (Exception e) {
-            webViewNotFound = true;
-            Log.e("CHECK_WV", "Android System WebView is not found");
-        }
+        // А те, кто на КК выпилили сами webview... Ну пусть идут нахуй.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            try {
+//            WebSettings.getDefaultUserAgent(App.getContext());
+                PackageManager pm = getPackageManager();
+                pm.getPackageInfo("com.google.android.webview", PackageManager.GET_ACTIVITIES);
+                webViewNotFound = false;
+            } catch (Exception e) {
+                webViewNotFound = true;
+                Log.e("CHECK_WV", "Android System WebView is not found");
+            }
 
-        if (isWebViewNotFound()) {
-            return;
+            if (isWebViewNotFound()) {
+                return;
+            }
         }
 
         templates.put(TEMPLATE_THEME, findTemplate(TEMPLATE_THEME));

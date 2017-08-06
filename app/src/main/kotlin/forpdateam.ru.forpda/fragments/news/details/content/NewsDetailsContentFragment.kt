@@ -25,12 +25,15 @@ import forpdateam.ru.forpda.R
 import forpdateam.ru.forpda.data.News
 import forpdateam.ru.forpda.data.Request
 import forpdateam.ru.forpda.data.Response
+import forpdateam.ru.forpda.ext.loadImageFromNetwork
 import forpdateam.ru.forpda.ext.logger
 import forpdateam.ru.forpda.fragments.news.details.NewsDetailsParentFragment
 import forpdateam.ru.forpda.utils.Bus
 import forpdateam.ru.forpda.utils.ExtendedWebView
 import forpdateam.ru.forpda.utils.ParentCallback
+import forpdateam.ru.forpda.utils.SendData
 import forpdateam.ru.forpda.views.widgets.FixCardView
+import io.reactivex.disposables.CompositeDisposable
 import java.util.*
 
 /**
@@ -54,6 +57,7 @@ class NewsDetailsContentFragment : LifecycleFragment(), SwipeRefreshLayout.OnRef
     private val actionsHandler = Handler(Looper.getMainLooper())
     private val actionsForWebView = LinkedList<Runnable>()
 
+    private var disposable: CompositeDisposable? = null
 
     private var newsUrl: String? = null
     private var webClient: NewsWebViewClient? = null
@@ -69,8 +73,8 @@ class NewsDetailsContentFragment : LifecycleFragment(), SwipeRefreshLayout.OnRef
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        newsUrl = arguments.getString("news.url.")
-        logger("$TAG news id $newsUrl")
+//        newsUrl = arguments.getString("news.details.url")
+        disposable = CompositeDisposable()
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View?
@@ -100,11 +104,19 @@ class NewsDetailsContentFragment : LifecycleFragment(), SwipeRefreshLayout.OnRef
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(NewsContentViewModel::class.java)
-        infoTitle.text = arguments.getString(NewsDetailsParentFragment.NEWS_TITLE)
-        infoAuthor.text = arguments.getString(NewsDetailsParentFragment.NEWS_AUTHOR)
-        infoDate.text = arguments.getString(NewsDetailsParentFragment.NEWS_DATE)
+        if (this.arguments != null) {
+            infoTitle.text = this.arguments.getString(NEWS_TITLE)
+            infoAuthor.text = this.arguments.getString(NEWS_AUTHOR)
+            infoDate.text = this.arguments.getString(NEWS_DATE)
+            cover.loadImageFromNetwork(this.arguments.getString(NEWS_IMG_URL))
+            startObserver(arguments.getString(NEWS_URL))
+        } else logger("$TAG args NULL")
 
-        newsUrl?.let { url -> viewModel.loadData(Request(url, null)).observe(this, android.arch.lifecycle.Observer<Response<News>> {
+
+    }
+
+    private fun startObserver(url: String) {
+        viewModel.loadData(Request(url, null)).observe(this, android.arch.lifecycle.Observer<Response<News>> {
             it?.let { item ->
 
                 if (item.data != null) {
@@ -113,25 +125,28 @@ class NewsDetailsContentFragment : LifecycleFragment(), SwipeRefreshLayout.OnRef
                     webView.loadDataWithBaseURL("http://4pda.ru/", data.body, "text/html", "utf-8", null)
                 }
             }
-        })}
+        })
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         webView.destroy()
+        disposable?.dispose()
     }
 
     override fun onRefresh() {
-        newsUrl?.let { url -> viewModel.refresh(Request(url, null)) }
+//        newsUrl?.let { url -> viewModel.refresh(Request(url, null)) }
     }
 
     companion object {
         private val TAG = NewsDetailsContentFragment::class.java.simpleName
-        fun createInstance(args: Bundle) : NewsDetailsContentFragment {
-            val fragment = NewsDetailsContentFragment()
-            fragment.arguments = args
-            return fragment
-        }
+        fun createInstance() : NewsDetailsContentFragment = NewsDetailsContentFragment()
+
+        const val NEWS_URL = "news.url"
+        const val NEWS_IMG_URL = "news.img.url"
+        const val NEWS_TITLE = "news.title"
+        const val NEWS_AUTHOR = "news.author"
+        const val NEWS_DATE = "news.date"
     }
 
     inner internal class NewsWebViewClient : WebViewClient() {

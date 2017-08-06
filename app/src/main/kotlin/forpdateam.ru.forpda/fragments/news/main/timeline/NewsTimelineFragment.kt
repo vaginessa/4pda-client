@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.*
 import forpdateam.ru.forpda.R
 import forpdateam.ru.forpda.TabManager
+import forpdateam.ru.forpda.TestFrag
 import forpdateam.ru.forpda.api.news.Constants
 import forpdateam.ru.forpda.data.News
 import forpdateam.ru.forpda.data.Request
@@ -23,7 +24,10 @@ import forpdateam.ru.forpda.ext.logger
 import forpdateam.ru.forpda.ext.visible
 import forpdateam.ru.forpda.fragments.TabFragment
 import forpdateam.ru.forpda.fragments.news.details.NewsDetailsParentFragment
+import forpdateam.ru.forpda.fragments.news.details.content.NewsDetailsContentFragment
 import forpdateam.ru.forpda.pref.Preferences
+import forpdateam.ru.forpda.utils.Bus
+import forpdateam.ru.forpda.utils.SendData
 import forpdateam.ru.forpda.views.widgets.FixCardView
 import forpdateam.ru.forpda.views.widgets.RecyclerViewHeader
 
@@ -167,10 +171,27 @@ class NewsTimelineFragment : LifecycleFragment(), NewsAdapter.ItemClickListener,
     }
 
     override fun itemClick(itemView: View, position: Int) {
-        openDetailsFragment(itemView, position)
+        val model = rootAdapter.getItem(position)
+        logger("TEST CLICK ${model.url}")
+        val args = Bundle()
+        args.putString(NewsDetailsContentFragment.NEWS_IMG_URL, model.imgUrl)
+        args.putString(NewsDetailsContentFragment.NEWS_TITLE, model.title)
+        args.putString(NewsDetailsContentFragment.NEWS_URL, model.url)
+        args.putString(NewsDetailsContentFragment.NEWS_AUTHOR, model.author)
+        args.putString(NewsDetailsContentFragment.NEWS_DATE, model.date)
+        TabManager.getInstance().add(TabFragment.Builder(NewsDetailsParentFragment::class.java).setArgs(args).build())
     }
 
     override fun itemLongClick(position: Int) {
+        logger("$TAG item LONG click ${rootAdapter.getItem(position).title}")
+    }
+
+    override fun offlineClick(position: Int) {
+        logger("$TAG item OFFLINE click ${rootAdapter.getItem(position).title}")
+    }
+
+    override fun shareClick(view: View, position: Int) {
+        logger("$TAG item SHARE click ${rootAdapter.getItem(position).title}")
     }
 
     private fun initHeaderView(view: View) {
@@ -184,7 +205,6 @@ class NewsTimelineFragment : LifecycleFragment(), NewsAdapter.ItemClickListener,
         topAdapter = NewsTopAdapter()
         topAdapter.setOnClickItemListener(object : NewsTopAdapter.ItemClickListener {
             override fun itemClick(itemView: View, position: Int) {
-                openDetailsFragment(itemView, position)
             }
 
             override fun itemLongClick(position: Int) {
@@ -192,19 +212,6 @@ class NewsTimelineFragment : LifecycleFragment(), NewsAdapter.ItemClickListener,
 
         })
         topList.adapter = topAdapter
-    }
-
-    private fun openDetailsFragment(itemView: View, position: Int) {
-        val model = rootAdapter.getItem(position)
-        model.url.let {
-            val args = Bundle()
-            args.putString(NewsDetailsParentFragment.NEWS_IMG_URL, model.imgUrl)
-            args.putString(NewsDetailsParentFragment.NEWS_TITLE, model.title)
-            args.putString(NewsDetailsParentFragment.NEWS_URL, model.url)
-            args.putString(NewsDetailsParentFragment.NEWS_AUTHOR, model.author)
-            args.putString(NewsDetailsParentFragment.NEWS_DATE, model.date)
-            TabManager.getInstance().add(TabFragment.Builder(NewsDetailsParentFragment::class.java).setArgs(args).build())
-        }
     }
 
     companion object {

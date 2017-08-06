@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import forpdateam.ru.forpda.R
+import forpdateam.ru.forpda.ext.gone
 import forpdateam.ru.forpda.fragments.TabFragment
 
 /**
@@ -19,6 +20,7 @@ abstract class BaseParentFragment : TabFragment() {
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
+        appBarLayout.gone()
         baseInflateFragment(inflater, R.layout.bottom_navigation_layout)
         navigation = findViewById(R.id.news_bottom_navigation) as BottomNavigationView
         navigation.inflateMenu(getMenuId())

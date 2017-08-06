@@ -3,9 +3,11 @@ package forpdateam.ru.forpda.client;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.webkit.WebSettings;
 
@@ -50,8 +52,10 @@ import okio.Sink;
 
 import static forpdateam.ru.forpda.ext.LogExtKt.logger;
 
+
 public class Client implements IWebClient {
-    private final static String userAgent = WebSettings.getDefaultUserAgent(App.getContext());
+//    private final static String userAgent = WebSettings.getDefaultUserAgent(App.getContext());
+    public static final String USER_AGENT = "Mozilla/5.0 (Linux; Android 4.4; Nexus 5 Build/_BuildID_) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/30.0.0.0 Mobile Safari/537.36";
     private final static Pattern countsPattern = Pattern.compile("<a href=\"(?:https?)?\\/\\/4pda\\.ru\\/forum\\/index\\.php\\?act=mentions[^>]*?><i[^>]*?>(\\d+)<\\/i>[\\s\\S]*?act=fav[^>]*?><i[^>]*?>(\\d+)<\\/i>[\\s\\S]*?act=qms[^>]*?data-count=\"(\\d+)\">");
     private final static Pattern errorPattern = Pattern.compile("^[\\s\\S]*?wr va-m text\">([\\s\\S]*?)</div></div></div></div><div class=\"footer\">");
     private static Client INSTANCE = null;
@@ -261,7 +265,7 @@ public class Client implements IWebClient {
 
         Request.Builder requestBuilder = new Request.Builder()
                 .url(url)
-                .header("User-Agent", userAgent);
+                .header("User-Agent", USER_AGENT);
         if (request.getHeaders() != null) {
             for (Map.Entry<String, String> entry : request.getHeaders().entrySet()) {
                 Log.d("FORPDA_LOG", "HEADER " + entry.getKey() + " : " + entry.getValue());

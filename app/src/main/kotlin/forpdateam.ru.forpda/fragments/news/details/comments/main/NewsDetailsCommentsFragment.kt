@@ -43,6 +43,6 @@ class NewsDetailsCommentsFragment : LifecycleFragment(), SwipeRefreshLayout.OnRe
     }
 
     companion object {
-        fun createInstance(args: Bundle) : NewsDetailsCommentsFragment = NewsDetailsCommentsFragment()
+        fun createInstance() : NewsDetailsCommentsFragment = NewsDetailsCommentsFragment()
     }
 }

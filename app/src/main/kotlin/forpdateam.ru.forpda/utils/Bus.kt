@@ -10,6 +10,7 @@ import io.reactivex.subjects.PublishSubject
 data class BackgroundProgress(val show: Boolean)
 data class NetworkStatus(val status: Boolean)
 data class ParentCallback(val title: String, val imgUrl: String)
+data class SendData(val title: String, val img: String, val author: String, val url: String, val date: String)
 
 object Bus {
     private val publisher = PublishSubject.create<Any>()

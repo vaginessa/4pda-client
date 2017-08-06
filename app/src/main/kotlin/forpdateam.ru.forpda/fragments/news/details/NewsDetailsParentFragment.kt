@@ -9,6 +9,7 @@ import android.view.MenuItem
 import forpdateam.ru.forpda.R
 import forpdateam.ru.forpda.base.BaseParentFragment
 import forpdateam.ru.forpda.ext.gone
+import forpdateam.ru.forpda.ext.logger
 import forpdateam.ru.forpda.fragments.news.details.comments.main.NewsDetailsCommentsFragment
 import forpdateam.ru.forpda.fragments.news.details.content.NewsDetailsContentFragment
 
@@ -50,9 +51,9 @@ class NewsDetailsParentFragment : BaseParentFragment() {
     internal inner class PagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm) {
 
         override fun getItem(position: Int): Fragment = when (position) {
-            0 -> NewsDetailsContentFragment.createInstance(arguments)
-            1 -> NewsDetailsCommentsFragment.createInstance(arguments)
-            else -> NewsDetailsContentFragment.createInstance(arguments)
+            0 -> NewsDetailsContentFragment.createInstance()
+            1 -> NewsDetailsCommentsFragment.createInstance()
+            else -> NewsDetailsContentFragment.createInstance()
         }
 
         override fun getCount(): Int = 2
@@ -61,16 +62,12 @@ class NewsDetailsParentFragment : BaseParentFragment() {
 
     companion object {
         private val TAG = NewsDetailsParentFragment::class.java.simpleName
-        const val NEWS_URL = "news.url"
-        const val NEWS_IMG_URL = "news.img.url"
-        const val NEWS_TITLE = "news.title"
-        const val NEWS_AUTHOR = "news.author"
-        const val NEWS_DATE = "news.date"
+
     }
 
     init {
         configuration.isAlone = true
         configuration.isUseCache = true
-        appBarLayout.gone()
+
     }
 }

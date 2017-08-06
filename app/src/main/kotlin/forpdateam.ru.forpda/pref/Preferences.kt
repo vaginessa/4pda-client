@@ -10,7 +10,7 @@ open class Preferences {
 
     open class News {
         open var compatItem: Boolean
-            get() = App.getInstance().preferences.getBoolean("news.list.compat", false)
+            get() = App.getInstance().preferences.getBoolean("news.list.compat", true)
             set(value) = App.getInstance().preferences.edit().putBoolean("news.list.compat", value).apply()
 
         open var showTopCommentsNew: Boolean
