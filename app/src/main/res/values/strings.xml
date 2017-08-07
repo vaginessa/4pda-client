@@ -82,6 +82,40 @@
     <string name="category_title_text">Новости</string>
     <string name="category_header_title_text">Выбор категории </string>
 
+    <!--News Category-->
+    <string name="category_news">Новости</string>
+    <string name="category_article">Cтатьи</string>
+    <string name="category_reviews">Обзоры</string>
+    <string name="category_software">Программы</string>
+    <string name="category_games">Игры</string>
+
+    <!--News Category Articles-->
+    <string name="article_android">how to android</string>
+    <string name="article_ios">how to ios</string>
+    <string name="article_wp">how to wp</string>
+    <string name="article_interview">Интервью</string>
+
+    <!--News Category Software-->
+    <string name="software_android">android</string>
+    <string name="software_ios">ios</string>
+    <string name="software_wp">wp</string>
+    <string name="software_story">DevStory</string>
+
+    <!--News Category Games-->
+    <string name="games_android">android</string>
+    <string name="games_ios">ios</string>
+    <string name="games_wp">wp</string>
+    <string name="games_story">DevStory</string>
+
+    <!--News Category Reviews-->
+    <string name="reviews_phones">смартфоны</string>
+    <string name="reviews_tablets">планшеты</string>
+    <string name="reviews_watch">умные часы</string>
+    <string name="reviews_acoustics">акустика</string>
+    <string name="reviews_notebooks">ноутбуки</string>
+    <string name="reviews_accessories">аксессуары</string>
+
+    <string name="sub_category_all">без фильтра</string>
 
     <!--For test-->
     <string name="test_comment">На большом воздушном шаре мы летали и хуйню в комментах на 4 пда писали.\nМы писали, мы писали, наши пальчики устали. О Божечки, какую хуйню мы тут понаписали.\nТипичный юзер 4пда. (с)</string>

@@ -23,6 +23,7 @@ class NewsDetailsParentFragment : BaseParentFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        appBarLayout.gone()
         pager.adapter = PagerAdapter(childFragmentManager)
         navigation.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {

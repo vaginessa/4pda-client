@@ -1,6 +1,7 @@
 package forpdateam.ru.forpda.data
 
 
+import forpdateam.ru.forpda.R
 import forpdateam.ru.forpda.api.Api
 import forpdateam.ru.forpda.api.Utils
 import forpdateam.ru.forpda.api.news.Constants.*
@@ -155,6 +156,46 @@ object NewsApi4K {
         }
         return NEWS_URL_ALL
     }
+
+    val categoryList: List<Category>
+        get() = listOf(
+                Category(R.string.category_news, generalSubList),
+                Category(R.string.category_article, articlesSubList),
+                Category(R.string.category_reviews, reviewsSubList),
+                Category(R.string.category_software, softwareSubList),
+                Category(R.string.category_games, gamesSubList))
+
+    private val generalSubList = listOf(SubCategory(R.string.sub_category_all, NEWS_CATEGORY_ALL))
+
+    private val gamesSubList = listOf(
+            SubCategory(R.string.sub_category_all, NEWS_CATEGORY_ARTICLES),
+            SubCategory(R.string.games_android, NEWS_SUBCATEGORY_ANDROID_GAME),
+            SubCategory(R.string.games_ios, NEWS_SUBCATEGORY_IOS_GAME),
+            SubCategory(R.string.games_wp, NEWS_SUBCATEGORY_WP7_GAME),
+            SubCategory(R.string.games_story, NEWS_SUBCATEGORY_DEVSTORY_GAMES))
+
+    private val softwareSubList = listOf(
+            SubCategory(R.string.sub_category_all, NEWS_CATEGORY_SOFTWARE),
+            SubCategory(R.string.software_android, NEWS_SUBCATEGORY_ANDROID_SOFTWARE),
+            SubCategory(R.string.software_ios, NEWS_SUBCATEGORY_IOS_SOFTWARE),
+            SubCategory(R.string.software_wp, NEWS_SUBCATEGORY_WP7_SOFTWARE),
+            SubCategory(R.string.software_story, NEWS_SUBCATEGORY_DEVSTORY_SOFTWARE))
+
+    private val reviewsSubList = listOf(
+            SubCategory(R.string.sub_category_all, NEWS_CATEGORY_REVIEWS),
+            SubCategory(R.string.reviews_phones, NEWS_SUBCATEGORY_SMARTPHONES_REVIEWS),
+            SubCategory(R.string.reviews_tablets, NEWS_SUBCATEGORY_TABLETS_REVIEWS),
+            SubCategory(R.string.reviews_watch, NEWS_SUBCATEGORY_SMART_WATCH_REVIEWS),
+            SubCategory(R.string.reviews_accessories, NEWS_SUBCATEGORY_ACCESSORIES_REVIEWS),
+            SubCategory(R.string.reviews_notebooks, NEWS_SUBCATEGORY_NOTEBOOKS_REVIEWS),
+            SubCategory(R.string.reviews_acoustics, NEWS_SUBCATEGORY_ACOUSTICS_REVIEWS))
+
+    private val articlesSubList = listOf(
+            SubCategory(R.string.sub_category_all, NEWS_CATEGORY_ARTICLES),
+            SubCategory(R.string.article_android, NEWS_SUBCATEGORY_HOW_TO_ANDROID),
+            SubCategory(R.string.article_ios, NEWS_SUBCATEGORY_HOW_TO_IOS),
+            SubCategory(R.string.article_wp, NEWS_SUBCATEGORY_HOW_TO_WP),
+            SubCategory(R.string.article_interview, NEWS_SUBCATEGORY_HOW_TO_INTERVIEW))
 
     // DETAILS
 

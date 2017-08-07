@@ -39,4 +39,12 @@
     <attr name="ProfileCardTitleStyle" extension="reference" />
     <attr name="CardStyle" extension="reference" />
 
+    <declare-styleable name="AvatarView">
+        <attr name="av_border_color" format="color" />
+        <attr name="av_border_width" format="dimension" />
+        <attr name="av_text_size_percentage" format="integer" />
+    </declare-styleable>
+    <declare-styleable name="TextViewLabel">
+        <attr name="labelColor" format="color|reference"/>
+    </declare-styleable>
 </resources>

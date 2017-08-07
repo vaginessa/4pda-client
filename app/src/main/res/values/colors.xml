@@ -138,4 +138,7 @@
         <item>#808080</item>
     </array>
 
+    <color name="av_default_border">@android:color/white</color>
+    <color name="av_bitmap_background_color">#424242</color>
+
 </resources>

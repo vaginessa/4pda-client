@@ -20,7 +20,6 @@ abstract class BaseParentFragment : TabFragment() {
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        appBarLayout.gone()
         baseInflateFragment(inflater, R.layout.bottom_navigation_layout)
         navigation = findViewById(R.id.news_bottom_navigation) as BottomNavigationView
         navigation.inflateMenu(getMenuId())
