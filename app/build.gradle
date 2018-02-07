@@ -169,4 +169,8 @@ dependencies {
     compile 'com.robohorse.pagerbullet:pagerbullet:1.0.8'
     compile 'com.github.apg-mobile:android-round-textview:v0.0.3'
     compile 'com.evernote:android-job:1.2.0'
+
+    compile 'com.arello-mobile:moxy:1.5.3'
+    annotationProcessor 'com.arello-mobile:moxy-compiler:1.5.3'
+    compile 'com.arello-mobile:moxy-app-compat:1.5.3'
 }
