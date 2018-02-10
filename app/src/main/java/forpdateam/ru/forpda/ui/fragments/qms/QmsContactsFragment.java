@@ -82,7 +82,6 @@ public class QmsContactsFragment extends RecyclerFragment implements QmsContacts
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        viewsReady();
         initFabBehavior();
         refreshLayoutStyle(refreshLayout);
         refreshLayout.setOnRefreshListener(this::loadData);

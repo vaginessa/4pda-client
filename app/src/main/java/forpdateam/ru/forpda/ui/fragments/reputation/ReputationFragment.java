@@ -92,7 +92,6 @@ public class ReputationFragment extends RecyclerFragment implements ReputationVi
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        viewsReady();
 
         dialogMenu = new DynamicDialogMenu<>();
         dialogMenu.addItem(getString(R.string.profile), (context, data1) -> presenter.navigateToProfile(data1.getUserId()));

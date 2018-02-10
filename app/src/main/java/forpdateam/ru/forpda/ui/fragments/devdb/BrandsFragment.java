@@ -61,7 +61,6 @@ public class BrandsFragment extends RecyclerFragment implements BrandsAdapter.On
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        viewsReady();
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         refreshLayout.setOnRefreshListener(this::loadData);
         titlesWrapper.setVisibility(View.GONE);

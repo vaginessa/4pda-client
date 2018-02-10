@@ -244,7 +244,6 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        viewsReady();
         setFontSize(Preferences.Main.getWebViewSize(getContext()));
 
         notificationButton.setColorFilter(App.getColorFromAttr(getContext(), R.attr.contrast_text_color), PorterDuff.Mode.SRC_ATOP);

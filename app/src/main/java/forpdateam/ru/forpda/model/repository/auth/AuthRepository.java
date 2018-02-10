@@ -20,13 +20,15 @@ public class AuthRepository {
     }
 
     public Observable<AuthForm> loadForm() {
-        return Observable.fromCallable(() -> authApi.getForm())
+        return Observable
+                .fromCallable(() -> authApi.getForm())
                 .subscribeOn(schedulers.io())
                 .observeOn(schedulers.ui());
     }
 
     public Observable<Boolean> signIn(AuthForm authForm) {
-        return Observable.fromCallable(() -> authApi.login(authForm))
+        return Observable
+                .fromCallable(() -> authApi.login(authForm))
                 .subscribeOn(schedulers.io())
                 .observeOn(schedulers.ui());
     }

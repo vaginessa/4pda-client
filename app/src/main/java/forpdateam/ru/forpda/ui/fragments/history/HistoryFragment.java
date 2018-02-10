@@ -67,7 +67,6 @@ public class HistoryFragment extends RecyclerFragment implements HistoryView {
 
         adapter.setItemClickListener(adapterListener);
         refreshLayout.setOnRefreshListener(this::loadCacheData);
-        viewsReady();
     }
 
     @Override

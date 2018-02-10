@@ -360,6 +360,7 @@ public class TabFragment extends MvpAppCompatFragment {
         setTitle(title);
         setSubtitle(subtitle);
         updateNotifyDot();
+        viewsReady();
     }
 
     @Override
@@ -389,7 +390,7 @@ public class TabFragment extends MvpAppCompatFragment {
     }
 
 
-    protected void viewsReady() {
+    private void viewsReady() {
         addBaseToolbarMenu(getMenu());
         if (ClientHelper.getNetworkState(getContext()) && !configuration.isUseCache()) {
             if (!alreadyCallLoad)

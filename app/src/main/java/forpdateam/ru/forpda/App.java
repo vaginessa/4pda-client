@@ -110,7 +110,8 @@ import static org.acra.ReportField.USER_APP_START_DATE;
         resDialogTitle = R.string.crash_title,
         resDialogText = R.string.crash_toast_text,
         resDialogTheme = R.style.DarkAppTheme_Dialog,
-        reportDialogClass = CustomCrashDialog.class
+        reportDialogClass = CustomCrashDialog.class,
+        alsoReportToAndroidFramework = true
 )
 
 public class App extends android.app.Application {

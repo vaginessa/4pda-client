@@ -33,42 +33,45 @@ public class ForumRepository {
     }
 
     public Observable<ForumItemTree> getForums() {
-        return Observable.fromCallable(() -> forumApi.getForums())
+        return Observable
+                .fromCallable(() -> forumApi.getForums())
                 .subscribeOn(schedulers.io())
                 .observeOn(schedulers.ui());
     }
 
     public Observable<ForumItemTree> getCache() {
-        return Observable.fromCallable(() -> {
-            List<ForumItemFlat> items = new ArrayList<>();
-            try (Realm realm = Realm.getDefaultInstance()) {
-                RealmResults<ForumItemFlatBd> results = realm
-                        .where(ForumItemFlatBd.class)
-                        .findAll();
-                for (ForumItemFlatBd itemBd : results) {
-                    items.add(new ForumItemFlat(itemBd));
-                }
-            }
-            ForumItemTree forumItemTree = new ForumItemTree();
-            forumApi.transformToTree(items, forumItemTree);
-            return forumItemTree;
-        })
+        return Observable
+                .fromCallable(() -> {
+                    List<ForumItemFlat> items = new ArrayList<>();
+                    try (Realm realm = Realm.getDefaultInstance()) {
+                        RealmResults<ForumItemFlatBd> results = realm
+                                .where(ForumItemFlatBd.class)
+                                .findAll();
+                        for (ForumItemFlatBd itemBd : results) {
+                            items.add(new ForumItemFlat(itemBd));
+                        }
+                    }
+                    ForumItemTree forumItemTree = new ForumItemTree();
+                    forumApi.transformToTree(items, forumItemTree);
+                    return forumItemTree;
+                })
                 .subscribeOn(schedulers.io())
                 .observeOn(schedulers.ui());
     }
 
     public Completable saveCache(ForumItemTree rootForum) {
-        return Completable.fromRunnable(() -> {
-            try (Realm realm = Realm.getDefaultInstance()) {
-                realm.executeTransaction(r -> {
-                    r.delete(ForumItemFlatBd.class);
-                    List<ForumItemFlatBd> items = new ArrayList<>();
-                    transformToList(items, rootForum);
-                    r.copyToRealmOrUpdate(items);
-                    items.clear();
-                });
-            }
-        })
+        return Completable
+                .fromRunnable(() -> {
+                    try (Realm realm = Realm.getDefaultInstance()) {
+                        realm.executeTransaction(r -> {
+                            r.delete(ForumItemFlatBd.class);
+                            List<ForumItemFlatBd> items = new ArrayList<>();
+                            transformToList(items, rootForum);
+                            r.copyToRealmOrUpdate(items);
+                            items.clear();
+                        });
+                    }
+                })
                 .subscribeOn(schedulers.io())
                 .observeOn(schedulers.ui());
     }

@@ -20,13 +20,15 @@ public class ProfileRepository {
     }
 
     public Observable<ProfileModel> loadProfile(String url) {
-        return Observable.fromCallable(() -> profileApi.getProfile(url))
+        return Observable
+                .fromCallable(() -> profileApi.getProfile(url))
                 .subscribeOn(schedulers.io())
                 .observeOn(schedulers.ui());
     }
 
     public Observable<Boolean> saveNote(String note) {
-        return Observable.fromCallable(() -> profileApi.saveNote(note))
+        return Observable
+                .fromCallable(() -> profileApi.saveNote(note))
                 .subscribeOn(schedulers.io())
                 .observeOn(schedulers.ui());
     }

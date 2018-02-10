@@ -6,6 +6,7 @@ import forpdateam.ru.forpda.api.forum.Forum;
 import forpdateam.ru.forpda.api.mentions.Mentions;
 import forpdateam.ru.forpda.api.profile.Profile;
 import forpdateam.ru.forpda.api.reputation.Reputation;
+import forpdateam.ru.forpda.api.topcis.Topics;
 import forpdateam.ru.forpda.apirx.apiclasses.TopicsRx;
 import forpdateam.ru.forpda.model.repository.auth.AuthRepository;
 import forpdateam.ru.forpda.model.repository.faviorites.FavoritesRepository;
@@ -40,7 +41,7 @@ public class Di {
     public Profile profileApi = new Profile();
     public Reputation reputationApi = new Reputation();
     public Forum forumApi = new Forum();
-    public TopicsRx topicsApi = new TopicsRx();
+    public Topics topicsApi = new Topics();
 
     public FavoritesRepository favoritesRepository = new FavoritesRepository(schedulers, favoritesApi);
     public HistoryRepository historyRepository = new HistoryRepository(schedulers);

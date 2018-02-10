@@ -140,7 +140,6 @@ public class QmsChatFragment extends TabFragment implements ChatThemeCreator.The
         webView.setWebChromeClient(new CustomWebChromeClient());
         loadBaseWebContainer();
 
-        viewsReady();
 
         attachmentsPopup.setAddOnClickListener(v -> tryPickFile());
         attachmentsPopup.setDeleteOnClickListener(v -> {

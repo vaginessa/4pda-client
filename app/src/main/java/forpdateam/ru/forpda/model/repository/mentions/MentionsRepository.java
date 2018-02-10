@@ -19,7 +19,8 @@ public class MentionsRepository {
     }
 
     public Observable<MentionsData> getMentions(int page) {
-        return Observable.fromCallable(() -> mentionsApi.getMentions(page))
+        return Observable
+                .fromCallable(() -> mentionsApi.getMentions(page))
                 .subscribeOn(schedulers.io())
                 .observeOn(schedulers.ui());
     }
