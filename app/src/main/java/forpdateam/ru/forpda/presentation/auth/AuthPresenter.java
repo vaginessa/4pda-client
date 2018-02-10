@@ -4,8 +4,8 @@ import com.arellomobile.mvp.InjectViewState;
 
 import forpdateam.ru.forpda.api.auth.models.AuthForm;
 import forpdateam.ru.forpda.common.mvp.BasePresenter;
-import forpdateam.ru.forpda.model.repository.AuthRepository;
-import forpdateam.ru.forpda.model.repository.ProfileRepository;
+import forpdateam.ru.forpda.model.repository.auth.AuthRepository;
+import forpdateam.ru.forpda.model.repository.profile.ProfileRepository;
 import io.reactivex.disposables.Disposable;
 
 /**

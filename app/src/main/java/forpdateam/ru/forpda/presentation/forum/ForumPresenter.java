@@ -7,7 +7,7 @@ import com.arellomobile.mvp.InjectViewState;
 import forpdateam.ru.forpda.api.forum.models.ForumItemTree;
 import forpdateam.ru.forpda.common.Utils;
 import forpdateam.ru.forpda.common.mvp.BasePresenter;
-import forpdateam.ru.forpda.model.repository.ForumRepository;
+import forpdateam.ru.forpda.model.repository.forum.ForumRepository;
 import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import forpdateam.ru.forpda.ui.fragments.search.SearchFragment;

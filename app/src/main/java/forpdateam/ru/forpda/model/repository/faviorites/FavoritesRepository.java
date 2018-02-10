@@ -1,4 +1,4 @@
-package forpdateam.ru.forpda.model.repository;
+package forpdateam.ru.forpda.model.repository.faviorites;
 
 import java.util.ArrayList;
 import java.util.Collections;

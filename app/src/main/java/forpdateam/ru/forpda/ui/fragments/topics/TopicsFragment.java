@@ -13,14 +13,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.arellomobile.mvp.presenter.InjectPresenter;
+import com.arellomobile.mvp.presenter.ProvidePresenter;
+
 import forpdateam.ru.forpda.App;
+import forpdateam.ru.forpda.Di;
 import forpdateam.ru.forpda.R;
+import forpdateam.ru.forpda.api.reputation.models.RepItem;
 import forpdateam.ru.forpda.api.topcis.models.TopicItem;
 import forpdateam.ru.forpda.api.topcis.models.TopicsData;
 import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.common.Utils;
+import forpdateam.ru.forpda.presentation.topics.TopicsPresenter;
+import forpdateam.ru.forpda.presentation.topics.TopicsView;
 import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.RecyclerFragment;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
@@ -29,16 +36,27 @@ import forpdateam.ru.forpda.ui.fragments.forum.ForumFragment;
 import forpdateam.ru.forpda.ui.fragments.forum.ForumHelper;
 import forpdateam.ru.forpda.ui.fragments.search.SearchFragment;
 import forpdateam.ru.forpda.ui.views.DynamicDialogMenu;
+import forpdateam.ru.forpda.ui.views.adapters.BaseAdapter;
 import forpdateam.ru.forpda.ui.views.pagination.PaginationHelper;
 
 /**
  * Created by radiationx on 01.03.17.
  */
 
-public class TopicsFragment extends RecyclerFragment implements TopicsAdapter.OnItemClickListener<TopicItem> {
+public class TopicsFragment extends RecyclerFragment implements TopicsView {
     public final static String TOPICS_ID_ARG = "TOPICS_ID_ARG";
-    private int id;
+
     private TopicsAdapter adapter;
+    private PaginationHelper paginationHelper;
+    private DynamicDialogMenu<TopicsFragment, TopicItem> dialogMenu;
+
+    @InjectPresenter
+    TopicsPresenter presenter;
+
+    @ProvidePresenter
+    TopicsPresenter provideReputationPresenter() {
+        return new TopicsPresenter(Di.get().topicsRepository);
+    }
 
     public TopicsFragment() {
         configuration.setDefaultTitle(App.get().getString(R.string.fragment_title_topics));
@@ -48,15 +66,9 @@ public class TopicsFragment extends RecyclerFragment implements TopicsAdapter.On
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            id = getArguments().getInt(TOPICS_ID_ARG);
+            presenter.setId(getArguments().getInt(TOPICS_ID_ARG));
         }
     }
-
-
-    private PaginationHelper paginationHelper;
-    private int currentSt = 0;
-    TopicsData data;
-    private DynamicDialogMenu<TopicsFragment, TopicItem> dialogMenu;
 
     @Nullable
     @Override
@@ -71,25 +83,39 @@ public class TopicsFragment extends RecyclerFragment implements TopicsAdapter.On
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         viewsReady();
+
+        dialogMenu = new DynamicDialogMenu<>();
+        dialogMenu.addItem(getString(R.string.copy_link), (context, data1) -> {
+            String url;
+            if (data1.isAnnounce()) {
+                url = data1.getAnnounceUrl();
+            } else {
+                url = "https://4pda.ru/forum/index.php?showtopic=" + data1.getId();
+            }
+            Utils.copyToClipBoard(url);
+        });
+        dialogMenu.addItem(getString(R.string.open_theme_forum), (context, data1) -> {
+            IntentHandler.handle("https://4pda.ru/forum/index.php?showforum=" + presenter.getCurrentData().getId());
+        });
+        dialogMenu.addItem(getString(R.string.add_to_favorites), ((context, data1) -> {
+            if (data1.isForum()) {
+                FavoritesHelper.addForumWithDialog(getContext(), aBoolean -> {
+                    Toast.makeText(getContext(), aBoolean ? getString(R.string.favorites_added) : getString(R.string.error_occurred), Toast.LENGTH_SHORT).show();
+                }, data1.getId());
+            } else {
+                FavoritesHelper.addWithDialog(getContext(), aBoolean -> {
+                    Toast.makeText(getContext(), aBoolean ? getString(R.string.favorites_added) : getString(R.string.error_occurred), Toast.LENGTH_SHORT).show();
+                }, data1.getId());
+            }
+        }));
+
         refreshLayout.setOnRefreshListener(this::loadData);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         adapter = new TopicsAdapter();
         recyclerView.setAdapter(adapter);
-        adapter.setOnItemClickListener(this);
-
-        paginationHelper.setListener(new PaginationHelper.PaginationListener() {
-            @Override
-            public boolean onTabSelected(TabLayout.Tab tab) {
-                return refreshLayout.isRefreshing();
-            }
-
-            @Override
-            public void onSelectedPage(int pageNumber) {
-                currentSt = pageNumber;
-                loadData();
-            }
-        });
+        adapter.setOnItemClickListener(adapterListener);
+        paginationHelper.setListener(paginationListener);
     }
 
     @Override
@@ -97,24 +123,20 @@ public class TopicsFragment extends RecyclerFragment implements TopicsAdapter.On
         if (!super.loadData()) {
             return false;
         }
-        setRefreshing(true);
-        subscribe(RxApi.Topics().getTopics(id, currentSt), this::onLoadThemes, new TopicsData(), v -> loadData());
+        presenter.loadTopics();
         return true;
     }
 
-    private void onLoadThemes(TopicsData data) {
-        setRefreshing(false);
-
-        this.data = data;
-
+    @Override
+    public void showTopics(TopicsData data) {
         setTitle(data.getTitle());
-        refreshList();
+        refreshList(data);
         paginationHelper.updatePagination(data.getPagination());
         setSubtitle(paginationHelper.getTitle());
         listScrollTop();
     }
 
-    private void refreshList() {
+    private void refreshList(TopicsData data) {
         adapter.clear();
         if (!data.getForumItems().isEmpty())
             adapter.addSection(getString(R.string.forum_section), data.getForumItems());
@@ -128,7 +150,7 @@ public class TopicsFragment extends RecyclerFragment implements TopicsAdapter.On
 
     public void markRead(int topicId) {
         Log.d("SUKA", "markRead " + topicId);
-        for (TopicItem item : data.getTopicItems()) {
+        for (TopicItem item : presenter.getCurrentData().getTopicItems()) {
             if (item.getId() == topicId) {
                 item.setNew(false);
             }
@@ -142,9 +164,7 @@ public class TopicsFragment extends RecyclerFragment implements TopicsAdapter.On
         menu
                 .add(R.string.open_forum)
                 .setOnMenuItemClickListener(item -> {
-                    Bundle args = new Bundle();
-                    args.putInt(ForumFragment.ARG_FORUM_ID, id);
-                    TabManager.get().add(ForumFragment.class, args);
+                    presenter.openForum();
                     return true;
                 });
         if (ClientHelper.getAuthState()) {
@@ -153,21 +173,17 @@ public class TopicsFragment extends RecyclerFragment implements TopicsAdapter.On
                     .setOnMenuItemClickListener(item -> {
                         new AlertDialog.Builder(getContext())
                                 .setMessage(getString(R.string.mark_read) + "?")
-                                .setPositiveButton(R.string.ok, (dialog, which) -> ForumHelper.markRead(o -> Toast.makeText(getContext(), R.string.action_complete, Toast.LENGTH_SHORT).show(), id))
+                                .setPositiveButton(R.string.ok, (dialog, which) -> ForumHelper.markRead(o -> Toast.makeText(getContext(), R.string.action_complete, Toast.LENGTH_SHORT).show(), presenter.getId()))
                                 .setNegativeButton(R.string.cancel, null)
                                 .show();
                         return true;
                     });
         }
 
-
         menu.add(R.string.fragment_title_search)
                 .setIcon(App.getVecDrawable(getContext(), R.drawable.ic_toolbar_search))
                 .setOnMenuItemClickListener(item -> {
-                    String url = "https://4pda.ru/forum/index.php?act=search&source=all&forums%5B%5D=" + id;
-                    Bundle args = new Bundle();
-                    args.putString(TabFragment.ARG_TAB, url);
-                    TabManager.get().add(SearchFragment.class, args);
+                    presenter.openSearch();
                     return true;
                 })
                 .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -181,49 +197,7 @@ public class TopicsFragment extends RecyclerFragment implements TopicsAdapter.On
     }
 
     @Override
-    public void onItemClick(TopicItem item) {
-        if (item.isAnnounce()) {
-            Bundle args = new Bundle();
-            args.putString(TabFragment.ARG_TITLE, item.getTitle());
-            IntentHandler.handle(item.getAnnounceUrl(), args);
-            return;
-        }
-        if (item.isForum()) {
-            IntentHandler.handle("https://4pda.ru/forum/index.php?showforum=" + item.getId());
-            return;
-        }
-        Bundle args = new Bundle();
-        args.putString(TabFragment.ARG_TITLE, item.getTitle());
-        IntentHandler.handle("https://4pda.ru/forum/index.php?showtopic=" + item.getId() + "&view=getnewpost", args);
-    }
-
-    @Override
-    public boolean onItemLongClick(TopicItem item) {
-        if (dialogMenu == null) {
-            dialogMenu = new DynamicDialogMenu<>();
-            dialogMenu.addItem(getString(R.string.copy_link), (context, data1) -> {
-                String url;
-                if (item.isAnnounce()) {
-                    url = item.getAnnounceUrl();
-                } else {
-                    url = "https://4pda.ru/forum/index.php?showtopic=" + data1.getId();
-                }
-                Utils.copyToClipBoard(url);
-            });
-            dialogMenu.addItem(getString(R.string.open_theme_forum), (context, data1) -> IntentHandler.handle("https://4pda.ru/forum/index.php?showforum=" + data.getId()));
-            dialogMenu.addItem(getString(R.string.add_to_favorites), ((context, data1) -> {
-                if (data1.isForum()) {
-                    FavoritesHelper.addForumWithDialog(getContext(), aBoolean -> {
-                        Toast.makeText(getContext(), aBoolean ? getString(R.string.favorites_added) : getString(R.string.error_occurred), Toast.LENGTH_SHORT).show();
-                    }, data1.getId());
-                } else {
-                    FavoritesHelper.addWithDialog(getContext(), aBoolean -> {
-                        Toast.makeText(getContext(), aBoolean ? getString(R.string.favorites_added) : getString(R.string.error_occurred), Toast.LENGTH_SHORT).show();
-                    }, data1.getId());
-                }
-
-            }));
-        }
+    public void showItemDialogMenu(TopicItem item) {
         dialogMenu.disallowAll();
         dialogMenu.allow(0);
         if (!item.isAnnounce()) {
@@ -233,6 +207,30 @@ public class TopicsFragment extends RecyclerFragment implements TopicsAdapter.On
             }
         }
         dialogMenu.show(getContext(), TopicsFragment.this, item);
-        return false;
     }
+
+    private PaginationHelper.PaginationListener paginationListener = new PaginationHelper.PaginationListener() {
+        @Override
+        public boolean onTabSelected(TabLayout.Tab tab) {
+            return refreshLayout.isRefreshing();
+        }
+
+        @Override
+        public void onSelectedPage(int pageNumber) {
+            presenter.loadPage(pageNumber);
+        }
+    };
+
+    private TopicsAdapter.OnItemClickListener<TopicItem> adapterListener = new TopicsAdapter.OnItemClickListener<TopicItem>() {
+        @Override
+        public void onItemClick(TopicItem item) {
+            presenter.onItemClick(item);
+        }
+
+        @Override
+        public boolean onItemLongClick(TopicItem item) {
+            presenter.onItemLongClick(item);
+            return false;
+        }
+    };
 }

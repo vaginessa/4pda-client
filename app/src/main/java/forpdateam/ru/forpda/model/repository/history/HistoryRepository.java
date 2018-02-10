@@ -1,4 +1,4 @@
-package forpdateam.ru.forpda.model.repository;
+package forpdateam.ru.forpda.model.repository.history;
 
 import java.util.ArrayList;
 import java.util.List;

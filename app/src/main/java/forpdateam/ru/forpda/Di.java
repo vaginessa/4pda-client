@@ -6,13 +6,15 @@ import forpdateam.ru.forpda.api.forum.Forum;
 import forpdateam.ru.forpda.api.mentions.Mentions;
 import forpdateam.ru.forpda.api.profile.Profile;
 import forpdateam.ru.forpda.api.reputation.Reputation;
-import forpdateam.ru.forpda.model.repository.AuthRepository;
-import forpdateam.ru.forpda.model.repository.FavoritesRepository;
-import forpdateam.ru.forpda.model.repository.ForumRepository;
-import forpdateam.ru.forpda.model.repository.HistoryRepository;
-import forpdateam.ru.forpda.model.repository.MentionsRepository;
-import forpdateam.ru.forpda.model.repository.ProfileRepository;
-import forpdateam.ru.forpda.model.repository.ReputationRepository;
+import forpdateam.ru.forpda.apirx.apiclasses.TopicsRx;
+import forpdateam.ru.forpda.model.repository.auth.AuthRepository;
+import forpdateam.ru.forpda.model.repository.faviorites.FavoritesRepository;
+import forpdateam.ru.forpda.model.repository.forum.ForumRepository;
+import forpdateam.ru.forpda.model.repository.history.HistoryRepository;
+import forpdateam.ru.forpda.model.repository.mentions.MentionsRepository;
+import forpdateam.ru.forpda.model.repository.profile.ProfileRepository;
+import forpdateam.ru.forpda.model.repository.reputation.ReputationRepository;
+import forpdateam.ru.forpda.model.repository.topics.TopicsRepository;
 import forpdateam.ru.forpda.model.system.AppSchedulers;
 import forpdateam.ru.forpda.model.system.SchedulersProvider;
 
@@ -38,6 +40,7 @@ public class Di {
     public Profile profileApi = new Profile();
     public Reputation reputationApi = new Reputation();
     public Forum forumApi = new Forum();
+    public TopicsRx topicsApi = new TopicsRx();
 
     public FavoritesRepository favoritesRepository = new FavoritesRepository(schedulers, favoritesApi);
     public HistoryRepository historyRepository = new HistoryRepository(schedulers);
@@ -46,4 +49,5 @@ public class Di {
     public ProfileRepository profileRepository = new ProfileRepository(schedulers, profileApi);
     public ReputationRepository reputationRepository = new ReputationRepository(schedulers, reputationApi);
     public ForumRepository forumRepository = new ForumRepository(schedulers, forumApi);
+    public TopicsRepository topicsRepository = new TopicsRepository(schedulers, topicsApi);
 }

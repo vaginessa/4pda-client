@@ -1,4 +1,4 @@
-package forpdateam.ru.forpda.model.repository;
+package forpdateam.ru.forpda.model.repository.auth;
 
 import forpdateam.ru.forpda.api.auth.Auth;
 import forpdateam.ru.forpda.api.auth.models.AuthForm;

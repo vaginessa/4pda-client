@@ -1,4 +1,4 @@
-package forpdateam.ru.forpda.model.repository;
+package forpdateam.ru.forpda.model.repository.profile;
 
 import forpdateam.ru.forpda.api.profile.Profile;
 import forpdateam.ru.forpda.api.profile.models.ProfileModel;
