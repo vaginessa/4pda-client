@@ -1,4 +1,4 @@
-package forpdateam.ru.forpda.model.repository;
+package forpdateam.ru.forpda.model.repository.forum;
 
 import java.util.ArrayList;
 import java.util.List;

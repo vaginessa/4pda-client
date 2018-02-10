@@ -7,7 +7,7 @@ import forpdateam.ru.forpda.api.reputation.models.RepData;
 import forpdateam.ru.forpda.api.reputation.models.RepItem;
 import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.common.mvp.BasePresenter;
-import forpdateam.ru.forpda.model.repository.ReputationRepository;
+import forpdateam.ru.forpda.model.repository.reputation.ReputationRepository;
 import io.reactivex.disposables.Disposable;
 
 /**

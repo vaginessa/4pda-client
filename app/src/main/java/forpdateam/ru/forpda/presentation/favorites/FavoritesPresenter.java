@@ -12,7 +12,7 @@ import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.common.Utils;
 import forpdateam.ru.forpda.common.mvp.BasePresenter;
 import forpdateam.ru.forpda.entity.app.TabNotification;
-import forpdateam.ru.forpda.model.repository.FavoritesRepository;
+import forpdateam.ru.forpda.model.repository.faviorites.FavoritesRepository;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import io.reactivex.disposables.Disposable;
 

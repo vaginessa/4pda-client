@@ -1,4 +1,4 @@
-package forpdateam.ru.forpda.model.repository;
+package forpdateam.ru.forpda.model.repository.mentions;
 
 import forpdateam.ru.forpda.api.mentions.Mentions;
 import forpdateam.ru.forpda.api.mentions.models.MentionsData;

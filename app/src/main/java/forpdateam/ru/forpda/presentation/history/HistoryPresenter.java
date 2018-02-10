@@ -8,7 +8,7 @@ import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.common.Utils;
 import forpdateam.ru.forpda.common.mvp.BasePresenter;
 import forpdateam.ru.forpda.entity.app.history.HistoryItem;
-import forpdateam.ru.forpda.model.repository.HistoryRepository;
+import forpdateam.ru.forpda.model.repository.history.HistoryRepository;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import io.reactivex.disposables.Disposable;
 
