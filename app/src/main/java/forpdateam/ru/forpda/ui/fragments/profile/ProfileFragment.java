@@ -62,17 +62,15 @@ public class ProfileFragment extends TabFragment implements ProfileAdapter.Click
         return new ProfilePresenter(Di.get().profileRepository);
     }
 
-    //private LayoutInflater inflater;
+    private RecyclerView recyclerView;
     private TextView nick, group, sign;
     private ImageView avatar;
-    //private LinearLayout countList, infoBlock, contactList, devicesList;
-    //private EditText noteText;
     private CircularProgressView progressView;
 
-    private String tab_url = "";
-    private ProfileModel currentProfile;
     private MenuItem copyLinkMenuItem;
     private MenuItem writeMenuItem;
+
+    private ProfileAdapter adapter;
 
     public ProfileFragment() {
         configuration.setFitSystemWindow(true);
@@ -81,15 +79,15 @@ public class ProfileFragment extends TabFragment implements ProfileAdapter.Click
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        String profileUrl = null;
         if (getArguments() != null) {
-            tab_url = getArguments().getString(ARG_TAB);
+            profileUrl = getArguments().getString(ARG_TAB);
         }
-        if (tab_url == null || tab_url.isEmpty())
-            tab_url = "https://4pda.ru/forum/index.php?showuser=".concat(Integer.toString(ClientHelper.getUserId() == 0 ? 2556269 : ClientHelper.getUserId()));
+        if (profileUrl == null || profileUrl.isEmpty()) {
+            profileUrl = "https://4pda.ru/forum/index.php?showuser=" + ClientHelper.getUserId();
+        }
+        presenter.setProfileUrl(profileUrl);
     }
-
-    private RecyclerView recyclerView;
-    private ProfileAdapter adapter;
 
     @Nullable
     @Override
@@ -115,7 +113,6 @@ public class ProfileFragment extends TabFragment implements ProfileAdapter.Click
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        viewsReady();
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         adapter = new ProfileAdapter();
@@ -128,7 +125,7 @@ public class ProfileFragment extends TabFragment implements ProfileAdapter.Click
         toolbarTitleView.setVisibility(View.GONE);
 
         ScrimHelper scrimHelper = new ScrimHelper(appBarLayout, toolbarLayout);
-        scrimHelper.setScrimListener(scrim1 -> {
+        scrimHelper.setScrimListener((boolean scrim1) -> {
             if (scrim1) {
                 toolbar.getNavigationIcon().clearColorFilter();
                 toolbar.getOverflowIcon().clearColorFilter();
@@ -147,13 +144,13 @@ public class ProfileFragment extends TabFragment implements ProfileAdapter.Click
         super.addBaseToolbarMenu(menu);
         copyLinkMenuItem = menu.add(R.string.copy_link)
                 .setOnMenuItemClickListener(menuItem -> {
-                    Utils.copyToClipBoard(tab_url);
+                    presenter.copyUrl();
                     return false;
                 });
         writeMenuItem = menu.add(R.string.write)
                 .setIcon(App.getVecDrawable(getContext(), R.drawable.ic_profile_toolbar_create))
                 .setOnMenuItemClickListener(item -> {
-                    IntentHandler.handle(currentProfile.getContacts().get(0).getUrl());
+                    presenter.navigateToQms();
                     return false;
                 })
                 .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -172,13 +169,11 @@ public class ProfileFragment extends TabFragment implements ProfileAdapter.Click
     }
 
     @Override
-    public boolean loadData() {
-        if (!super.loadData()) {
-            return false;
+    public void setRefreshing(boolean refreshing) {
+        super.setRefreshing(refreshing);
+        if(refreshing){
+            refreshToolbarMenuItems(false);
         }
-        refreshToolbarMenuItems(false);
-        presenter.loadProfile(tab_url);
-        return true;
     }
 
     @Override
@@ -192,17 +187,16 @@ public class ProfileFragment extends TabFragment implements ProfileAdapter.Click
     }
 
     @Override
-    public void showProfile(ProfileModel profile) {
-        currentProfile = profile;
-        if (currentProfile.getNick() == null) return;
-        adapter.setProfile(currentProfile);
-        adapter.notifyDataSetChanged();
+    public void showProfile(ProfileModel data) {
         refreshToolbarMenuItems(true);
-        ImageLoader.getInstance().loadImage(currentProfile.getAvatar(), new SimpleImageLoadingListener() {
+        adapter.setProfile(data);
+        adapter.notifyDataSetChanged();
+        ImageLoader.getInstance().loadImage(data.getAvatar(), new SimpleImageLoadingListener() {
             @Override
             public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
                 //Нужен handler, иначе при повторном создании фрагмента неверно вычисляется высота вьюхи
-                new Handler().post(() -> {
+                Handler handler = new Handler();
+                handler.post(() -> {
                     if (!isAdded())
                         return;
                     blur(loadedImage);
@@ -220,32 +214,30 @@ public class ProfileFragment extends TabFragment implements ProfileAdapter.Click
                     animation1.setDuration(500);
                     animation1.setFillAfter(true);
                     progressView.startAnimation(animation1);
-                    new Handler().postDelayed(() -> {
+                    handler.postDelayed(() -> {
                         progressView.stopAnimation();
                         progressView.setVisibility(View.GONE);
                     }, 500);
                 });
-
             }
         });
 
-
-        setTabTitle(String.format(getString(R.string.profile_with_Nick), currentProfile.getNick()));
-        setTitle(currentProfile.getNick());
-        nick.setText(currentProfile.getNick());
-        group.setText(currentProfile.getGroup());
-        if (currentProfile.getSign() != null) {
-            sign.setText(currentProfile.getSign());
+        setTabTitle(String.format(getString(R.string.profile_with_Nick), data.getNick()));
+        setTitle(data.getNick());
+        nick.setText(data.getNick());
+        group.setText(data.getGroup());
+        if (data.getSign() != null) {
+            sign.setText(data.getSign());
             sign.setVisibility(View.VISIBLE);
             sign.setMovementMethod(LinkMovementMethod.getInstance());
         }
 
-        if (!currentProfile.getContacts().isEmpty()) {
-            if (!Pattern.compile("showuser=".concat(Integer.toString(ClientHelper.getUserId()))).matcher(tab_url).find()) {
-                writeMenuItem.setVisible(true);
-            } else {
-                writeMenuItem.setVisible(false);
-            }
+        if (!data.getContacts().isEmpty()) {
+            boolean isMe = Pattern
+                    .compile("showuser=" + ClientHelper.getUserId())
+                    .matcher(presenter.getProfileUrl())
+                    .find();
+            writeMenuItem.setVisible(!isMe);
         }
     }
 
@@ -253,11 +245,12 @@ public class ProfileFragment extends TabFragment implements ProfileAdapter.Click
     private void blur(Bitmap bkg) {
         float scaleFactor = 3;
         int radius = 4;
-        Observable<Bitmap> observable = Observable.fromCallable(() -> {
-            Bitmap overlay = BitmapUtils.centerCrop(bkg, toolbarBackground.getWidth(), toolbarBackground.getHeight(), scaleFactor);
-            BitmapUtils.fastBlur(overlay, radius, true);
-            return overlay;
-        });
+        Observable<Bitmap> observable = Observable
+                .fromCallable(() -> {
+                    Bitmap overlay = BitmapUtils.centerCrop(bkg, toolbarBackground.getWidth(), toolbarBackground.getHeight(), scaleFactor);
+                    BitmapUtils.fastBlur(overlay, radius, true);
+                    return overlay;
+                });
         subscribe(observable, bitmap -> {
             AlphaAnimation animation1 = new AlphaAnimation(0, 1);
             animation1.setDuration(500);

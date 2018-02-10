@@ -222,7 +222,6 @@ public class SearchFragment extends TabFragment implements IPostFunctions, Exten
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        viewsReady();
 
         fab.setOnClickListener(v -> {
             if (webView.getDirection() == ExtendedWebView.DIRECTION_DOWN) {

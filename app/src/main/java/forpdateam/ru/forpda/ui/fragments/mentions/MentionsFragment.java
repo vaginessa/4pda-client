@@ -63,7 +63,6 @@ public class MentionsFragment extends RecyclerFragment implements MentionsView {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        viewsReady();
 
         dialogMenu = new DynamicDialogMenu<>();
         dialogMenu.addItem(getString(R.string.copy_link), (context, data) -> presenter.copyLink(data));

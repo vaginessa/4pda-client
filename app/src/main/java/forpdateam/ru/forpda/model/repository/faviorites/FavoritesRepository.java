@@ -34,66 +34,71 @@ public class FavoritesRepository {
     }
 
     public Observable<FavData> loadFavorites(int st, boolean all, Sorting sorting) {
-        return Observable.fromCallable(() -> favoritesApi.getFavorites(st, all, sorting))
+        return Observable
+                .fromCallable(() -> favoritesApi.getFavorites(st, all, sorting))
                 .subscribeOn(schedulers.io())
                 .observeOn(schedulers.ui());
     }
 
     public Observable<List<FavItem>> getCache() {
-        return Observable.fromCallable(() -> {
-            List<FavItem> items = new ArrayList<>();
-            try (Realm realm = Realm.getDefaultInstance()) {
-                RealmResults<FavItemBd>  results = realm
-                        .where(FavItemBd.class)
-                        .findAll();
-                for (FavItemBd itemBd : results) {
-                    items.add(new FavItem(itemBd));
-                }
-            }
-            return items;
-        })
+        return Observable
+                .fromCallable(() -> {
+                    List<FavItem> items = new ArrayList<>();
+                    try (Realm realm = Realm.getDefaultInstance()) {
+                        RealmResults<FavItemBd> results = realm
+                                .where(FavItemBd.class)
+                                .findAll();
+                        for (FavItemBd itemBd : results) {
+                            items.add(new FavItem(itemBd));
+                        }
+                    }
+                    return items;
+                })
                 .subscribeOn(schedulers.io())
                 .observeOn(schedulers.ui());
     }
 
     public Completable saveFavorites(List<FavItem> items) {
-        return Completable.fromRunnable(() -> {
-            try (Realm realm = Realm.getDefaultInstance()) {
-                realm.executeTransaction(r -> saveFavorites(r, items));
-            }
-        })
+        return Completable
+                .fromRunnable(() -> {
+                    try (Realm realm = Realm.getDefaultInstance()) {
+                        realm.executeTransaction(r -> saveFavorites(r, items));
+                    }
+                })
                 .subscribeOn(schedulers.io())
                 .observeOn(schedulers.ui());
     }
 
     public Completable markRead(int topicId) {
-        return Completable.fromRunnable(() -> {
-            try (Realm realm = Realm.getDefaultInstance()) {
-                realm.executeTransaction(realm1 -> {
-                    IFavItem favItem = realm1
-                            .where(FavItemBd.class)
-                            .equalTo("topicId", topicId)
-                            .findFirst();
-                    if (favItem != null) {
-                        favItem.setNew(false);
+        return Completable
+                .fromRunnable(() -> {
+                    try (Realm realm = Realm.getDefaultInstance()) {
+                        realm.executeTransaction(realm1 -> {
+                            IFavItem favItem = realm1
+                                    .where(FavItemBd.class)
+                                    .equalTo("topicId", topicId)
+                                    .findFirst();
+                            if (favItem != null) {
+                                favItem.setNew(false);
+                            }
+                        });
                     }
-                });
-            }
-        })
+                })
                 .subscribeOn(schedulers.io())
                 .observeOn(schedulers.ui());
     }
 
     public Observable<Integer> handleEvent(TabNotification event, Sorting sorting, int count) {
-        return Observable.fromCallable(() -> {
-            final int[] newCount = {0};
-            try (Realm realm = Realm.getDefaultInstance()) {
-                realm.executeTransaction(realm1 -> {
-                    newCount[0] = handleEventTransaction(realm, event, sorting, count);
-                });
-            }
-            return newCount[0];
-        })
+        return Observable
+                .fromCallable(() -> {
+                    final int[] newCount = {0};
+                    try (Realm realm = Realm.getDefaultInstance()) {
+                        realm.executeTransaction(realm1 -> {
+                            newCount[0] = handleEventTransaction(realm, event, sorting, count);
+                        });
+                    }
+                    return newCount[0];
+                })
                 .subscribeOn(schedulers.io())
                 .observeOn(schedulers.ui());
     }

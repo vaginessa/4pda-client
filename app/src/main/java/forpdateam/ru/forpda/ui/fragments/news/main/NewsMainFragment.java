@@ -49,7 +49,6 @@ public class NewsMainFragment extends RecyclerFragment implements NewsListAdapte
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        viewsReady();
         setCardsBackground();
         refreshLayout.setOnRefreshListener(this::loadData);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));

@@ -76,7 +76,6 @@ public class NotesFragment extends RecyclerFragment implements NotesAdapter.OnIt
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         refreshLayout.setOnRefreshListener(this::loadCacheData);
         recyclerView.addItemDecoration(new BrandFragment.SpacingItemDecoration(App.px8, false));
-        viewsReady();
     }
 
     @Override

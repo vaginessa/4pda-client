@@ -147,7 +147,6 @@ public class NewsDetailsFragment extends TabFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        viewsReady();
 
         ScrimHelper scrimHelper = new ScrimHelper(appBarLayout, toolbarLayout);
         scrimHelper.setScrimListener(scrim1 -> {

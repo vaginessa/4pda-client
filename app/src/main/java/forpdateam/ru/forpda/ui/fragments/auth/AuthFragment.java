@@ -98,7 +98,6 @@ public class AuthFragment extends TabFragment implements AuthView {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        viewsReady();
         setListsBackground();
         skipButton.setOnClickListener(v -> {
             new AlertDialog.Builder(getContext())

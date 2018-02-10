@@ -82,7 +82,6 @@ public class TopicsFragment extends RecyclerFragment implements TopicsView {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        viewsReady();
 
         dialogMenu = new DynamicDialogMenu<>();
         dialogMenu.addItem(getString(R.string.copy_link), (context, data1) -> {

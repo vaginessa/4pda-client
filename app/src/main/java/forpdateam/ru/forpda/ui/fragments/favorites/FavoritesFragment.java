@@ -151,7 +151,6 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        viewsReady();
 
         dialogMenu = new DynamicDialogMenu<>();
         dialogMenu.addItem(getString(R.string.copy_link), (context, data) -> presenter.copyLink(data));

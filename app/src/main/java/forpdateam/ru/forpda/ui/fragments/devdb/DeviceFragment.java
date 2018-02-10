@@ -134,7 +134,6 @@ public class DeviceFragment extends TabFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        viewsReady();
 
         setCardsBackground();
         toolbarTitleView.setShadowLayer(App.px2, 0, 0, App.getColorFromAttr(getContext(), R.attr.colorPrimary));

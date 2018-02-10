@@ -109,7 +109,6 @@ public class EditPostFragment extends TabFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        viewsReady();
         messagePanel.addSendOnClickListener(v -> {
             if (postForm.getType() == TYPE_EDIT_POST) {
                 showReasonDialog();

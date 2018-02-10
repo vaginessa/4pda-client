@@ -61,7 +61,6 @@ public class SearchFragment extends TabFragment implements BrandAdapter.OnItemCl
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        viewsReady();
         setCardsBackground();
         refreshLayoutStyle(refreshLayout);
         refreshLayout.setOnRefreshListener(this::loadData);

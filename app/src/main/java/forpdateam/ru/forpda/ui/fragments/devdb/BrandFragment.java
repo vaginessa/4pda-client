@@ -68,7 +68,6 @@ public class BrandFragment extends TabFragment implements BrandAdapter.OnItemCli
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        viewsReady();
         setCardsBackground();
         refreshLayoutStyle(refreshLayout);
         refreshLayout.setOnRefreshListener(this::loadData);

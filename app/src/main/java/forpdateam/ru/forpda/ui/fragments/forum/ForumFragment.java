@@ -110,7 +110,6 @@ public class ForumFragment extends TabFragment implements ForumView {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        viewsReady();
         setListsBackground();
 
         dialogMenu = new DynamicDialogMenu<>();

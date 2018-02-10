@@ -2,6 +2,9 @@ package forpdateam.ru.forpda.presentation.profile;
 
 import com.arellomobile.mvp.InjectViewState;
 
+import forpdateam.ru.forpda.api.profile.models.ProfileModel;
+import forpdateam.ru.forpda.common.IntentHandler;
+import forpdateam.ru.forpda.common.Utils;
 import forpdateam.ru.forpda.common.mvp.BasePresenter;
 import forpdateam.ru.forpda.model.repository.profile.ProfileRepository;
 import io.reactivex.disposables.Disposable;
@@ -13,27 +16,52 @@ import io.reactivex.disposables.Disposable;
 @InjectViewState
 public class ProfilePresenter extends BasePresenter<ProfileView> {
 
+    private String profileUrl;
+    private ProfileModel currentData;
     private ProfileRepository profileRepository;
 
     public ProfilePresenter(ProfileRepository profileRepository) {
         this.profileRepository = profileRepository;
     }
 
-    public void loadProfile(String url) {
+    public void setProfileUrl(String profileUrl) {
+        this.profileUrl = profileUrl;
+    }
+
+    public String getProfileUrl() {
+        return profileUrl;
+    }
+
+    @Override
+    protected void onFirstViewAttach() {
+        super.onFirstViewAttach();
+        loadProfile();
+    }
+
+    private void loadProfile() {
         Disposable disposable
-                = profileRepository.loadProfile(url)
+                = profileRepository.loadProfile(profileUrl)
                 .doOnTerminate(() -> getViewState().setRefreshing(true))
                 .doAfterTerminate(() -> getViewState().setRefreshing(false))
-                .subscribe(profileModel -> getViewState().showProfile(profileModel), this::handleErrorRx);
+                .subscribe(profileModel -> {
+                    currentData = profileModel;
+                    getViewState().showProfile(profileModel);
+                }, this::handleErrorRx);
         addToDisposable(disposable);
     }
 
     public void saveNote(String note) {
         Disposable disposable
                 = profileRepository.saveNote(note)
-                .doOnTerminate(() -> getViewState().setRefreshing(true))
-                .doAfterTerminate(() -> getViewState().setRefreshing(false))
                 .subscribe(success -> getViewState().onSaveNote(success), this::handleErrorRx);
         addToDisposable(disposable);
+    }
+
+    public void copyUrl() {
+        Utils.copyToClipBoard(profileUrl);
+    }
+
+    public void navigateToQms() {
+        IntentHandler.handle(currentData.getContacts().get(0).getUrl());
     }
 }

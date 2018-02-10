@@ -84,7 +84,6 @@ public class QmsThemesFragment extends RecyclerFragment implements QmsThemesAdap
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        viewsReady();
         initFabBehavior();
         tryShowAvatar();
 

@@ -58,7 +58,6 @@ public class GoogleCaptchaFragment extends TabFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        viewsReady();
         setSubtitle("Это из-за VPN/Proxy и т.д.");
         webView.setWebViewClient(new CaptchaWebViewClient());
     }

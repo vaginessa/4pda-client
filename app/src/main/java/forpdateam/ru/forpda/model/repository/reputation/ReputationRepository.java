@@ -21,13 +21,15 @@ public class ReputationRepository {
 
 
     public Observable<RepData> loadReputation(RepData repData) {
-        return Observable.fromCallable(() -> reputationApi.getReputation(repData))
+        return Observable
+                .fromCallable(() -> reputationApi.getReputation(repData))
                 .subscribeOn(schedulers.io())
                 .observeOn(schedulers.ui());
     }
 
     public Observable<String> changeReputation(int postId, int userId, boolean type, String message) {
-        return Observable.fromCallable(() -> reputationApi.editReputation(postId, userId, type, message))
+        return Observable
+                .fromCallable(() -> reputationApi.editReputation(postId, userId, type, message))
                 .subscribeOn(schedulers.io())
                 .observeOn(schedulers.ui());
     }
