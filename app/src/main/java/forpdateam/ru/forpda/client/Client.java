@@ -47,7 +47,6 @@ public class Client implements IWebClient {
     private static final String USER_AGENT = "Mozilla/5.0 (Linux; Android 4.4; Nexus 5 Build/_BuildID_) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/30.0.0.0 Mobile Safari/537.36";
     private static Client INSTANCE = null;
     private Map<String, Cookie> clientCookies = new HashMap<>();
-    private SimpleObservable networkObservables = new SimpleObservable();
     private Handler observerHandler = new Handler(Looper.getMainLooper());
     private List<String> privateHeaders = new ArrayList<>(Arrays.asList("pass_hash", "session_id", "auth_key", "password"));
     private final Cookie mobileCookie = Cookie.parse(HttpUrl.parse("https://4pda.ru/"), "ngx_mb=1;");
@@ -359,18 +358,6 @@ public class Client implements IWebClient {
 
     public void clearCookies() {
         clientCookies.clear();
-    }
-
-    public void removeNetworkObserver(Observer observer) {
-        networkObservables.deleteObserver(observer);
-    }
-
-    public void addNetworkObserver(Observer observer) {
-        networkObservables.addObserver(observer);
-    }
-
-    public void notifyNetworkObservers(Boolean b) {
-        networkObservables.notifyObservers(b);
     }
 
 }

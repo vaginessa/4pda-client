@@ -23,11 +23,15 @@ import forpdateam.ru.forpda.client.Client;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.common.Utils;
+import forpdateam.ru.forpda.model.NetworkStateProvider;
 import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.activities.MainActivity;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import forpdateam.ru.forpda.ui.fragments.profile.ProfileFragment;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -40,6 +44,17 @@ public class DrawerHeader {
     private View headerLayout;
     private ImageButton openLinkButton;
     private MainActivity activity;
+
+    private CompositeDisposable disposables = new CompositeDisposable();
+
+    private NetworkStateProvider networkState = App.get().Di().networkState;
+
+    private Consumer<Boolean> networkObserver = state -> {
+        if (state) {
+            state(ClientHelper.getAuthState() == ClientHelper.AUTH_STATE_LOGIN);
+        }
+    };
+
     private View.OnClickListener headerClickListener = v -> {
         TabFragment tabFragment = null;
         for (TabFragment fragment : TabManager.get().getFragments()) {
@@ -70,17 +85,16 @@ public class DrawerHeader {
         if (o == null) o = false;
         state((boolean) o);
     };
-    private Observer networkObserver = (observable, o) -> {
-        if (o == null) o = true;
-        if ((boolean) o) {
-            state(ClientHelper.getAuthState() == ClientHelper.AUTH_STATE_LOGIN);
-        }
-    };
+
+    private void addToDisposable(Disposable disposable) {
+        disposables.add(disposable);
+    }
 
     public void destroy() {
         activity = null;
+        if (!disposables.isDisposed())
+            disposables.dispose();
         ClientHelper.get().removeLoginObserver(loginObserver);
-        Client.get().removeNetworkObserver(networkObserver);
     }
 
     public DrawerHeader(MainActivity activity, DrawerLayout drawerLayout) {
@@ -111,7 +125,11 @@ public class DrawerHeader {
                     .show();
         });
         ClientHelper.get().addLoginObserver(loginObserver);
-        Client.get().addNetworkObserver(networkObserver);
+        addToDisposable(
+                networkState
+                        .observeState()
+                        .subscribe(networkObserver)
+        );
         state(ClientHelper.getAuthState() == ClientHelper.AUTH_STATE_LOGIN);
     }
 

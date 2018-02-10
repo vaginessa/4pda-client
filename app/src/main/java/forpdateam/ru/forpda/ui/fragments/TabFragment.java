@@ -23,7 +23,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.accessibility.AccessibilityManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -41,6 +40,7 @@ import forpdateam.ru.forpda.client.Client;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.ErrorHandler;
 import forpdateam.ru.forpda.common.Preferences;
+import forpdateam.ru.forpda.model.NetworkStateProvider;
 import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.activities.MainActivity;
 import forpdateam.ru.forpda.ui.views.ContentController;
@@ -52,8 +52,6 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
-
-import static android.content.Context.ACCESSIBILITY_SERVICE;
 
 /**
  * Created by radiationx on 07.08.16.
@@ -102,18 +100,19 @@ public class TabFragment extends MvpAppCompatFragment {
     private boolean alreadyCallLoad = false;
     protected ContentController contentController;
 
-    protected CompositeDisposable disposable = new CompositeDisposable();
+    protected CompositeDisposable disposables = new CompositeDisposable();
+    protected NetworkStateProvider networkState = App.get().Di().networkState;
 
     protected Observer countsObserver = (observable, o) -> updateNotifyDot();
-    protected Observer networkObserver = (observable, o) -> {
-        if (o == null)
-            o = true;
-        if ((!configuration.isUseCache() || noNetwork.getVisibility() == View.VISIBLE) && (boolean) o) {
+
+    protected Consumer<Boolean> networkObserver = state -> {
+        if ((!configuration.isUseCache() || noNetwork.getVisibility() == View.VISIBLE) && state) {
             if (!alreadyCallLoad)
                 loadData();
             noNetwork.setVisibility(View.GONE);
         }
     };
+
     protected Observer tabPreferenceObserver = (observable, o) -> {
         if (o == null) return;
         String key = (String) o;
@@ -214,8 +213,8 @@ public class TabFragment extends MvpAppCompatFragment {
         return toolbar.getMenu();
     }
 
-    public CompositeDisposable getDisposable() {
-        return disposable;
+    public CompositeDisposable getDisposables() {
+        return disposables;
     }
 
     public <T> void subscribe(@NonNull Observable<T> observable, @NonNull Consumer<T> onNext, @NonNull T onErrorReturn) {
@@ -232,11 +231,15 @@ public class TabFragment extends MvpAppCompatFragment {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(onNext, throwable -> handleErrorRx(throwable, onErrorAction));
 
-        this.disposable.add(disposable);
+        this.disposables.add(disposable);
     }
 
     private void handleErrorRx(Throwable throwable, View.OnClickListener listener) {
         ErrorHandler.handle(this, throwable, listener);
+    }
+
+    protected void addToDisposable(Disposable disposable) {
+        disposables.add(disposable);
     }
 
     //False - можно закрывать
@@ -254,7 +257,8 @@ public class TabFragment extends MvpAppCompatFragment {
     //Загрузка каких-то данных, выполняется только при наличии сети
     @CallSuper
     public boolean loadData() {
-        if (!ClientHelper.getNetworkState(getContext())) {
+        Log.e("SUKA", "loadData " + networkState.getState() + " : " + this);
+        if (!networkState.getState()) {
             setRefreshing(false);
             return false;
         }
@@ -284,7 +288,7 @@ public class TabFragment extends MvpAppCompatFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mUiThread = Thread.currentThread();
-        Log.d(LOG_TAG, "onDestroy " + this);
+        Log.d(LOG_TAG, "onCreate " + this);
         if (savedInstanceState != null) {
             title = savedInstanceState.getString(BUNDLE_PREFIX.concat(BUNDLE_TITLE));
             subtitle = savedInstanceState.getString(BUNDLE_PREFIX.concat(BUNDLE_SUBTITLE));
@@ -330,9 +334,15 @@ public class TabFragment extends MvpAppCompatFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        addToDisposable(
+                networkState
+                        .observeState()
+                        .subscribe(networkObserver)
+        );
+
         App.get().addStatusBarSizeObserver(statusBarSizeObserver);
         ClientHelper.get().addCountsObserver(countsObserver);
-        Client.get().addNetworkObserver(networkObserver);
         App.get().addPreferenceChangeObserver(tabPreferenceObserver);
 
         toolbarTitleView.setEllipsize(TextUtils.TruncateAt.MARQUEE);
@@ -351,7 +361,7 @@ public class TabFragment extends MvpAppCompatFragment {
             findViewById(R.id.toolbar_shadow_prelp).setVisibility(View.VISIBLE);
         }
 
-        if (!ClientHelper.getNetworkState(getContext())) {
+        if (!networkState.getState()) {
             if (!configuration.isUseCache())
                 noNetwork.setVisibility(View.VISIBLE);
             Snackbar.make(getCoordinatorLayout(), "No network connection", Snackbar.LENGTH_LONG).show();
@@ -392,7 +402,7 @@ public class TabFragment extends MvpAppCompatFragment {
 
     private void viewsReady() {
         addBaseToolbarMenu(getMenu());
-        if (ClientHelper.getNetworkState(getContext()) && !configuration.isUseCache()) {
+        if (networkState.getState() && !configuration.isUseCache()) {
             if (!alreadyCallLoad)
                 loadData();
         } else {
@@ -509,14 +519,13 @@ public class TabFragment extends MvpAppCompatFragment {
         super.onDestroy();
         attachedWebView = null;
         Log.d(LOG_TAG, "onDestroy " + this);
-        if (!disposable.isDisposed())
-            disposable.dispose();
+        if (!disposables.isDisposed())
+            disposables.dispose();
         hidePopupWindows();
         if (contentController != null) {
             contentController.destroy();
         }
         ClientHelper.get().removeCountsObserver(countsObserver);
-        Client.get().removeNetworkObserver(networkObserver);
         App.get().removePreferenceChangeObserver(tabPreferenceObserver);
         App.get().removeStatusBarSizeObserver(statusBarSizeObserver);
     }
@@ -525,15 +534,6 @@ public class TabFragment extends MvpAppCompatFragment {
 
     protected void attachWebView(ExtendedWebView webView) {
         this.attachedWebView = webView;
-    }
-
-    protected boolean isTalkBackEnabled() {
-        AccessibilityManager am = (AccessibilityManager) getActivity().getSystemService(ACCESSIBILITY_SERVICE);
-        boolean isAccessibilityEnabled = am.isEnabled();
-        boolean isExploreByTouchEnabled = am.isTouchExplorationEnabled();
-        Log.d("SUKA", "CHECK TALKBACK " + isAccessibilityEnabled + " : " + isExploreByTouchEnabled);
-        //return isExploreByTouchEnabled;
-        return false;
     }
 
     public final void runInUiThread(final Runnable action) {

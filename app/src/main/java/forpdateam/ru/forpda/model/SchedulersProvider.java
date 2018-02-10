@@ -1,4 +1,4 @@
-package forpdateam.ru.forpda.model.system;
+package forpdateam.ru.forpda.model;
 
 import io.reactivex.Scheduler;
 

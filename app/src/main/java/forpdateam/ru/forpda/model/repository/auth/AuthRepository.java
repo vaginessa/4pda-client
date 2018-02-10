@@ -2,7 +2,7 @@ package forpdateam.ru.forpda.model.repository.auth;
 
 import forpdateam.ru.forpda.api.auth.Auth;
 import forpdateam.ru.forpda.api.auth.models.AuthForm;
-import forpdateam.ru.forpda.model.system.SchedulersProvider;
+import forpdateam.ru.forpda.model.SchedulersProvider;
 import io.reactivex.Observable;
 
 /**

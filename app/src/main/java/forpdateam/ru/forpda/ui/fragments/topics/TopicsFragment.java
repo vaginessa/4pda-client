@@ -17,26 +17,19 @@ import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 
 import forpdateam.ru.forpda.App;
-import forpdateam.ru.forpda.Di;
+import forpdateam.ru.forpda.Dependencies;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.api.reputation.models.RepItem;
 import forpdateam.ru.forpda.api.topcis.models.TopicItem;
 import forpdateam.ru.forpda.api.topcis.models.TopicsData;
-import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.common.Utils;
 import forpdateam.ru.forpda.presentation.topics.TopicsPresenter;
 import forpdateam.ru.forpda.presentation.topics.TopicsView;
-import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.RecyclerFragment;
-import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import forpdateam.ru.forpda.ui.fragments.favorites.FavoritesHelper;
-import forpdateam.ru.forpda.ui.fragments.forum.ForumFragment;
 import forpdateam.ru.forpda.ui.fragments.forum.ForumHelper;
-import forpdateam.ru.forpda.ui.fragments.search.SearchFragment;
 import forpdateam.ru.forpda.ui.views.DynamicDialogMenu;
-import forpdateam.ru.forpda.ui.views.adapters.BaseAdapter;
 import forpdateam.ru.forpda.ui.views.pagination.PaginationHelper;
 
 /**
@@ -55,7 +48,7 @@ public class TopicsFragment extends RecyclerFragment implements TopicsView {
 
     @ProvidePresenter
     TopicsPresenter provideReputationPresenter() {
-        return new TopicsPresenter(Di.get().topicsRepository);
+        return new TopicsPresenter(App.get().Di().topicsRepository);
     }
 
     public TopicsFragment() {

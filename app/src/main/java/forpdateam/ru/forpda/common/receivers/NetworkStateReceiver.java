@@ -16,40 +16,31 @@ import forpdateam.ru.forpda.client.Client;
  */
 public class NetworkStateReceiver extends BroadcastReceiver {
     private static final String TAG = "NetworkStateReceiver";
-    private final IntentFilter mIntentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-    private final Context context;
     private ConnectivityManagerDelegate managerDelegate;
-    private boolean mRegistered;
     private NetworkInfo.State mConnectionType;
 
-    public NetworkStateReceiver() {
-
-        context = App.getContext();
-        managerDelegate = new ConnectivityManagerDelegate(context);
-        mConnectionType = getCurrentConnectionType();
-    }
-
-    public NetworkStateReceiver(Context context) {
-        this.context = context.getApplicationContext();
-        managerDelegate = new ConnectivityManagerDelegate(this.context);
-        mConnectionType = getCurrentConnectionType();
-    }
-
-    public void registerReceiver() {
-        if (!mRegistered) {
-            mRegistered = true;
-            context.registerReceiver(this, mIntentFilter);
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        Log.d(TAG, "onReceive " + intent);
+        if (managerDelegate == null) {
+            managerDelegate = new ConnectivityManagerDelegate(context);
         }
-    }
-
-    public void unregisterReceiver() {
-        if (mRegistered) {
-            mRegistered = false;
-            context.unregisterReceiver(this);
+        if (!(intent.getAction() != null && intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION))) {
+            return;
         }
+        NetworkInfo.State newConnectionType = getCurrentConnectionType();
+        if (newConnectionType == mConnectionType) return;
+
+        mConnectionType = newConnectionType;
+        Log.d(TAG, "Network connectivity changed, type is: " + mConnectionType);
+
+        boolean state = mConnectionType == NetworkInfo.State.CONNECTED;
+        Log.e("suka", "ntework send state " + state);
+        App.get().Di().networkState.setState(state);
     }
 
     public NetworkInfo.State getCurrentConnectionType() {
+
         if (!managerDelegate.activeNetworkExists() ||
                 !managerDelegate.isConnected()) {
             return NetworkInfo.State.DISCONNECTED;
@@ -64,21 +55,6 @@ public class NetworkStateReceiver extends BroadcastReceiver {
             default:
                 return NetworkInfo.State.UNKNOWN;
         }
-    }
-
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        Log.d(TAG, "onReceive " + intent);
-        if (!(intent.getAction() != null && intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION))) {
-            return;
-        }
-        NetworkInfo.State newConnectionType = getCurrentConnectionType();
-        if (newConnectionType == mConnectionType) return;
-
-        mConnectionType = newConnectionType;
-        Log.d(TAG, "Network connectivity changed, type is: " + mConnectionType);
-
-        Client.get(context).notifyNetworkObservers(mConnectionType == NetworkInfo.State.CONNECTED);
     }
 
     private static class ConnectivityManagerDelegate {

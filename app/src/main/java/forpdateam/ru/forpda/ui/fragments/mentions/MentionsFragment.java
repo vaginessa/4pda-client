@@ -13,7 +13,7 @@ import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 
 import forpdateam.ru.forpda.App;
-import forpdateam.ru.forpda.Di;
+import forpdateam.ru.forpda.Dependencies;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.api.mentions.models.MentionItem;
 import forpdateam.ru.forpda.api.mentions.models.MentionsData;
@@ -39,7 +39,7 @@ public class MentionsFragment extends RecyclerFragment implements MentionsView {
 
     @ProvidePresenter
     MentionsPresenter provideMentionsPresenter() {
-        return new MentionsPresenter(Di.get().mentionsRepository);
+        return new MentionsPresenter(App.get().Di().mentionsRepository);
     }
 
     private DynamicDialogMenu<MentionsFragment, MentionItem> dialogMenu;

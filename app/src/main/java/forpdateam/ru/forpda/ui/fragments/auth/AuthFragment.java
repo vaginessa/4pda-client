@@ -27,7 +27,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
 import forpdateam.ru.forpda.App;
-import forpdateam.ru.forpda.Di;
+import forpdateam.ru.forpda.Dependencies;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.api.ApiUtils;
 import forpdateam.ru.forpda.api.auth.models.AuthForm;
@@ -52,7 +52,7 @@ public class AuthFragment extends TabFragment implements AuthView {
 
     @ProvidePresenter
     AuthPresenter provideAuthPresenter() {
-        return new AuthPresenter(Di.get().authRepository, Di.get().profileRepository);
+        return new AuthPresenter(App.get().Di().authRepository, App.get().Di().profileRepository);
     }
 
     private EditText nick, password, captcha;

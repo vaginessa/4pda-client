@@ -52,9 +52,12 @@ import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.BitmapUtils;
 import forpdateam.ru.forpda.common.Preferences;
 import forpdateam.ru.forpda.entity.app.TabNotification;
+import forpdateam.ru.forpda.model.NetworkStateProvider;
 import forpdateam.ru.forpda.ui.activities.MainActivity;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.Response;
@@ -101,9 +104,13 @@ public class NotificationsService extends Service {
         if (o == null) o = false;
 
     };
-    private Observer networkObserver = (observable, o) -> {
-        if (o == null) o = true;
-        if ((boolean) o) {
+
+    protected CompositeDisposable disposables = new CompositeDisposable();
+
+    protected NetworkStateProvider networkState = App.get().Di().networkState;
+
+    protected Consumer<Boolean> networkObserver = state -> {
+        if (state) {
             start(true);
         }
     };
@@ -199,6 +206,10 @@ public class NotificationsService extends Service {
     };
 
 
+    private void addToDisposable(Disposable disposable) {
+        disposables.add(disposable);
+    }
+
     public static void startAndCheck() {
         try {
             Intent intent = new Intent(App.getContext(), NotificationsService.class).setAction(NotificationsService.CHECK_LAST_EVENTS);
@@ -230,7 +241,11 @@ public class NotificationsService extends Service {
     @Override
     public void onCreate() {
         Log.i(LOG_TAG, "onCreate");
-        Client.get(getApplicationContext()).addNetworkObserver(networkObserver);
+        addToDisposable(
+                networkState
+                        .observeState()
+                        .subscribe(networkObserver)
+        );
         App.get().addPreferenceChangeObserver(notificationSettingObserver);
         timerPeriod = Preferences.Notifications.Main.getLimit(getApplicationContext());
     }
@@ -285,8 +300,8 @@ public class NotificationsService extends Service {
     }
 
     private void start(boolean checkEvents) {
-        Log.e(LOG_TAG, "Start: " + ClientHelper.getNetworkState(getApplicationContext()) + " : " + connected + " : " + checkEvents);
-        if (ClientHelper.getNetworkState(getApplicationContext())) {
+        Log.e(LOG_TAG, "Start: " + networkState.getState() + " : " + connected + " : " + checkEvents);
+        if (networkState.getState()) {
             if (!connected) {
                 webSocket = Client.get().createWebSocketConnection(webSocketListener);
                 connected = true;
@@ -314,8 +329,9 @@ public class NotificationsService extends Service {
     public void onDestroy() {
         super.onDestroy();
         Log.i(LOG_TAG, "onDestroy");
+        if (!disposables.isDisposed())
+            disposables.dispose();
         App.get().removePreferenceChangeObserver(notificationSettingObserver);
-        Client.get().removeNetworkObserver(networkObserver);
         stop();
     }
 

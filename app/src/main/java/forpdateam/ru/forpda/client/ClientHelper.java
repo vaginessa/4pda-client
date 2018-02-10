@@ -104,16 +104,4 @@ public class ClientHelper {
     public static void setMentionsCount(int mentionsCount) {
         ClientHelper.mentionsCount = mentionsCount;
     }
-
-    public static boolean getNetworkState(Context context) {
-        if (context == null)
-            return false;
-
-        ConnectivityManager cm =
-                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        assert cm != null;
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-    }
 }

@@ -1,11 +1,8 @@
 package forpdateam.ru.forpda.model.repository.topics;
 
-import forpdateam.ru.forpda.api.reputation.Reputation;
-import forpdateam.ru.forpda.api.reputation.models.RepData;
 import forpdateam.ru.forpda.api.topcis.Topics;
 import forpdateam.ru.forpda.api.topcis.models.TopicsData;
-import forpdateam.ru.forpda.apirx.apiclasses.TopicsRx;
-import forpdateam.ru.forpda.model.system.SchedulersProvider;
+import forpdateam.ru.forpda.model.SchedulersProvider;
 import io.reactivex.Observable;
 
 /**

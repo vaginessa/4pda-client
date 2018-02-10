@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Locale;
 
 import forpdateam.ru.forpda.App;
-import forpdateam.ru.forpda.Di;
+import forpdateam.ru.forpda.Dependencies;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.entity.app.history.HistoryItem;
 import forpdateam.ru.forpda.entity.db.history.HistoryItemBd;
@@ -41,7 +41,7 @@ public class HistoryFragment extends RecyclerFragment implements HistoryView {
 
     @ProvidePresenter
     HistoryPresenter provideHistoryPresenter() {
-        return new HistoryPresenter(Di.get().historyRepository);
+        return new HistoryPresenter(App.get().Di().historyRepository);
     }
 
     private HistoryAdapter adapter;

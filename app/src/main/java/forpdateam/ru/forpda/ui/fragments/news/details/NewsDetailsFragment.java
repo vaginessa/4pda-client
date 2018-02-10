@@ -277,8 +277,8 @@ public class NewsDetailsFragment extends TabFragment {
     public void onDestroy() {
         super.onDestroy();
 
-        /*if (!disposable.isDisposed())
-            disposable.dispose();*/
+        /*if (!disposables.isDisposed())
+            disposables.dispose();*/
         //if (realm != null) realm.close();
     }
 

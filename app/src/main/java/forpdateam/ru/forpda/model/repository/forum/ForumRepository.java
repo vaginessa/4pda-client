@@ -3,16 +3,11 @@ package forpdateam.ru.forpda.model.repository.forum;
 import java.util.ArrayList;
 import java.util.List;
 
-import forpdateam.ru.forpda.api.Api;
-import forpdateam.ru.forpda.api.favorites.models.FavItem;
 import forpdateam.ru.forpda.api.forum.Forum;
-import forpdateam.ru.forpda.api.forum.models.Announce;
 import forpdateam.ru.forpda.api.forum.models.ForumItemFlat;
 import forpdateam.ru.forpda.api.forum.models.ForumItemTree;
-import forpdateam.ru.forpda.api.forum.models.ForumRules;
-import forpdateam.ru.forpda.entity.db.favorites.FavItemBd;
 import forpdateam.ru.forpda.entity.db.forum.ForumItemFlatBd;
-import forpdateam.ru.forpda.model.system.SchedulersProvider;
+import forpdateam.ru.forpda.model.SchedulersProvider;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.realm.Realm;
