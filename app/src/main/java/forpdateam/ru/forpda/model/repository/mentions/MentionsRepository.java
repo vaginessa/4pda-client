@@ -2,7 +2,7 @@ package forpdateam.ru.forpda.model.repository.mentions;
 
 import forpdateam.ru.forpda.api.mentions.Mentions;
 import forpdateam.ru.forpda.api.mentions.models.MentionsData;
-import forpdateam.ru.forpda.model.system.SchedulersProvider;
+import forpdateam.ru.forpda.model.SchedulersProvider;
 import io.reactivex.Observable;
 
 /**

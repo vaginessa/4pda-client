@@ -13,7 +13,7 @@ import forpdateam.ru.forpda.api.favorites.models.FavItem;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.entity.app.TabNotification;
 import forpdateam.ru.forpda.entity.db.favorites.FavItemBd;
-import forpdateam.ru.forpda.model.system.SchedulersProvider;
+import forpdateam.ru.forpda.model.SchedulersProvider;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.realm.Realm;

@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Observer;
 
 import forpdateam.ru.forpda.App;
-import forpdateam.ru.forpda.Di;
+import forpdateam.ru.forpda.Dependencies;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.api.favorites.Favorites;
 import forpdateam.ru.forpda.api.favorites.Sorting;
@@ -62,7 +62,7 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
 
     @ProvidePresenter
     FavoritesPresenter provideFavoritesPresenter() {
-        return new FavoritesPresenter(Di.get().favoritesRepository);
+        return new FavoritesPresenter(App.get().Di().favoritesRepository);
     }
 
     private DynamicDialogMenu<FavoritesFragment, FavItem> dialogMenu;
@@ -297,7 +297,7 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
         }
         adapter.addSection(getString(R.string.fav_themes), otherItems);
         adapter.notifyDataSetChanged();
-        if (!ClientHelper.getNetworkState(getContext())) {
+        if (!networkState.getState()) {
             ClientHelper.get().notifyCountsChanged();
         }
     }

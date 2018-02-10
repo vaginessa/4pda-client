@@ -2,7 +2,7 @@ package forpdateam.ru.forpda.model.repository.profile;
 
 import forpdateam.ru.forpda.api.profile.Profile;
 import forpdateam.ru.forpda.api.profile.models.ProfileModel;
-import forpdateam.ru.forpda.model.system.SchedulersProvider;
+import forpdateam.ru.forpda.model.SchedulersProvider;
 import io.reactivex.Observable;
 
 /**

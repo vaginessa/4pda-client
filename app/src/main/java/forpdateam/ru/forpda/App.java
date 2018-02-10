@@ -16,6 +16,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.VectorDrawable;
+import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
@@ -72,6 +73,7 @@ import forpdateam.ru.forpda.client.Client;
 import forpdateam.ru.forpda.common.LocaleHelper;
 import forpdateam.ru.forpda.common.Preferences;
 import forpdateam.ru.forpda.common.realm.DbMigration;
+import forpdateam.ru.forpda.common.receivers.NetworkStateReceiver;
 import forpdateam.ru.forpda.common.receivers.WakeUpReceiver;
 import forpdateam.ru.forpda.common.simple.SimpleObservable;
 import forpdateam.ru.forpda.entity.app.TabNotification;
@@ -257,6 +259,8 @@ public class App extends android.app.Application {
 
         ACRA.getErrorReporter().putCustomData("VERSIONS_HISTORY", getPreferences().getString("app.versions.history", ""));
 
+        dependencies = new Dependencies(this);
+
         density = getResources().getDisplayMetrics().density;
         initImageLoader(this);
 
@@ -354,8 +358,18 @@ public class App extends android.app.Application {
                 .subscribe();
 
         QmsHelper.init();
-        Di.get();
         Log.e("APP", "TIME APP FINAL " + (System.currentTimeMillis() - time));
+
+        registerReceiver(
+                new NetworkStateReceiver(),
+                new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+        );
+    }
+
+    private Dependencies dependencies;
+
+    public Dependencies Di() {
+        return dependencies;
     }
 
     private ServiceConnection mServiceConnection = new ServiceConnection() {

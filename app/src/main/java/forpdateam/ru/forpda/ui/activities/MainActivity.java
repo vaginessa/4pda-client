@@ -27,7 +27,6 @@ import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.common.LocaleHelper;
 import forpdateam.ru.forpda.common.Preferences;
-import forpdateam.ru.forpda.common.receivers.NetworkStateReceiver;
 import forpdateam.ru.forpda.common.webview.WebViewsProvider;
 import forpdateam.ru.forpda.notifications.NotificationsService;
 import forpdateam.ru.forpda.ui.TabManager;
@@ -68,7 +67,6 @@ public class MainActivity extends AppCompatActivity implements TabManager.TabLis
         TabManager.init(this, this);
     }
 
-    private NetworkStateReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -178,8 +176,6 @@ public class MainActivity extends AppCompatActivity implements TabManager.TabLis
             }
         });
 
-        receiver = new NetworkStateReceiver();
-        receiver.registerReceiver();
 
         KeyboardUtil keyboardUtil = new KeyboardUtil(this, findViewById(R.id.fragments_container));
         keyboardUtil.enable();
@@ -356,8 +352,6 @@ public class MainActivity extends AppCompatActivity implements TabManager.TabLis
         super.onResume();
         Log.d(LOG_TAG, "onResume");
         Log.d(LOG_TAG, "TabManager active tab: " + TabManager.getActiveIndex() + " : " + TabManager.getActiveTag());
-        if (receiver != null)
-            receiver.registerReceiver();
         if (lang == null) {
             lang = LocaleHelper.getLanguage(this);
         }
@@ -391,17 +385,12 @@ public class MainActivity extends AppCompatActivity implements TabManager.TabLis
     protected void onPause() {
         super.onPause();
         Log.d(LOG_TAG, "onPause");
-        if (receiver != null)
-            receiver.unregisterReceiver();
     }
 
     @Override
     protected void onDestroy() {
         Log.d(LOG_TAG, "onDestroy");
         super.onDestroy();
-        if (receiver != null) {
-            receiver.unregisterReceiver();
-        }
         if (drawers != null) {
             drawers.destroy();
         }

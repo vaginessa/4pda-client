@@ -1,5 +1,7 @@
 package forpdateam.ru.forpda;
 
+import android.content.Context;
+
 import forpdateam.ru.forpda.api.auth.Auth;
 import forpdateam.ru.forpda.api.favorites.Favorites;
 import forpdateam.ru.forpda.api.forum.Forum;
@@ -7,7 +9,7 @@ import forpdateam.ru.forpda.api.mentions.Mentions;
 import forpdateam.ru.forpda.api.profile.Profile;
 import forpdateam.ru.forpda.api.reputation.Reputation;
 import forpdateam.ru.forpda.api.topcis.Topics;
-import forpdateam.ru.forpda.apirx.apiclasses.TopicsRx;
+import forpdateam.ru.forpda.model.NetworkStateProvider;
 import forpdateam.ru.forpda.model.repository.auth.AuthRepository;
 import forpdateam.ru.forpda.model.repository.faviorites.FavoritesRepository;
 import forpdateam.ru.forpda.model.repository.forum.ForumRepository;
@@ -16,24 +18,25 @@ import forpdateam.ru.forpda.model.repository.mentions.MentionsRepository;
 import forpdateam.ru.forpda.model.repository.profile.ProfileRepository;
 import forpdateam.ru.forpda.model.repository.reputation.ReputationRepository;
 import forpdateam.ru.forpda.model.repository.topics.TopicsRepository;
+import forpdateam.ru.forpda.model.system.AppNetworkState;
 import forpdateam.ru.forpda.model.system.AppSchedulers;
-import forpdateam.ru.forpda.model.system.SchedulersProvider;
+import forpdateam.ru.forpda.model.SchedulersProvider;
 
 /**
  * Created by radiationx on 01.01.18.
  */
 
-public class Di {
-    private static final Di ourInstance = new Di();
+public class Dependencies {
+    private Context context;
+    public NetworkStateProvider networkState;
 
-    public static Di get() {
-        return ourInstance;
-    }
-
-    private Di() {
+    Dependencies(Context context) {
+        this.context = context;
+        networkState = new AppNetworkState(context);
     }
 
     public SchedulersProvider schedulers = new AppSchedulers();
+
 
     public Favorites favoritesApi = new Favorites();
     public Mentions mentionsApi = new Mentions();

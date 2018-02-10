@@ -34,14 +34,12 @@ import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListene
 import java.util.regex.Pattern;
 
 import forpdateam.ru.forpda.App;
-import forpdateam.ru.forpda.Di;
+import forpdateam.ru.forpda.Dependencies;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.api.profile.models.ProfileModel;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.BitmapUtils;
-import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.common.LinkMovementMethod;
-import forpdateam.ru.forpda.common.Utils;
 import forpdateam.ru.forpda.presentation.profile.ProfilePresenter;
 import forpdateam.ru.forpda.presentation.profile.ProfileView;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
@@ -59,7 +57,7 @@ public class ProfileFragment extends TabFragment implements ProfileAdapter.Click
 
     @ProvidePresenter
     ProfilePresenter provideProfilePresenter() {
-        return new ProfilePresenter(Di.get().profileRepository);
+        return new ProfilePresenter(App.get().Di().profileRepository);
     }
 
     private RecyclerView recyclerView;

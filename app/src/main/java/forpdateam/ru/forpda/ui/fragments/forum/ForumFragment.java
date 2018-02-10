@@ -1,7 +1,6 @@
 package forpdateam.ru.forpda.ui.fragments.forum;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
@@ -16,27 +15,19 @@ import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.unnamed.b.atv.model.TreeNode;
 import com.unnamed.b.atv.view.AndroidTreeView;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import forpdateam.ru.forpda.App;
-import forpdateam.ru.forpda.Di;
+import forpdateam.ru.forpda.Dependencies;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.api.Api;
 import forpdateam.ru.forpda.api.forum.models.ForumItemTree;
-import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.client.ClientHelper;
-import forpdateam.ru.forpda.common.Utils;
 import forpdateam.ru.forpda.entity.db.forum.ForumItemFlatBd;
 import forpdateam.ru.forpda.presentation.forum.ForumPresenter;
 import forpdateam.ru.forpda.presentation.forum.ForumView;
 import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import forpdateam.ru.forpda.ui.fragments.favorites.FavoritesHelper;
-import forpdateam.ru.forpda.ui.fragments.search.SearchFragment;
 import forpdateam.ru.forpda.ui.fragments.topics.TopicsFragment;
 import forpdateam.ru.forpda.ui.views.DynamicDialogMenu;
-import io.realm.Realm;
 import io.realm.RealmResults;
 
 /**
@@ -51,7 +42,7 @@ public class ForumFragment extends TabFragment implements ForumView {
 
     @ProvidePresenter
     ForumPresenter provideForumPresenter() {
-        return new ForumPresenter(Di.get().forumRepository);
+        return new ForumPresenter(App.get().Di().forumRepository);
     }
 
     private NestedScrollView treeContainer;

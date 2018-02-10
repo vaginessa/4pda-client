@@ -5,7 +5,7 @@ import java.util.List;
 
 import forpdateam.ru.forpda.entity.app.history.HistoryItem;
 import forpdateam.ru.forpda.entity.db.history.HistoryItemBd;
-import forpdateam.ru.forpda.model.system.SchedulersProvider;
+import forpdateam.ru.forpda.model.SchedulersProvider;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.realm.Realm;
