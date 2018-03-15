@@ -52,7 +52,7 @@ public class ReputationFragment extends RecyclerFragment implements ReputationVi
 
     @ProvidePresenter
     ReputationPresenter provideReputationPresenter() {
-        return new ReputationPresenter(App.get().Di().reputationRepository);
+        return new ReputationPresenter(App.get().Di().getReputationRepository());
     }
 
     private ReputationAdapter adapter;

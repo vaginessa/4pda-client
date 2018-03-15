@@ -42,7 +42,7 @@ public class ForumFragment extends TabFragment implements ForumView {
 
     @ProvidePresenter
     ForumPresenter provideForumPresenter() {
-        return new ForumPresenter(App.get().Di().forumRepository);
+        return new ForumPresenter(App.get().Di().getForumRepository());
     }
 
     private NestedScrollView treeContainer;

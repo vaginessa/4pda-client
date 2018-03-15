@@ -47,7 +47,7 @@ public class DrawerHeader {
 
     private CompositeDisposable disposables = new CompositeDisposable();
 
-    private NetworkStateProvider networkState = App.get().Di().networkState;
+    private NetworkStateProvider networkState = App.get().Di().getNetworkState();
 
     private Consumer<Boolean> networkObserver = state -> {
         if (state) {

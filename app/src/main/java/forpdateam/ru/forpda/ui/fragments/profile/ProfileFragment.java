@@ -57,7 +57,7 @@ public class ProfileFragment extends TabFragment implements ProfileAdapter.Click
 
     @ProvidePresenter
     ProfilePresenter provideProfilePresenter() {
-        return new ProfilePresenter(App.get().Di().profileRepository);
+        return new ProfilePresenter(App.get().Di().getProfileRepository());
     }
 
     private RecyclerView recyclerView;

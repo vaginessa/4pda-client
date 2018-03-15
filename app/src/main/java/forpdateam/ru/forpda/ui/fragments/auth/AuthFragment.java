@@ -52,7 +52,7 @@ public class AuthFragment extends TabFragment implements AuthView {
 
     @ProvidePresenter
     AuthPresenter provideAuthPresenter() {
-        return new AuthPresenter(App.get().Di().authRepository, App.get().Di().profileRepository);
+        return new AuthPresenter(App.get().Di().getAuthRepository(), App.get().Di().getProfileRepository());
     }
 
     private EditText nick, password, captcha;

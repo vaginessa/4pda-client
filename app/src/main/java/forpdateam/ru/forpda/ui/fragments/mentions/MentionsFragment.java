@@ -39,7 +39,7 @@ public class MentionsFragment extends RecyclerFragment implements MentionsView {
 
     @ProvidePresenter
     MentionsPresenter provideMentionsPresenter() {
-        return new MentionsPresenter(App.get().Di().mentionsRepository);
+        return new MentionsPresenter(App.get().Di().getMentionsRepository());
     }
 
     private DynamicDialogMenu<MentionsFragment, MentionItem> dialogMenu;

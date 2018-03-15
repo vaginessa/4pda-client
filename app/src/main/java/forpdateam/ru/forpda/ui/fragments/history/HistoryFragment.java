@@ -9,6 +9,8 @@ import android.view.View;
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -41,7 +43,7 @@ public class HistoryFragment extends RecyclerFragment implements HistoryView {
 
     @ProvidePresenter
     HistoryPresenter provideHistoryPresenter() {
-        return new HistoryPresenter(App.get().Di().historyRepository);
+        return new HistoryPresenter(App.get().Di().getHistoryRepository());
     }
 
     private HistoryAdapter adapter;
@@ -86,7 +88,7 @@ public class HistoryFragment extends RecyclerFragment implements HistoryView {
     }
 
     @Override
-    public void showHistory(List<HistoryItem> history) {
+    public void showHistory(@NotNull List<? extends HistoryItem> history) {
         if (history.isEmpty()) {
             if (!contentController.contains(ContentController.TAG_NO_DATA)) {
                 FunnyContent funnyContent = new FunnyContent(getContext())

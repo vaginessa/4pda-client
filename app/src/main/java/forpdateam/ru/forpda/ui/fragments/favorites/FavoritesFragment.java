@@ -19,6 +19,8 @@ import android.widget.Toast;
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -62,7 +64,7 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
 
     @ProvidePresenter
     FavoritesPresenter provideFavoritesPresenter() {
-        return new FavoritesPresenter(App.get().Di().favoritesRepository);
+        return new FavoritesPresenter(App.get().Di().getFavoritesRepository());
     }
 
     private DynamicDialogMenu<FavoritesFragment, FavItem> dialogMenu;
@@ -252,7 +254,7 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
     }
 
     @Override
-    public void onShowFavorite(List<FavItem> items) {
+    public void onShowFavorite(@NotNull List<? extends FavItem> items) {
         if (items.isEmpty()) {
             if (!contentController.contains(ContentController.TAG_NO_DATA)) {
                 FunnyContent funnyContent = new FunnyContent(getContext())

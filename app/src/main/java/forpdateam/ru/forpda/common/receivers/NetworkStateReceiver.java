@@ -36,7 +36,7 @@ public class NetworkStateReceiver extends BroadcastReceiver {
 
         boolean state = mConnectionType == NetworkInfo.State.CONNECTED;
         Log.e("suka", "ntework send state " + state);
-        App.get().Di().networkState.setState(state);
+        App.get().Di().getNetworkState().setState(state);
     }
 
     public NetworkInfo.State getCurrentConnectionType() {

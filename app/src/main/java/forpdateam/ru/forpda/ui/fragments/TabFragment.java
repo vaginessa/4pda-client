@@ -101,7 +101,7 @@ public class TabFragment extends MvpAppCompatFragment {
     protected ContentController contentController;
 
     protected CompositeDisposable disposables = new CompositeDisposable();
-    protected NetworkStateProvider networkState = App.get().Di().networkState;
+    protected NetworkStateProvider networkState = App.get().Di().getNetworkState();
 
     protected Observer countsObserver = (observable, o) -> updateNotifyDot();
 
@@ -335,15 +335,6 @@ public class TabFragment extends MvpAppCompatFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        addToDisposable(
-                networkState
-                        .observeState()
-                        .subscribe(networkObserver)
-        );
-
-        App.get().addStatusBarSizeObserver(statusBarSizeObserver);
-        ClientHelper.get().addCountsObserver(countsObserver);
-        App.get().addPreferenceChangeObserver(tabPreferenceObserver);
 
         toolbarTitleView.setEllipsize(TextUtils.TruncateAt.MARQUEE);
         toolbarTitleView.setHorizontallyScrolling(true);
@@ -371,6 +362,15 @@ public class TabFragment extends MvpAppCompatFragment {
         setSubtitle(subtitle);
         updateNotifyDot();
         viewsReady();
+        addToDisposable(
+                networkState
+                        .observeState()
+                        .subscribe(networkObserver)
+        );
+
+        App.get().addStatusBarSizeObserver(statusBarSizeObserver);
+        ClientHelper.get().addCountsObserver(countsObserver);
+        App.get().addPreferenceChangeObserver(tabPreferenceObserver);
     }
 
     @Override

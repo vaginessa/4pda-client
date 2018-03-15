@@ -107,7 +107,7 @@ public class NotificationsService extends Service {
 
     protected CompositeDisposable disposables = new CompositeDisposable();
 
-    protected NetworkStateProvider networkState = App.get().Di().networkState;
+    protected NetworkStateProvider networkState = App.get().Di().getNetworkState();
 
     protected Consumer<Boolean> networkObserver = state -> {
         if (state) {

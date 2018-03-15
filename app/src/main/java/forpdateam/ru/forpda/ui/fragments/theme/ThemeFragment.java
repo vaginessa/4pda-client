@@ -37,6 +37,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.arellomobile.mvp.presenter.InjectPresenter;
+import com.arellomobile.mvp.presenter.ProvidePresenter;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -61,6 +64,8 @@ import forpdateam.ru.forpda.common.Preferences;
 import forpdateam.ru.forpda.common.Utils;
 import forpdateam.ru.forpda.common.webview.jsinterfaces.IPostFunctions;
 import forpdateam.ru.forpda.entity.app.TabNotification;
+import forpdateam.ru.forpda.presentation.theme.ThemePresenter;
+import forpdateam.ru.forpda.presentation.theme.ThemeView;
 import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import forpdateam.ru.forpda.ui.fragments.favorites.FavoritesFragment;
@@ -78,7 +83,7 @@ import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip;
  * Created by radiationx on 20.10.16.
  */
 
-public abstract class ThemeFragment extends TabFragment implements IPostFunctions {
+public abstract class ThemeFragment extends TabFragment implements IPostFunctions, ThemeView {
     //Указывают на произведенное действие: переход назад, обновление, обычный переход по ссылке
     private final static String LOG_TAG = ThemeFragment.class.getSimpleName();
     protected final static int BACK_ACTION = 0, REFRESH_ACTION = 1, NORMAL_ACTION = 2;
@@ -140,6 +145,16 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
         TabNotification event = (TabNotification) o;
         runInUiThread(() -> handleEvent(event));
     };
+
+
+    @InjectPresenter
+    ThemePresenter presenter;
+
+    @ProvidePresenter
+    ThemePresenter provideThemePresenter() {
+        return new ThemePresenter(App.get().Di().getThemeRepository());
+    }
+
 
     private void handleEvent(TabNotification event) {
         Log.e("SUKAT", "handleEvent " + event.isWebSocket() + " : " + event.getSource() + " : " + event.getType());
