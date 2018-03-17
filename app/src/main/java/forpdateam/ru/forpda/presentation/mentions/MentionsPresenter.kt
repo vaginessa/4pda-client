@@ -25,7 +25,8 @@ class MentionsPresenter(
 ) : BasePresenter<MentionsView>() {
 
     fun getMentions(st: Int) {
-        val disposable = mentionsRepository.getMentions(st)
+        mentionsRepository
+                .getMentions(st)
                 .doOnTerminate { viewState.setRefreshing(true) }
                 .doAfterTerminate { viewState.setRefreshing(false) }
                 .subscribe({
@@ -33,8 +34,7 @@ class MentionsPresenter(
                 }, {
                     this.handleErrorRx(it)
                 })
-
-        addToDisposable(disposable)
+                .addToDisposable()
     }
 
     fun onItemClick(item: MentionItem) {

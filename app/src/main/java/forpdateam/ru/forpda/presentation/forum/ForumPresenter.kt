@@ -24,7 +24,8 @@ class ForumPresenter(
 ) : BasePresenter<ForumView>() {
 
     fun loadForums() {
-        val disposable = forumRepository.getForums()
+        forumRepository
+                .getForums()
                 .doOnTerminate { viewState.setRefreshing(true) }
                 .doAfterTerminate { viewState.setRefreshing(false) }
                 .subscribe({
@@ -33,11 +34,12 @@ class ForumPresenter(
                 }, {
                     this.handleErrorRx(it)
                 })
-        addToDisposable(disposable)
+                .addToDisposable()
     }
 
     fun getCacheForums() {
-        val disposable = forumRepository.getCache()
+        forumRepository
+                .getCache()
                 .doOnTerminate { viewState.setRefreshing(true) }
                 .doAfterTerminate { viewState.setRefreshing(false) }
                 .subscribe({ it ->
@@ -49,11 +51,12 @@ class ForumPresenter(
                 }, {
                     this.handleErrorRx(it)
                 })
-        addToDisposable(disposable)
+                .addToDisposable()
     }
 
     private fun saveCacheForums(rootForum: ForumItemTree) {
-        val disposable = forumRepository.saveCache(rootForum)
+        forumRepository
+                .saveCache(rootForum)
                 .doOnTerminate { viewState.setRefreshing(true) }
                 .doAfterTerminate { viewState.setRefreshing(false) }
                 .subscribe({
@@ -61,7 +64,7 @@ class ForumPresenter(
                 }, {
                     this.handleErrorRx(it)
                 })
-        addToDisposable(disposable)
+                .addToDisposable()
     }
 
     fun copyLink(item: ForumItemTree) {

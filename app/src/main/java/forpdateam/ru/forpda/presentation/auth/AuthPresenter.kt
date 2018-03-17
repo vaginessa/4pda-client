@@ -19,7 +19,8 @@ class AuthPresenter(
 ) : BasePresenter<AuthView>() {
 
     fun loadForm() {
-        val disposable = authRepository.loadForm()
+        authRepository
+                .loadForm()
                 .doOnTerminate { viewState.setRefreshing(true) }
                 .doAfterTerminate { viewState.setRefreshing(false) }
                 .subscribe({
@@ -27,11 +28,12 @@ class AuthPresenter(
                 }, {
                     this.handleErrorRx(it)
                 })
-        addToDisposable(disposable)
+                .addToDisposable()
     }
 
     fun signIn(authForm: AuthForm) {
-        val disposable = authRepository.signIn(authForm)
+        authRepository
+                .signIn(authForm)
                 .doOnTerminate { viewState.setRefreshing(true) }
                 .doAfterTerminate { viewState.setRefreshing(false) }
                 .subscribe({
@@ -39,11 +41,12 @@ class AuthPresenter(
                 }, {
                     this.handleErrorRx(it)
                 })
-        addToDisposable(disposable)
+                .addToDisposable()
     }
 
     fun loadProfile(url: String) {
-        val disposable = profileRepository.loadProfile(url)
+        profileRepository
+                .loadProfile(url)
                 .doOnTerminate { viewState.setRefreshing(true) }
                 .doAfterTerminate { viewState.setRefreshing(false) }
                 .subscribe({
@@ -51,6 +54,6 @@ class AuthPresenter(
                 }, {
                     this.handleErrorRx(it)
                 })
-        addToDisposable(disposable)
+                .addToDisposable()
     }
 }

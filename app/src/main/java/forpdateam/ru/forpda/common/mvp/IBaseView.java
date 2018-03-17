@@ -7,5 +7,5 @@ import com.arellomobile.mvp.MvpView;
  */
 
 public interface IBaseView extends MvpView {
-    void setRefreshing(boolean refreshing);
+    void setRefreshing(boolean isRefreshing);
 }

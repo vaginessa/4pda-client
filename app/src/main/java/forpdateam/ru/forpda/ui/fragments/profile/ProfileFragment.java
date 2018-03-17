@@ -167,9 +167,9 @@ public class ProfileFragment extends TabFragment implements ProfileAdapter.Click
     }
 
     @Override
-    public void setRefreshing(boolean refreshing) {
-        super.setRefreshing(refreshing);
-        if(refreshing){
+    public void setRefreshing(boolean isRefreshing) {
+        super.setRefreshing(isRefreshing);
+        if(isRefreshing){
             refreshToolbarMenuItems(false);
         }
     }

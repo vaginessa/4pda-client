@@ -22,7 +22,8 @@ class HistoryPresenter(
 ) : BasePresenter<HistoryView>() {
 
     fun getHistory() {
-        val disposable = historyRepository.getHistory()
+        historyRepository
+                .getHistory()
                 .doOnTerminate { viewState.setRefreshing(true) }
                 .doAfterTerminate { viewState.setRefreshing(false) }
                 .subscribe({
@@ -30,11 +31,12 @@ class HistoryPresenter(
                 }, {
                     this.handleErrorRx(it)
                 })
-        addToDisposable(disposable)
+                .addToDisposable()
     }
 
     fun remove(id: Int) {
-        val disposable = historyRepository.remove(id)
+        historyRepository
+                .remove(id)
                 .doOnTerminate { viewState.setRefreshing(true) }
                 .doAfterTerminate { viewState.setRefreshing(false) }
                 .subscribe({
@@ -42,11 +44,12 @@ class HistoryPresenter(
                 }, {
                     this.handleErrorRx(it)
                 })
-        addToDisposable(disposable)
+                .addToDisposable()
     }
 
     fun clear() {
-        val disposable = historyRepository.clear()
+        historyRepository
+                .clear()
                 .doOnTerminate { viewState.setRefreshing(true) }
                 .doAfterTerminate { viewState.setRefreshing(false) }
                 .subscribe({
@@ -54,7 +57,7 @@ class HistoryPresenter(
                 }, {
                     this.handleErrorRx(it)
                 })
-        addToDisposable(disposable)
+                .addToDisposable()
     }
 
     fun copyLink(item: HistoryItem) {

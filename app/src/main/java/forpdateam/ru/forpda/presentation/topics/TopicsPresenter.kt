@@ -26,14 +26,17 @@ import io.reactivex.functions.Consumer
  */
 
 @InjectViewState
-class TopicsPresenter(private val topicsRepository: TopicsRepository) : BasePresenter<TopicsView>() {
+class TopicsPresenter(
+        private val topicsRepository: TopicsRepository
+) : BasePresenter<TopicsView>() {
 
     var id = 0
     private var currentSt = 0
     var currentData: TopicsData? = null
 
     fun loadTopics() {
-        val disposable = topicsRepository.getTopics(id, currentSt)
+        topicsRepository
+                .getTopics(id, currentSt)
                 .doOnTerminate { viewState.setRefreshing(true) }
                 .doAfterTerminate { viewState.setRefreshing(false) }
                 .subscribe({
@@ -41,8 +44,7 @@ class TopicsPresenter(private val topicsRepository: TopicsRepository) : BasePres
                 }, {
                     this.handleErrorRx(it)
                 })
-
-        addToDisposable(disposable)
+                .addToDisposable()
     }
 
     fun loadPage(st: Int) {

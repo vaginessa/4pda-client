@@ -552,8 +552,8 @@ public class TabFragment extends MvpAppCompatFragment {
         contentController.stopRefreshing();
     }
 
-    public void setRefreshing(boolean refreshing) {
-        if (refreshing)
+    public void setRefreshing(boolean isRefreshing) {
+        if (isRefreshing)
             startRefreshing();
         else
             stopRefreshing();

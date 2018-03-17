@@ -28,7 +28,8 @@ class ProfilePresenter(
 
     private fun loadProfile() {
         profileUrl?.let {
-            val disposable = profileRepository.loadProfile(it)
+            profileRepository
+                    .loadProfile(it)
                     .doOnTerminate { viewState.setRefreshing(true) }
                     .doAfterTerminate { viewState.setRefreshing(false) }
                     .subscribe({ profileModel ->
@@ -37,18 +38,19 @@ class ProfilePresenter(
                     }, {
                         this.handleErrorRx(it)
                     })
-            addToDisposable(disposable)
+                    .addToDisposable()
         }
     }
 
     fun saveNote(note: String) {
-        val disposable = profileRepository.saveNote(note)
+        profileRepository
+                .saveNote(note)
                 .subscribe({
                     viewState.onSaveNote(it)
                 }, {
                     this.handleErrorRx(it)
                 })
-        addToDisposable(disposable)
+                .addToDisposable()
     }
 
     fun copyUrl() {

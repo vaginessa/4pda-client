@@ -24,7 +24,8 @@ class FavoritesPresenter(
 ) : BasePresenter<FavoritesView>() {
 
     fun getFavorites(st: Int, all: Boolean, sorting: Sorting) {
-        val disposable = favoritesRepository.loadFavorites(st, all, sorting)
+        favoritesRepository
+                .loadFavorites(st, all, sorting)
                 .doOnTerminate { viewState.setRefreshing(true) }
                 .doAfterTerminate { viewState.setRefreshing(false) }
                 .subscribe({
@@ -32,46 +33,50 @@ class FavoritesPresenter(
                 }, {
                     this.handleErrorRx(it)
                 })
-        addToDisposable(disposable)
+                .addToDisposable()
     }
 
     fun saveFavorites(items: List<FavItem>) {
-        val disposable = favoritesRepository.saveFavorites(items)
+        favoritesRepository
+                .saveFavorites(items)
                 .subscribe({
                     this.showFavorites()
                 }, {
                     this.handleErrorRx(it)
                 })
-        addToDisposable(disposable)
+                .addToDisposable()
     }
 
     fun showFavorites() {
-        val disposable = favoritesRepository.cache
+        favoritesRepository
+                .cache
                 .subscribe {
                     viewState.onShowFavorite(it)
                 }
-        addToDisposable(disposable)
+                .addToDisposable()
     }
 
     fun markRead(topicId: Int) {
-        val disposable = favoritesRepository.markRead(topicId)
+        favoritesRepository
+                .markRead(topicId)
                 .subscribe({
                     this.showFavorites()
                 }, {
                     this.handleErrorRx(it)
                 })
-        addToDisposable(disposable)
+                .addToDisposable()
     }
 
     fun handleEvent(event: TabNotification, sorting: Sorting, count: Int) {
         if (event.isWebSocket && event.event.isNew) return
-        val disposable = favoritesRepository.handleEvent(event, sorting, count)
+        favoritesRepository
+                .handleEvent(event, sorting, count)
                 .subscribe({
                     viewState.onHandleEvent(it)
                 }, {
                     this.handleErrorRx(it)
                 })
-        addToDisposable(disposable)
+                .addToDisposable()
     }
 
 

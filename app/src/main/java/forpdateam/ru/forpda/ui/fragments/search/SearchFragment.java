@@ -842,21 +842,22 @@ public class SearchFragment extends TabFragment implements IPostFunctions, Exten
     public void showUserMenu(IBaseForumPost post) {
         if (getContext() == null)
             return;
-        ThemeDialogsHelper.showUserMenu(getContext(), this, post);
+        //todo totodo
+        //ThemeDialogsHelper.showUserMenu(getContext(), this, post);
     }
 
     @Override
     public void showReputationMenu(IBaseForumPost post) {
         if (getContext() == null)
             return;
-        ThemeDialogsHelper.showReputationMenu(getContext(), this, post);
+        //ThemeDialogsHelper.showReputationMenu(getContext(), this, post);
     }
 
     @Override
     public void showPostMenu(IBaseForumPost post) {
         if (getContext() == null)
             return;
-        ThemeDialogsHelper.showPostMenu(getContext(), this, post);
+        //ThemeDialogsHelper.showPostMenu(getContext(), this, post);
     }
 
     @Override

@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -40,8 +39,8 @@ import android.widget.Toast;
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -53,6 +52,7 @@ import forpdateam.ru.forpda.api.ApiUtils;
 import forpdateam.ru.forpda.api.IBaseForumPost;
 import forpdateam.ru.forpda.api.RequestFile;
 import forpdateam.ru.forpda.api.events.models.NotificationEvent;
+import forpdateam.ru.forpda.api.others.pagination.Pagination;
 import forpdateam.ru.forpda.api.theme.editpost.models.AttachmentItem;
 import forpdateam.ru.forpda.api.theme.editpost.models.EditPostForm;
 import forpdateam.ru.forpda.api.theme.models.ThemePage;
@@ -83,11 +83,10 @@ import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip;
  * Created by radiationx on 20.10.16.
  */
 
-public abstract class ThemeFragment extends TabFragment implements IPostFunctions, ThemeView {
+public abstract class ThemeFragment extends TabFragment implements ThemeView {
     //Указывают на произведенное действие: переход назад, обновление, обычный переход по ссылке
     private final static String LOG_TAG = ThemeFragment.class.getSimpleName();
-    protected final static int BACK_ACTION = 0, REFRESH_ACTION = 1, NORMAL_ACTION = 2;
-    protected int loadAction = NORMAL_ACTION;
+
     protected MenuItem toggleMessagePanelItem;
     protected MenuItem refreshMenuItem;
     protected MenuItem copyLinkMenuItem;
@@ -97,18 +96,19 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
     protected MenuItem deleteFavoritesMenuItem;
     protected MenuItem addFavoritesMenuItem;
     protected MenuItem openForumMenuItem;
+
     protected SwipeRefreshLayout refreshLayout;
-    protected ThemePage currentPage;
-    protected List<ThemePage> history = new ArrayList<>();
-    //protected Subscriber<String> helperSubscriber = new Subscriber<>(this);
+
     private PaginationHelper paginationHelper;
+
     //Тег для вьюхи поиска. Чтобы создавались кнопки и т.д, только при вызове поиска, а не при каждом создании меню.
     protected int searchViewTag = 0;
-    //protected final ColorFilter colorFilter = new PorterDuffColorFilter(Color.argb(80, 255, 255, 255), PorterDuff.Mode.DST_IN);
+
     protected MessagePanel messagePanel;
     protected AttachmentsPopup attachmentsPopup;
-    protected String tab_url = "";
+
     protected SimpleTooltip tooltip;
+
     private View notificationView;
     private TextView notificationTitle;
     private ImageButton notificationButton;
@@ -160,10 +160,10 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
         Log.e("SUKAT", "handleEvent " + event.isWebSocket() + " : " + event.getSource() + " : " + event.getType());
         if (!event.isWebSocket())
             return;
-        if (currentPage == null)
+        if (!presenter.isPageLoaded())
             return;
-        Log.e("SUKAT", "handleEvent " + event.getEvent().getSourceId() + " : " + currentPage.getId());
-        if (event.getEvent().getSourceId() != currentPage.getId())
+        Log.e("SUKAT", "handleEvent " + event.getEvent().getSourceId() + " : " + presenter.getId());
+        if (event.getEvent().getSourceId() != presenter.getId())
             return;
 
         if (event.getSource() == NotificationEvent.Source.THEME) {
@@ -179,9 +179,7 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
                     break;
             }
         }
-
     }
-
 
     private void onEventNew(TabNotification event) {
         Log.d("SUKAT", "onEventNew");
@@ -196,27 +194,11 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
     }
 
 
-    protected abstract void addShowingView();
-
-    protected abstract void findNext(boolean next);
-
-    protected abstract void findText(String text);
-
-    protected abstract void saveToHistory(ThemePage themePage);
-
-    protected abstract void updateHistoryLast(ThemePage themePage);
-
-    protected abstract void updateShowAvatarState(boolean isShow);
-
-    protected abstract void updateTypeAvatarState(boolean isCircle);
-
-    protected abstract void setFontSize(int size);
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            tab_url = getArguments().getString(ARG_TAB);
+            presenter.setThemeUrl(getArguments().getString(ARG_TAB, ""));
         }
     }
 
@@ -251,8 +233,6 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
         notificationView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         contentController.setMainRefresh(refreshLayout);
-
-        addShowingView();
         return view;
     }
 
@@ -267,29 +247,22 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
         notificationButton.setOnClickListener(v -> {
             notificationView.setVisibility(View.GONE);
         });
-        notificationView.findViewById(R.id.new_message_card)
+        notificationView
+                .findViewById(R.id.new_message_card)
                 .setOnClickListener(v -> {
-                    tab_url = "https://4pda.ru/forum/index.php?showtopic=" + currentPage.getId() + "&view=getnewpost";
-                    loadData(NORMAL_ACTION);
+                    presenter.loadNewPosts();
                     notificationView.setVisibility(View.GONE);
                 });
-
 
         messagePanel.enableBehavior();
         messagePanel.addSendOnClickListener(v -> sendMessage());
         messagePanel.getSendButton().setOnLongClickListener(v -> {
-            EditPostForm form = createEditPostForm();
-            if (form != null) {
-                TabManager.get().add(EditPostFragment.newInstance(createEditPostForm(), currentPage.getTitle()));
-            }
+            presenter.openEditPostForm(messagePanel.getMessage(), messagePanel.getAttachments());
             return true;
         });
         messagePanel.getFullButton().setVisibility(View.VISIBLE);
         messagePanel.getFullButton().setOnClickListener(v -> {
-            EditPostForm form = createEditPostForm();
-            if (form != null) {
-                TabManager.get().add(EditPostFragment.newInstance(createEditPostForm(), currentPage.getTitle()));
-            }
+            presenter.openEditPostForm(messagePanel.getMessage(), messagePanel.getAttachments());
         });
         messagePanel.getHideButton().setVisibility(View.VISIBLE);
         messagePanel.getHideButton().setOnClickListener(v -> {
@@ -308,11 +281,7 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
 
             @Override
             public void onSelectedPage(int pageNumber) {
-                String url = "https://4pda.ru/forum/index.php?showtopic=";
-                url = url.concat(Uri.parse(tab_url).getQueryParameter("showtopic"));
-                if (pageNumber != 0) url = url.concat("&st=").concat(Integer.toString(pageNumber));
-                tab_url = url;
-                loadData(NORMAL_ACTION);
+                presenter.loadPage(pageNumber);
             }
         });
 
@@ -329,7 +298,7 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
         App.get().addPreferenceChangeObserver(themePreferenceObserver);
         refreshLayoutStyle(refreshLayout);
         refreshLayout.setOnRefreshListener(() -> {
-            loadData(REFRESH_ACTION);
+            presenter.reload();
         });
         if (App.get().getPreferences().getBoolean("theme.tooltip.long_click_send", true)) {
             tooltip = new SimpleTooltip.Builder(getContext())
@@ -372,7 +341,6 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
         super.onDestroy();
         App.get().removePreferenceChangeObserver(themePreferenceObserver);
         App.get().unSubscribeFavorites(notification);
-        history.clear();
         messagePanel.onDestroy();
         if (paginationHelper != null)
             paginationHelper.destroy();
@@ -384,8 +352,6 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
         messagePanel.hidePopupWindows();
     }
 
-    public abstract void scrollToAnchor(String anchor);
-
     @Override
     public boolean onBackPressed() {
         super.onBackPressed();
@@ -393,117 +359,66 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
             tooltip.dismiss();
             return true;
         }
-        if (messagePanel.onBackPressed())
+
+        if (messagePanel.onBackPressed()) {
             return true;
+        }
+
         if (getMenu().findItem(R.id.action_search) != null && getMenu().findItem(R.id.action_search).isActionViewExpanded()) {
             toolbar.collapseActionView();
             return true;
         }
-        if (App.get().getPreferences().getBoolean("theme.anchor_history", true)) {
-            if (currentPage != null && currentPage.getAnchors().size() > 1) {
-                currentPage.removeAnchor();
-                scrollToAnchor(currentPage.getAnchor());
-                return true;
-            }
-        }
-        if (history.size() > 1) {
-            setAction(BACK_ACTION);
 
-            ThemePage removed = history.get(history.size() - 1);
-            history.remove(history.size() - 1);
-            currentPage = history.get(history.size() - 1);
-            Log.e(LOG_TAG, "BACK PRESS REMOVE " + removed + " :" + currentPage);
-            tab_url = currentPage.getUrl();
-            updateView();
+        if (presenter.onBackPressed()) {
             return true;
         }
+
         if ((messagePanel.getMessage() != null && !messagePanel.getMessage().isEmpty()) || !messagePanel.getAttachments().isEmpty()) {
             new AlertDialog.Builder(getContext())
                     .setMessage(R.string.editpost_lose_changes)
                     .setPositiveButton(R.string.ok, (dialog, which) -> {
-                        history.clear();
                         TabManager.get().remove(ThemeFragment.this);
                     })
                     .setNegativeButton(R.string.no, null)
                     .show();
             return true;
         }
+
         return false;
     }
 
 
-    /*
-    *
-    * LOADING POST FUNCTIONS
-    *
-    * */
-
-    public void setAction(int action) {
-        this.loadAction = action;
-    }
-
-    protected abstract void updateHistoryLastHtml();
-
-    public void loadData(int action) {
-        setAction(action);
-        if (action == NORMAL_ACTION || action == REFRESH_ACTION) {
-            updateHistoryLastHtml();
-        }
-        loadData();
+    @Override
+    public void setRefreshing(boolean isRefreshing) {
+        super.setRefreshing(isRefreshing);
+        refreshToolbarMenuItems(!isRefreshing);
     }
 
     @Override
-    public boolean loadData() {
-        if (!super.loadData()) {
-            return false;
-        }
-        setRefreshing(true);
+    public void onLoadData(@NotNull ThemePage newPage) {
+        appBarLayout.post(() -> {
+            if (appBarLayout != null) {
+                appBarLayout.setExpanded(false, true);
+            }
+        });
 
-        refreshToolbarMenuItems(false);
-        boolean hatOpen = false;
-        boolean pollOpen = false;
-        if (currentPage != null) {
-            hatOpen = currentPage.isHatOpen();
-            pollOpen = currentPage.isPollOpen();
-        }
-        subscribe(RxApi.Theme().getTheme(tab_url, true, hatOpen, pollOpen), this::onLoadData, new ThemePage(), v -> loadData());
-        return true;
+        updateFavorites(newPage);
+        updateMainHistory(newPage);
+        updateView(newPage);
     }
 
-    protected void onLoadData(ThemePage newPage) throws Exception {
-        setRefreshing(false);
-        if (newPage == null || newPage.getId() == 0 || newPage.getUrl() == null) {
-            if (currentPage != null)
-                tab_url = currentPage.getUrl();
-            return;
-        }
-        if (currentPage == null) {
-            new Handler().postDelayed(() -> (appBarLayout).setExpanded(false, true), 225);
-            /*if (!isTalkBackEnabled()) {
-                new Handler().postDelayed(() -> (appBarLayout).setExpanded(false, true), 225);
-            }*/
-        }
+    @CallSuper
+    @Override
+    public void updateView(@NotNull ThemePage page) {
+        refreshToolbarMenuItems(true);
+        paginationHelper.updatePagination(page.getPagination());
 
-        currentPage = newPage;
+        setTitle(page.getTitle());
 
-        if (loadAction == NORMAL_ACTION) {
-            saveToHistory(currentPage);
-        }
-        if (loadAction == REFRESH_ACTION) {
-            updateHistoryLast(currentPage);
-        }
-        updateFavorites(currentPage);
-        updateMainHistory(currentPage);
-        updateView();
-    }
+        setTabTitle(String.format(getString(R.string.fragment_tab_title_theme), page.getTitle()));
 
-    protected void updateTitle() {
-        setTitle(currentPage.getTitle());
-        setTabTitle(String.format(getString(R.string.fragment_tab_title_theme), currentPage.getTitle()));
-    }
-
-    protected void updateSubTitle() {
-        setSubtitle(String.valueOf(currentPage.getPagination().getCurrent()).concat("/").concat(String.valueOf(currentPage.getPagination().getAll())));
+        Pagination pagination = page.getPagination();
+        setSubtitle("" + pagination.getCurrent() + "/" + pagination.getAll());
     }
 
     protected void updateFavorites(ThemePage themePage) {
@@ -534,14 +449,6 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
         Log.d("SUKA", "ADD TO HISTORY " + (System.currentTimeMillis() - time));
     }
 
-    @CallSuper
-    protected void updateView() {
-        paginationHelper.updatePagination(currentPage.getPagination());
-        tab_url = currentPage.getUrl();
-        updateTitle();
-        updateSubTitle();
-        refreshToolbarMenuItems(true);
-    }
 
     private void toggleMessagePanel() {
         if (messagePanel.getVisibility() == View.VISIBLE) {
@@ -587,70 +494,50 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
                 })
                 .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-        refreshMenuItem = menu.add(R.string.refresh)
+        refreshMenuItem = menu
+                .add(R.string.refresh)
                 .setIcon(App.getVecDrawable(getContext(), R.drawable.ic_toolbar_refresh))
                 .setOnMenuItemClickListener(menuItem -> {
-                    loadData(REFRESH_ACTION);
+                    presenter.reload();
                     return false;
                 });
 
-        copyLinkMenuItem = menu.add(R.string.copy_link)
+        copyLinkMenuItem = menu
+                .add(R.string.copy_link)
                 .setOnMenuItemClickListener(menuItem -> {
-                    String url = tab_url;
-                    if (currentPage != null) {
-                        url = "https://4pda.ru/forum/index.php?showtopic=" + currentPage.getId();
-                    }
-                    Utils.copyToClipBoard(url);
+                    presenter.copyLink();
                     return false;
                 });
         addSearchOnPageItem(menu);
-        searchInThemeMenuItem = menu.add(R.string.search_in_theme)
+        searchInThemeMenuItem = menu
+                .add(R.string.search_in_theme)
                 .setOnMenuItemClickListener(menuItem -> {
-                    IntentHandler.handle("https://4pda.ru/forum/index.php?forums=" + currentPage.getForumId() + "&topics=" + currentPage.getId() + "&act=search&source=pst&result=posts");
+                    presenter.openSearch();
                     return false;
                 });
-        searchPostsMenuItem = menu.add(R.string.search_my_posts)
+        searchPostsMenuItem = menu
+                .add(R.string.search_my_posts)
                 .setOnMenuItemClickListener(menuItem -> {
-                    String url = "https://4pda.ru/forum/index.php?forums="
-                            + currentPage.getForumId()
-                            + "&topics="
-                            + currentPage.getId()
-                            + "&act=search&source=pst&result=posts&username=";
-
-                    try {
-                        url += URLEncoder.encode(App.get().getPreferences().getString("auth.user.nick", "null"), "windows-1251");
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
-                    IntentHandler.handle(url);
+                    presenter.openSearchMyPosts();
                     return false;
                 });
 
-        deleteFavoritesMenuItem = menu.add(R.string.delete_from_favorites)
+        deleteFavoritesMenuItem = menu
+                .add(R.string.delete_from_favorites)
                 .setOnMenuItemClickListener(menuItem -> {
-                    if (currentPage.getFavId() == 0) {
-                        Toast.makeText(App.getContext(), R.string.fav_delete_error_id_not_found, Toast.LENGTH_SHORT).show();
-                        return false;
-                    }
-                    FavoritesHelper.deleteWithDialog(getContext(), aBoolean -> {
-                        Toast.makeText(App.getContext(), getString(aBoolean ? R.string.favorite_theme_deleted : R.string.error), Toast.LENGTH_SHORT).show();
-                        currentPage.setInFavorite(!aBoolean);
-                        refreshToolbarMenuItems(true);
-                    }, currentPage.getFavId());
+                    presenter.onClickDeleteInFav();
                     return false;
                 });
-        addFavoritesMenuItem = menu.add(R.string.add_to_favorites)
+        addFavoritesMenuItem = menu
+                .add(R.string.add_to_favorites)
                 .setOnMenuItemClickListener(menuItem -> {
-                    FavoritesHelper.addWithDialog(getContext(), aBoolean -> {
-                        Toast.makeText(App.getContext(), aBoolean ? getString(R.string.favorites_added) : getString(R.string.error), Toast.LENGTH_SHORT).show();
-                        currentPage.setInFavorite(aBoolean);
-                        refreshToolbarMenuItems(true);
-                    }, currentPage.getId());
+                    presenter.onClickAddInFav();
                     return false;
                 });
-        openForumMenuItem = menu.add(R.string.open_theme_forum)
+        openForumMenuItem = menu
+                .add(R.string.open_theme_forum)
                 .setOnMenuItemClickListener(menuItem -> {
-                    IntentHandler.handle("https://4pda.ru/forum/index.php?showforum=" + currentPage.getForumId());
+                    presenter.openForum();
                     return false;
                 });
 
@@ -661,8 +548,7 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
     protected void refreshToolbarMenuItems(boolean enable) {
         super.refreshToolbarMenuItems(enable);
         if (enable) {
-            boolean pageNotNull = !(currentPage == null || currentPage.getId() == 0 || currentPage.getUrl() == null);
-
+            boolean pageNotNull = presenter.isPageLoaded();
 
             toggleMessagePanelItem.setEnabled(true);
             refreshMenuItem.setEnabled(true);
@@ -673,7 +559,7 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
             deleteFavoritesMenuItem.setEnabled(pageNotNull);
             addFavoritesMenuItem.setEnabled(pageNotNull);
             if (pageNotNull) {
-                if (currentPage.isInFavorite()) {
+                if (presenter.isInFavorites()) {
                     deleteFavoritesMenuItem.setVisible(true);
                     addFavoritesMenuItem.setVisible(false);
                 } else {
@@ -770,6 +656,27 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
         });
     }
 
+    @Override
+    public void showAddInFavDialog(@NotNull ThemePage page) {
+        FavoritesHelper.addWithDialog(getContext(), aBoolean -> {
+            Toast.makeText(App.getContext(), aBoolean ? getString(R.string.favorites_added) : getString(R.string.error), Toast.LENGTH_SHORT).show();
+            page.setInFavorite(aBoolean);
+            refreshToolbarMenuItems(true);
+        }, page.getId());
+    }
+
+    @Override
+    public void showDeleteInFavDialog(@NotNull ThemePage page) {
+        if (page.getFavId() == 0) {
+            Toast.makeText(App.getContext(), R.string.fav_delete_error_id_not_found, Toast.LENGTH_SHORT).show();
+        }
+        FavoritesHelper.deleteWithDialog(getContext(), aBoolean -> {
+            Toast.makeText(App.getContext(), getString(aBoolean ? R.string.favorite_theme_deleted : R.string.error), Toast.LENGTH_SHORT).show();
+            page.setInFavorite(!aBoolean);
+            refreshToolbarMenuItems(true);
+        }, page.getFavId());
+    }
+
 
     /*
     *
@@ -785,21 +692,6 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
         return attachmentsPopup;
     }
 
-    private EditPostForm createEditPostForm() {
-        EditPostForm form = new EditPostForm();
-        if (currentPage == null) {
-            return null;
-        }
-        form.setForumId(currentPage.getForumId());
-        form.setTopicId(currentPage.getId());
-        form.setSt(currentPage.getPagination().getCurrent() * currentPage.getPagination().getPerPage());
-        form.setMessage(messagePanel.getMessage());
-        List<AttachmentItem> attachments = messagePanel.getAttachments();
-        for (AttachmentItem item : attachments) {
-            form.addAttachment(item);
-        }
-        return form;
-    }
 
     public void onSendPostCompleted(ThemePage themePage) throws Exception {
         messagePanel.clearAttachments();
@@ -813,22 +705,21 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
 
     private void sendMessage() {
         hidePopupWindows();
-        EditPostForm form = createEditPostForm();
-        if (form != null) {
-            messagePanel.setProgressState(true);
-            subscribe(RxApi.EditPost().sendPost(form), s -> {
-                messagePanel.setProgressState(false);
-                if (s != currentPage) {
-                    onLoadData(s);
-                    messagePanel.clearAttachments();
-                    messagePanel.clearMessage();
-                    if (Preferences.Main.isEditorDefaultHidden(getContext())) {
-                        hideMessagePanel();
-                    }
-                }
-            }, currentPage);
-        }
+        presenter.sendMessage(messagePanel.getMessage(), messagePanel.getAttachments());
+    }
 
+    @Override
+    public void onMessageSent() {
+        messagePanel.clearAttachments();
+        messagePanel.clearMessage();
+        if (Preferences.Main.isEditorDefaultHidden(getContext())) {
+            hideMessagePanel();
+        }
+    }
+
+    @Override
+    public void setMessageRefreshing(boolean isRefreshing) {
+        messagePanel.setProgressState(isRefreshing);
     }
 
     public void tryPickFile() {
@@ -866,70 +757,43 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
     *
     * */
 
-    public IBaseForumPost getPostById(int postId) {
-        for (IBaseForumPost post : currentPage.getPosts())
-            if (post.getId() == postId)
-                return post;
-        return null;
-    }
 
+    @Override
     public void firstPage() {
         paginationHelper.firstPage();
     }
 
+    @Override
     public void prevPage() {
         paginationHelper.prevPage();
     }
 
-
+    @Override
     public void nextPage() {
         paginationHelper.nextPage();
     }
 
+    @Override
     public void lastPage() {
         paginationHelper.lastPage();
     }
 
+    @Override
     public void selectPage() {
         paginationHelper.selectPageDialog();
     }
 
-    public void showUserMenu(final String postId) {
-        showUserMenu(getPostById(Integer.parseInt(postId)));
-    }
-
-    public void showReputationMenu(final String postId) {
-        showReputationMenu(getPostById(Integer.parseInt(postId)));
-    }
-
-    public void showPostMenu(final String postId) {
-        showPostMenu(getPostById(Integer.parseInt(postId)));
-    }
-
-    public void reportPost(final String postId) {
-        reportPost(getPostById(Integer.parseInt(postId)));
-    }
-
-    public void reply(final String postId) {
-        reply(getPostById(Integer.parseInt(postId)));
-    }
 
     @Override
-    public void reply(IBaseForumPost post) {
-        if (getContext() == null || post == null) {
-            return;
-        }
+    public void reply(@NotNull IBaseForumPost post) {
         String insert = String.format(Locale.getDefault(), "[snapback]%s[/snapback] [b]%s,[/b] \n", post.getId(), post.getNick());
         messagePanel.insertText(insert);
         showMessagePanel(true);
     }
 
-    public void quotePost(final String text, final String postId) {
-        quotePost(text, getPostById(Integer.parseInt(postId)));
-    }
 
     @Override
-    public void quotePost(String text, IBaseForumPost post) {
+    public void quotePost(@NotNull String text, @NotNull IBaseForumPost post) {
         if (getContext() == null) {
             return;
         }
@@ -939,46 +803,16 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
         showMessagePanel(true);
     }
 
-
-    public void deletePost(final String postId) {
-        deletePost(getPostById(Integer.parseInt(postId)));
-    }
-
-    public void editPost(final String postId) {
-        editPost(getPostById(Integer.parseInt(postId)));
-    }
-
     @Override
-    public void editPost(IBaseForumPost post) {
-        if (getContext() == null) {
-            return;
-        }
-        TabManager.get().add(EditPostFragment.newInstance(post.getId(), currentPage.getId(), currentPage.getForumId(), currentPage.getSt(), currentPage.getTitle()));
+    public void editPost(@NotNull IBaseForumPost post) {
+        presenter.openEditPostForm(post.getId());
     }
 
-    public void votePost(final String postId, final boolean type) {
-        votePost(getPostById(Integer.parseInt(postId)), type);
-    }
-
-    public void setHistoryBody(final String index, final String body) {
-        setHistoryBody(Integer.parseInt(index), body);
-    }
-
-    public void setHistoryBody(int index, String body) {
-        history.get(index).setHtml(body);
-    }
-
-    public void copySelectedText(final String text) {
-        Utils.copyToClipBoard(text);
-    }
-
-    public void toast(final String text) {
-        if (getContext() == null)
-            return;
+    public void toast(@NotNull final String text) {
         Toast.makeText(getContext(), text, Toast.LENGTH_SHORT).show();
     }
 
-    public void log(final String text) {
+    public void log(@NotNull String text) {
         int maxLogSize = 1000;
         for (int i = 0; i <= text.length() / maxLogSize; i++) {
             int start = i * maxLogSize;
@@ -988,79 +822,54 @@ public abstract class ThemeFragment extends TabFragment implements IPostFunction
         }
     }
 
-    public void showPollResults() {
-        tab_url = tab_url.replaceFirst("#[^&]*", "").replace("&mode=show", "").replace("&poll_open=true", "").concat("&mode=show&poll_open=true");
-        loadData(NORMAL_ACTION);
-    }
-
-    public void showPoll() {
-        tab_url = tab_url.replaceFirst("#[^&]*", "").replace("&mode=show", "").replace("&poll_open=true", "").concat("&poll_open=true");
-        loadData(NORMAL_ACTION);
-    }
-
     @Override
-    public void showUserMenu(IBaseForumPost post) {
-        if (getContext() == null || post == null)
-            return;
+    public void showUserMenu(@NotNull IBaseForumPost post) {
         ThemeDialogsHelper.showUserMenu(getContext(), this, post);
     }
 
     @Override
-    public void showReputationMenu(IBaseForumPost post) {
-        if (getContext() == null || post == null)
-            return;
+    public void showReputationMenu(@NotNull IBaseForumPost post) {
         ThemeDialogsHelper.showReputationMenu(getContext(), this, post);
     }
 
     @Override
-    public void showPostMenu(IBaseForumPost post) {
-        if (getContext() == null || post == null)
-            return;
+    public void showPostMenu(@NotNull IBaseForumPost post) {
         ThemeDialogsHelper.showPostMenu(getContext(), this, post);
     }
 
     @Override
-    public void reportPost(IBaseForumPost post) {
-        if (getContext() == null || post == null)
-            return;
+    public void reportPost(@NotNull IBaseForumPost post) {
         ThemeDialogsHelper.tryReportPost(getContext(), post);
     }
 
     //Удаление сообщения
     @Override
-    public void deletePost(IBaseForumPost post) {
-        if (getContext() == null || post == null)
-            return;
+    public void deletePost(@NotNull IBaseForumPost post) {
         ThemeDialogsHelper.deletePost(getContext(), post, aBoolean -> {
-            if (aBoolean)
+            if (aBoolean){
                 deletePostUi(post);
-
+            }
         });
     }
 
-    public abstract void deletePostUi(IBaseForumPost post);
-
     //Изменение репутации сообщения
     @Override
-    public void votePost(IBaseForumPost post, boolean type) {
-        if (getContext() == null || post == null)
+    public void votePost(@NotNull IBaseForumPost post, boolean type) {
+        if (getContext() == null)
             return;
         new AlertDialog.Builder(getContext())
                 .setMessage(String.format(getString(R.string.change_post_reputation_Type_Nick), getString(type ? R.string.increase : R.string.decrease), post.getNick()))
-
                 .setPositiveButton(R.string.ok, (dialog, which) -> ThemeHelper.votePost(s -> toast(s.isEmpty() ? getString(R.string.unknown_error) : s), post.getId(), type))
                 .setNegativeButton(R.string.cancel, null)
                 .show();
-
     }
 
     //Изменение репутации пользователя
     @SuppressLint("InflateParams")
     @Override
-    public void changeReputation(IBaseForumPost post, boolean type) {
-        if (getContext() == null || post == null)
+    public void changeReputation(@NotNull IBaseForumPost post, boolean type) {
+        if (getContext() == null)
             return;
         ThemeDialogsHelper.changeReputation(getContext(), post, type);
     }
-
 }

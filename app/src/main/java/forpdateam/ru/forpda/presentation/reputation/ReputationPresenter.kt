@@ -22,7 +22,8 @@ class ReputationPresenter(
     var currentData = RepData()
 
     fun loadReputation() {
-        val disposable = reputationRepository.loadReputation(currentData)
+        reputationRepository
+                .loadReputation(currentData)
                 .doOnTerminate { viewState.setRefreshing(true) }
                 .doAfterTerminate { viewState.setRefreshing(false) }
                 .subscribe({
@@ -30,11 +31,12 @@ class ReputationPresenter(
                 }, {
                     this.handleErrorRx(it)
                 })
-        addToDisposable(disposable)
+                .addToDisposable()
     }
 
     fun changeReputation(type: Boolean, message: String) {
-        val disposable = reputationRepository.changeReputation(0, currentData.id, type, message)
+        reputationRepository
+                .changeReputation(0, currentData.id, type, message)
                 .doOnTerminate { viewState.setRefreshing(true) }
                 .doAfterTerminate { viewState.setRefreshing(false) }
                 .subscribe({
@@ -43,7 +45,7 @@ class ReputationPresenter(
                 }, {
                     this.handleErrorRx(it)
                 })
-        addToDisposable(disposable)
+                .addToDisposable()
     }
 
     fun selectPage(page: Int) {

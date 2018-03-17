@@ -18,6 +18,7 @@ import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.common.Utils;
 import forpdateam.ru.forpda.common.webview.jsinterfaces.IPostFunctions;
+import forpdateam.ru.forpda.presentation.theme.ThemeView;
 import forpdateam.ru.forpda.ui.fragments.notes.NotesAddPopup;
 import forpdateam.ru.forpda.ui.fragments.search.SearchFragment;
 import forpdateam.ru.forpda.ui.views.DynamicDialogMenu;
@@ -28,13 +29,13 @@ import io.reactivex.functions.Consumer;
  */
 
 public class ThemeDialogsHelper {
-    private static DynamicDialogMenu<IPostFunctions, IBaseForumPost> userMenu, reputationMenu, postMenu;
+    private static DynamicDialogMenu<ThemeView, IBaseForumPost> userMenu, reputationMenu, postMenu;
 
-    public static void showUserMenu(Context context, IPostFunctions theme, IBaseForumPost post) {
+    public static void showUserMenu(Context context, ThemeView theme, IBaseForumPost post) {
         if (userMenu == null) {
             userMenu = new DynamicDialogMenu<>();
             userMenu.addItem(App.get().getString(R.string.profile), (context1, data) -> IntentHandler.handle("https://4pda.ru/forum/index.php?showuser=" + data.getUserId()));
-            userMenu.addItem(App.get().getString(R.string.reputation), IPostFunctions::showReputationMenu);
+            userMenu.addItem(App.get().getString(R.string.reputation), ThemeView::showReputationMenu);
             userMenu.addItem(App.get().getString(R.string.pm_qms), (context1, data) -> IntentHandler.handle("https://4pda.ru/forum/index.php?act=qms&amp;mid=" + data.getUserId()));
             userMenu.addItem(App.get().getString(R.string.user_themes), (context1, data) -> {
                 SearchSettings settings = new SearchSettings();
@@ -75,7 +76,7 @@ public class ThemeDialogsHelper {
         userMenu.show(context, theme, post);
     }
 
-    public static void showReputationMenu(Context context, IPostFunctions theme, IBaseForumPost post) {
+    public static void showReputationMenu(Context context, ThemeView theme, IBaseForumPost post) {
         if (reputationMenu == null) {
             reputationMenu = new DynamicDialogMenu<>();
             reputationMenu.addItem(App.get().getString(R.string.increase), (context1, data) -> context1.changeReputation(data, true));
@@ -97,19 +98,19 @@ public class ThemeDialogsHelper {
     }
 
 
-    public static void showPostMenu(Context context, IPostFunctions theme, IBaseForumPost post) {
+    public static void showPostMenu(Context context, ThemeView theme, IBaseForumPost post) {
         if (postMenu == null) {
             postMenu = new DynamicDialogMenu<>();
-            postMenu.addItem(App.get().getString(R.string.reply), IPostFunctions::reply);
+            postMenu.addItem(App.get().getString(R.string.reply), ThemeView::reply);
             postMenu.addItem(App.get().getString(R.string.quote_from_clipboard), (context1, data) -> {
                 String text = Utils.readFromClipboard();
                 if (text != null && !text.isEmpty()) {
                     theme.quotePost(text, data);
                 }
             });
-            postMenu.addItem(App.get().getString(R.string.report), IPostFunctions::reportPost);
-            postMenu.addItem(App.get().getString(R.string.edit), IPostFunctions::editPost);
-            postMenu.addItem(App.get().getString(R.string.delete), IPostFunctions::deletePost);
+            postMenu.addItem(App.get().getString(R.string.report), ThemeView::reportPost);
+            postMenu.addItem(App.get().getString(R.string.edit), ThemeView::editPost);
+            postMenu.addItem(App.get().getString(R.string.delete), ThemeView::deletePost);
             postMenu.addItem(App.get().getString(R.string.copy_link), (context1, data) -> {
                 String url = "https://4pda.ru/forum/index.php?s=&showtopic=" + data.getTopicId() + "&view=findpost&p=" + data.getId();
                 Utils.copyToClipBoard(url);
@@ -121,7 +122,7 @@ public class ThemeDialogsHelper {
                     themeTitle = searchItem.getTitle();
                 } else if (context1 instanceof ThemeFragment) {
                     ThemeFragment themeFragment = (ThemeFragment) context1;
-                    themeTitle = themeFragment.currentPage.getTitle();
+                    themeTitle = themeFragment.getTitle();
                 }
                 String title = String.format(App.get().getString(R.string.post_Topic_Nick_Number), themeTitle, data.getNick(), data.getId());
                 String url = "https://4pda.ru/forum/index.php?s=&showtopic=" + data.getTopicId() + "&view=findpost&p=" + data.getId();
