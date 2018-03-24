@@ -843,35 +843,35 @@ public class SearchFragment extends TabFragment implements IPostFunctions, Exten
         if (getContext() == null)
             return;
         //todo totodo
-        //ThemeDialogsHelper.showUserMenu(getContext(), this, post);
+        //ThemeDialogsHelper.onUserMenuClick(getContext(), this, post);
     }
 
     @Override
     public void showReputationMenu(IBaseForumPost post) {
         if (getContext() == null)
             return;
-        //ThemeDialogsHelper.showReputationMenu(getContext(), this, post);
+        //ThemeDialogsHelper.onReputationMenuClick(getContext(), this, post);
     }
 
     @Override
     public void showPostMenu(IBaseForumPost post) {
         if (getContext() == null)
             return;
-        //ThemeDialogsHelper.showPostMenu(getContext(), this, post);
+        //ThemeDialogsHelper.onPostMenuClick(getContext(), this, post);
     }
 
     @Override
     public void reportPost(IBaseForumPost post) {
         if (getContext() == null)
             return;
-        ThemeDialogsHelper.tryReportPost(getContext(), post);
+        //ThemeDialogsHelper.tryReportPost(getContext(), post);
     }
 
     @Override
     public void reply(IBaseForumPost post) {
         if (getContext() == null)
             return;
-        Toast.makeText(getContext(), R.string.action_not_available, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getContext(), R.string.action_not_available, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -885,10 +885,10 @@ public class SearchFragment extends TabFragment implements IPostFunctions, Exten
     public void deletePost(IBaseForumPost post) {
         if (getContext() == null)
             return;
-        ThemeDialogsHelper.deletePost(getContext(), post, aBoolean -> {
+        /*ThemeDialogsHelper.deletePost(getContext(), post, aBoolean -> {
             if (aBoolean)
-                webView.evalJs("deletePost(" + post.getId() + ");");
-        });
+                webView.evalJs("onDeletePostClick(" + post.getId() + ");");
+        });*/
     }
 
     @Override

@@ -785,21 +785,8 @@ public abstract class ThemeFragment extends TabFragment implements ThemeView {
 
 
     @Override
-    public void reply(@NotNull IBaseForumPost post) {
-        String insert = String.format(Locale.getDefault(), "[snapback]%s[/snapback] [b]%s,[/b] \n", post.getId(), post.getNick());
-        messagePanel.insertText(insert);
-        showMessagePanel(true);
-    }
-
-
-    @Override
-    public void quotePost(@NotNull String text, @NotNull IBaseForumPost post) {
-        if (getContext() == null) {
-            return;
-        }
-        String date = Utils.getForumDateTime(Utils.parseForumDateTime(post.getDate()));
-        String insert = String.format(Locale.getDefault(), "[quote name=\"%s\" date=\"%s\" post=%S]%s[/quote]\n", ApiUtils.escapeQuotes(post.getNick()), date, post.getId(), text);
-        messagePanel.insertText(insert);
+    public void insertText(@NotNull String text) {
+        messagePanel.insertText(text);
         showMessagePanel(true);
     }
 
@@ -824,32 +811,32 @@ public abstract class ThemeFragment extends TabFragment implements ThemeView {
 
     @Override
     public void showUserMenu(@NotNull IBaseForumPost post) {
-        ThemeDialogsHelper.showUserMenu(getContext(), this, post);
+        //ThemeDialogsHelper.showUserMenu(getContext(), this, post);
     }
 
     @Override
     public void showReputationMenu(@NotNull IBaseForumPost post) {
-        ThemeDialogsHelper.showReputationMenu(getContext(), this, post);
+        //ThemeDialogsHelper.showReputationMenu(getContext(), this, post);
     }
 
     @Override
     public void showPostMenu(@NotNull IBaseForumPost post) {
-        ThemeDialogsHelper.showPostMenu(getContext(), this, post);
+        //ThemeDialogsHelper.showPostMenu(getContext(), this, post);
     }
 
     @Override
     public void reportPost(@NotNull IBaseForumPost post) {
-        ThemeDialogsHelper.tryReportPost(getContext(), post);
+        //ThemeDialogsHelper.tryReportPost(getContext(), post);
     }
 
     //Удаление сообщения
     @Override
     public void deletePost(@NotNull IBaseForumPost post) {
-        ThemeDialogsHelper.deletePost(getContext(), post, aBoolean -> {
+        /*ThemeDialogsHelper.deletePost(getContext(), post, aBoolean -> {
             if (aBoolean){
                 deletePostUi(post);
             }
-        });
+        });*/
     }
 
     //Изменение репутации сообщения
@@ -870,6 +857,6 @@ public abstract class ThemeFragment extends TabFragment implements ThemeView {
     public void changeReputation(@NotNull IBaseForumPost post, boolean type) {
         if (getContext() == null)
             return;
-        ThemeDialogsHelper.changeReputation(getContext(), post, type);
+        //ThemeDialogsHelper.changeReputation(getContext(), post, type);
     }
 }

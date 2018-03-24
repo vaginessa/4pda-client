@@ -27,7 +27,6 @@ import forpdateam.ru.forpda.api.IBaseForumPost;
 import forpdateam.ru.forpda.api.theme.models.ThemePage;
 import forpdateam.ru.forpda.common.webview.CustomWebChromeClient;
 import forpdateam.ru.forpda.common.webview.CustomWebViewClient;
-import forpdateam.ru.forpda.common.webview.jsinterfaces.IPostFunctions;
 import forpdateam.ru.forpda.presentation.theme.ThemePresenter;
 import forpdateam.ru.forpda.ui.views.ExtendedWebView;
 
@@ -91,7 +90,7 @@ public class ThemeFragmentWeb extends ThemeFragment implements ExtendedWebView.J
             menu.add(R.string.copy)
                     .setIcon(App.getVecDrawable(getContext(), R.drawable.ic_toolbar_content_copy))
                     .setOnMenuItemClickListener(item -> {
-                        webView.evalJs("copySelectedText()");
+                        webView.evalJs("copyText()");
                         actionMode.finish();
                         return true;
                     })
@@ -115,7 +114,7 @@ public class ThemeFragmentWeb extends ThemeFragment implements ExtendedWebView.J
             menu.add(R.string.share)
                     .setIcon(App.getVecDrawable(getContext(), R.drawable.ic_toolbar_share))
                     .setOnMenuItemClickListener(item -> {
-                        webView.evalJs("shareSelectedText()");
+                        webView.evalJs("shareText()");
                         return true;
                     })
                     .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -262,10 +261,7 @@ public class ThemeFragmentWeb extends ThemeFragment implements ExtendedWebView.J
 
     @Override
     public void deletePostUi(@NotNull IBaseForumPost post) {
-        if (getContext() == null) {
-            return;
-        }
-        webView.evalJs("deletePost(" + post.getId() + ");");
+        webView.evalJs("onDeletePostClick(" + post.getId() + ");");
     }
 
     @Override
@@ -278,7 +274,7 @@ public class ThemeFragmentWeb extends ThemeFragment implements ExtendedWebView.J
                 .setTitle(R.string.link_to_anchor)
                 .setMessage(link)
                 .setPositiveButton(R.string.copy, (dialog, which) -> {
-                    presenter.copySelectedText(link);
+                    presenter.copyText(link);
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show();
@@ -293,7 +289,7 @@ public class ThemeFragmentWeb extends ThemeFragment implements ExtendedWebView.J
                 .setMessage(R.string.spoiler_link_copy_ask)
                 .setPositiveButton(R.string.ok, (dialog, which) -> {
                     String s = "https://4pda.ru/forum/index.php?act=findpost&pid=" + post.getId() + "&anchor=Spoil-" + post.getId() + "-" + spoilNumber;
-                    presenter.copySelectedText(s);
+                    presenter.copyText(s);
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show();

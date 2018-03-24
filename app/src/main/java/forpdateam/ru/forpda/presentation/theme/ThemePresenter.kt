@@ -2,7 +2,6 @@ package forpdateam.ru.forpda.presentation.theme
 
 import android.net.Uri
 import android.util.Log
-import android.widget.Toast
 import com.arellomobile.mvp.InjectViewState
 import forpdateam.ru.forpda.App
 import forpdateam.ru.forpda.api.ApiUtils
@@ -11,9 +10,7 @@ import forpdateam.ru.forpda.api.theme.Theme
 import forpdateam.ru.forpda.api.theme.editpost.models.AttachmentItem
 import forpdateam.ru.forpda.api.theme.editpost.models.EditPostForm
 import forpdateam.ru.forpda.api.theme.models.ThemePage
-import forpdateam.ru.forpda.apirx.RxApi
 import forpdateam.ru.forpda.common.IntentHandler
-import forpdateam.ru.forpda.common.Preferences
 import forpdateam.ru.forpda.common.Utils
 
 import forpdateam.ru.forpda.common.mvp.BasePresenter
@@ -169,7 +166,7 @@ class ThemePresenter(
         }
     }
 
-    override fun showPollResults() {
+    override fun onPollResultsClick() {
         val url = themeUrl
                 .replaceFirst("#[^&]*", "")
                 .replace("&mode=show", "")
@@ -177,7 +174,7 @@ class ThemePresenter(
         loadUrl(url)
     }
 
-    override fun showPoll() {
+    override fun onPollClick() {
         val url = themeUrl
                 .replaceFirst("#[^&]*", "")
                 .replace("&mode=show", "")
@@ -208,7 +205,7 @@ class ThemePresenter(
         }
     }
 
-    override fun shareSelectedText(text: String) {
+    override fun shareText(text: String) {
         Utils.shareText(text)
     }
 
@@ -251,77 +248,80 @@ class ThemePresenter(
                 it.id == postId
             }
 
-    override fun firstPage() = viewState.firstPage()
+    override fun onFirstPageClick() = viewState.firstPage()
 
-    override fun prevPage() = viewState.prevPage()
+    override fun onPrevPageClick() = viewState.prevPage()
 
-    override fun nextPage() = viewState.nextPage()
+    override fun onNextPageClick() = viewState.nextPage()
 
-    override fun lastPage() = viewState.lastPage()
+    override fun onLastPageClick() = viewState.lastPage()
 
-    override fun selectPage() = viewState.selectPage()
+    override fun onSelectPageClick() = viewState.selectPage()
 
+    override fun onUserMenuClick(postId: Int) {
+        getPostById(postId)?.let { viewState.showUserMenu(it) }
+    }
 
-    override fun showUserMenu(postId: String) {
-        getPostById(Integer.parseInt(postId))?.let {
-            viewState.showUserMenu(it)
+    override fun onReputationMenuClick(postId: Int) {
+        getPostById(postId)?.let { viewState.showReputationMenu(it) }
+    }
+
+    override fun onPostMenuClick(postId: Int) {
+        getPostById(postId)?.let { viewState.showPostMenu(it) }
+    }
+
+    override fun onReportPostClick(postId: Int) {
+        getPostById(postId)?.let { viewState.reportPost(it) }
+    }
+
+    override fun onReplyPostClick(postId: Int) {
+        getPostById(postId)?.let {
+            val text = "[snapback]${it.id}[/snapback] [b]${it.nick},[/b] \n"
+            viewState.insertText(text)
         }
     }
 
-    override fun showReputationMenu(postId: String) {
-        getPostById(Integer.parseInt(postId))?.let {
-            viewState.showReputationMenu(it)
+    override fun onQuotePostClick(postId: Int, text: String) {
+        getPostById(postId)?.let {
+            val date = Utils.getForumDateTime(Utils.parseForumDateTime(it.getDate()))
+            val insert = "[quote name=\"${it.nick}\" date=\"$date\" post=${it.id}]$text[/quote]\n"
+            viewState.insertText(insert)
         }
     }
 
-    override fun showPostMenu(postId: String) {
-        getPostById(Integer.parseInt(postId))?.let {
-            viewState.showPostMenu(it)
-        }
+    override fun onDeletePostClick(postId: Int) {
+        getPostById(postId)?.let { viewState.deletePost(it) }
     }
 
-    override fun reportPost(postId: String) {
-        getPostById(Integer.parseInt(postId))?.let {
-            viewState.reportPost(it)
-        }
+    override fun onEditPostClick(postId: Int) {
+        getPostById(postId)?.let { viewState.editPost(it) }
     }
 
-    override fun reply(postId: String) {
-        getPostById(Integer.parseInt(postId))?.let {
-            viewState.reply(it)
-        }
+    override fun onVotePostClick(postId: Int, type: Boolean) {
+        getPostById(postId)?.let { viewState.votePost(it, type) }
     }
 
-
-    override fun quotePost(text: String, postId: String) {
-        getPostById(Integer.parseInt(postId))?.let {
-            viewState.quotePost(text, it)
-        }
+    override fun onSpoilerCopyLinkClick(postId: Int, spoilNumber: String) {
+        getPostById(postId)?.let { viewState.openSpoilerLinkDialog(it, spoilNumber) }
     }
 
-    override fun deletePost(postId: String) {
-        getPostById(Integer.parseInt(postId))?.let {
-            viewState.deletePost(it)
-        }
+    override fun onAnchorClick(postId: Int, name: String) {
+        getPostById(postId)?.let { viewState.openAnchorDialog(it, name) }
     }
 
-    override fun editPost(postId: String) {
-        getPostById(Integer.parseInt(postId))?.let {
-            viewState.editPost(it)
-        }
+    override fun onPollHeaderClick(bValue: Boolean) {
+        currentPage?.let { it.isPollOpen = bValue }
     }
 
-    override fun votePost(postId: String, type: Boolean) {
-        getPostById(Integer.parseInt(postId))?.let {
-            viewState.votePost(it, type)
-        }
+    override fun onHatHeaderClick(bValue: Boolean) {
+        currentPage?.let { it.isHatOpen = bValue }
     }
 
-    override fun setHistoryBody(index: String, body: String) {
-        history[Integer.parseInt(index)].html = body
+    override fun setHistoryBody(index: Int, body: String) {
+        history[index].html = body
     }
 
-    override fun copySelectedText(text: String) {
+    override fun copyText(text: String) {
         Utils.copyToClipBoard(text)
     }
 
@@ -332,31 +332,6 @@ class ThemePresenter(
     override fun log(text: String) {
         viewState.log(text)
     }
-
-    override fun copySpoilerLink(postId: String, spoilNumber: String) {
-        getPostById(Integer.parseInt(postId))?.let {
-            viewState.openSpoilerLinkDialog(it, spoilNumber)
-        }
-    }
-
-    override fun anchorDialog(postId: String, name: String) {
-        getPostById(Integer.parseInt(postId))?.let {
-            viewState.openAnchorDialog(it, name)
-        }
-    }
-
-    override fun setPollOpen(bValue: String) {
-        currentPage?.let {
-            it.isPollOpen = bValue.toBoolean()
-        }
-    }
-
-    override fun setHatOpen(bValue: String) {
-        currentPage?.let {
-            it.isHatOpen = bValue.toBoolean()
-        }
-    }
-
 
     private val LOG_TAG = ThemeFragmentWeb::class.java.simpleName
     fun handleNewUrl(uri: Uri) {

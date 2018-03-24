@@ -101,13 +101,13 @@ public class ThemeDialogsHelper {
     public static void showPostMenu(Context context, ThemeView theme, IBaseForumPost post) {
         if (postMenu == null) {
             postMenu = new DynamicDialogMenu<>();
-            postMenu.addItem(App.get().getString(R.string.reply), ThemeView::reply);
+            /*postMenu.addItem(App.get().getString(R.string.reply), ThemeView::reply);
             postMenu.addItem(App.get().getString(R.string.quote_from_clipboard), (context1, data) -> {
                 String text = Utils.readFromClipboard();
                 if (text != null && !text.isEmpty()) {
                     theme.quotePost(text, data);
                 }
-            });
+            });*/
             postMenu.addItem(App.get().getString(R.string.report), ThemeView::reportPost);
             postMenu.addItem(App.get().getString(R.string.edit), ThemeView::editPost);
             postMenu.addItem(App.get().getString(R.string.delete), ThemeView::deletePost);

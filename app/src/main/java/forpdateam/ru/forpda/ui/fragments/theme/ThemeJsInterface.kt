@@ -13,132 +13,81 @@ class ThemeJsInterface(
 
     private val handler = Handler(Looper.getMainLooper())
 
-    private fun runInUiThread(runnable: Runnable) {
-        handler.post(runnable)
-    }
+    private fun runInUiThread(runnable: Runnable) = handler.post(runnable)
 
     @JavascriptInterface
-    fun firstPage() {
-        runInUiThread(Runnable { presenter.firstPage() })
-    }
+    fun firstPage() = runInUiThread(Runnable { presenter.onFirstPageClick() })
 
     @JavascriptInterface
-    fun prevPage() {
-        runInUiThread(Runnable { presenter.prevPage() })
-    }
+    fun prevPage() = runInUiThread(Runnable { presenter.onPrevPageClick() })
 
     @JavascriptInterface
-    fun nextPage() {
-        runInUiThread(Runnable { presenter.nextPage() })
-    }
+    fun nextPage() = runInUiThread(Runnable { presenter.onNextPageClick() })
 
     @JavascriptInterface
-    fun lastPage() {
-        runInUiThread(Runnable { presenter.lastPage() })
-    }
+    fun lastPage() = runInUiThread(Runnable { presenter.onLastPageClick() })
 
     @JavascriptInterface
-    fun selectPage() {
-        runInUiThread(Runnable { presenter.selectPage() })
-    }
+    fun selectPage() = runInUiThread(Runnable { presenter.onSelectPageClick() })
 
     @JavascriptInterface
-    fun showUserMenu(postId: String) {
-        runInUiThread(Runnable { presenter.showUserMenu(postId) })
-    }
+    fun showUserMenu(postId: String) = runInUiThread(Runnable { presenter.onUserMenuClick(postId.toInt()) })
 
     @JavascriptInterface
-    fun showReputationMenu(postId: String) {
-        runInUiThread(Runnable { presenter.showReputationMenu(postId) })
-    }
+    fun showReputationMenu(postId: String) = runInUiThread(Runnable { presenter.onReputationMenuClick(postId.toInt()) })
 
     @JavascriptInterface
-    fun showPostMenu(postId: String) {
-        runInUiThread(Runnable { presenter.showPostMenu(postId) })
-    }
+    fun showPostMenu(postId: String) = runInUiThread(Runnable { presenter.onPostMenuClick(postId.toInt()) })
 
     @JavascriptInterface
-    fun reportPost(postId: String) {
-        runInUiThread(Runnable { presenter.reportPost(postId) })
-    }
+    fun reportPost(postId: String) = runInUiThread(Runnable { presenter.onReportPostClick(postId.toInt()) })
 
     @JavascriptInterface
-    fun reply(postId: String) {
-        runInUiThread(Runnable { presenter.reply(postId) })
-    }
+    fun reply(postId: String) = runInUiThread(Runnable { presenter.onReplyPostClick(postId.toInt()) })
 
     @JavascriptInterface
-    fun quotePost(text: String, postId: String) {
-        runInUiThread(Runnable { presenter.quotePost(text, postId) })
-    }
+    fun quotePost(text: String, postId: String) = runInUiThread(Runnable { presenter.onQuotePostClick(postId.toInt(), text) })
 
     @JavascriptInterface
-    fun deletePost(postId: String) {
-        runInUiThread(Runnable { presenter.deletePost(postId) })
-    }
+    fun deletePost(postId: String) = runInUiThread(Runnable { presenter.onDeletePostClick(postId.toInt()) })
 
     @JavascriptInterface
-    fun editPost(postId: String) {
-        runInUiThread(Runnable { presenter.editPost(postId) })
-    }
+    fun editPost(postId: String) = runInUiThread(Runnable { presenter.onEditPostClick(postId.toInt()) })
 
     @JavascriptInterface
-    fun votePost(postId: String, type: Boolean) {
-        runInUiThread(Runnable { presenter.votePost(postId, type) })
-    }
+    fun votePost(postId: String, type: Boolean) = runInUiThread(Runnable { presenter.onVotePostClick(postId.toInt(), type) })
 
     @JavascriptInterface
-    fun setHistoryBody(index: String, body: String) {
-        runInUiThread(Runnable { presenter.setHistoryBody(index, body) })
-    }
+    fun setHistoryBody(index: String, body: String) = runInUiThread(Runnable { presenter.setHistoryBody(index.toInt(), body) })
 
     @JavascriptInterface
-    fun copySelectedText(text: String) {
-        runInUiThread(Runnable { presenter.copySelectedText(text) })
-    }
+    fun copySelectedText(text: String) = runInUiThread(Runnable { presenter.copyText(text) })
 
     @JavascriptInterface
-    fun toast(text: String) {
-        runInUiThread(Runnable { presenter.toast(text) })
-    }
+    fun toast(text: String) = runInUiThread(Runnable { presenter.toast(text) })
 
     @JavascriptInterface
-    fun log(text: String) {
-        runInUiThread(Runnable { presenter.log(text) })
-    }
+    fun log(text: String) = runInUiThread(Runnable { presenter.log(text) })
 
     @JavascriptInterface
-    fun showPollResults() {
-        runInUiThread(Runnable { presenter.showPollResults() })
-    }
+    fun showPollResults() = runInUiThread(Runnable { presenter.onPollResultsClick() })
 
     @JavascriptInterface
-    fun showPoll() {
-        runInUiThread(Runnable { presenter.showPoll() })
-    }
+    fun showPoll() = runInUiThread(Runnable { presenter.onPollClick() })
 
     @JavascriptInterface
-    fun copySpoilerLink(postId: String, spoilNumber: String) {
-        runInUiThread(Runnable { presenter.copySpoilerLink(postId, spoilNumber) })
-    }
+    fun copySpoilerLink(postId: String, spoilNumber: String) = runInUiThread(Runnable { presenter.onSpoilerCopyLinkClick(postId.toInt(), spoilNumber) })
 
     @JavascriptInterface
-    fun setPollOpen(bValue: String) {
-        runInUiThread(Runnable { presenter.setPollOpen(bValue) })
-    }
+    fun setPollOpen(bValue: String) = runInUiThread(Runnable { presenter.onPollHeaderClick(bValue.toBoolean()) })
 
     @JavascriptInterface
-    fun setHatOpen(bValue: String) {
-        runInUiThread(Runnable { presenter.setHatOpen(bValue) })
-    }
+    fun setHatOpen(bValue: String) = runInUiThread(Runnable { presenter.onHatHeaderClick(bValue.toBoolean()) })
 
     @JavascriptInterface
-    fun shareSelectedText(text: String) {
-        runInUiThread(Runnable { presenter.shareSelectedText(text) })
-    }
+    fun shareSelectedText(text: String) = runInUiThread(Runnable { presenter.shareText(text) })
 
     @JavascriptInterface
-    fun anchorDialog(postId: String, name: String) {
-        runInUiThread(Runnable { presenter.anchorDialog(postId, name) })
-    }
+    fun anchorDialog(postId: String, name: String) = runInUiThread(Runnable { presenter.onAnchorClick(postId.toInt(), name) })
+
 }
