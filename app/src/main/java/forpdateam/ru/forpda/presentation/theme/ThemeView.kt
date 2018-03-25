@@ -25,6 +25,7 @@ interface ThemeView : IBaseView {
 
     fun showDeleteInFavDialog(page: ThemePage)
     fun showAddInFavDialog(page: ThemePage)
+    fun showNoteCreate(title: String, url: String)
 
 
     fun firstPage()
@@ -42,7 +43,7 @@ interface ThemeView : IBaseView {
     fun deletePost(post: IBaseForumPost)
     fun editPost(post: IBaseForumPost)
     fun votePost(post: IBaseForumPost, type: Boolean)
-    fun changeReputation(post: IBaseForumPost, type: Boolean)
+    fun showChangeReputation(post: IBaseForumPost, type: Boolean)
 
     fun openAnchorDialog(post: IBaseForumPost, anchorName: String)
     fun openSpoilerLinkDialog(post: IBaseForumPost, spoilNumber: String)

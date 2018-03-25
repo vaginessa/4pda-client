@@ -10,6 +10,6 @@ import forpdateam.ru.forpda.common.mvp.IBaseView
 
 interface ReputationView : IBaseView {
     fun showReputation(repData: RepData)
-    fun onChangeReputation(result: String)
+    fun onChangeReputation(result: Boolean)
     fun showItemDialogMenu(item: RepItem)
 }

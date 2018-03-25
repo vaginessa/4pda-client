@@ -167,7 +167,7 @@ public class Theme {
         return page;
     }
 
-    public String reportPost(int topicId, int postId, String message) throws Exception {
+    public Boolean reportPost(int topicId, int postId, String message) throws Exception {
         NetworkRequest request = new NetworkRequest.Builder()
                 .url("https://4pda.ru/forum/index.php?act=report&send=1&t=" + Integer.toString(topicId) + "&p=" + Integer.toString(postId))
                 .formHeader("message", URLEncoder.encode(message, "windows-1251"), true)
@@ -178,14 +178,21 @@ public class Theme {
                 "\\s*\n" +
                 "\\s*<p>(.*)</p>", Pattern.MULTILINE);
         Matcher m = p.matcher(response.getBody());
-        return m.find() ? "Ошибка отправки жалобы: ".concat(m.group(1)) : "Жалоба отправлена";
+        if (m.find()) {
+            throw new Exception("Ошибка отправки жалобы: ".concat(m.group(1)));
+        }
+        return true;
     }
 
 
     public Boolean deletePost(int postId) throws Exception {
         String url = "https://4pda.ru/forum/index.php?act=zmod&auth_key=".concat(Api.getWebClient().getAuthKey()).concat("&code=postchoice&tact=delete&selectedpids=").concat(Integer.toString(postId));
         NetworkResponse response = Api.getWebClient().request(new NetworkRequest.Builder().url(url).xhrHeader().build());
-        return response.getBody().equals("ok");
+        String body = response.getBody();
+        if (!body.equals("ok")) {
+            throw new Exception("Ошибка изменения репутации поста");
+        }
+        return true;
     }
 
 
@@ -193,12 +200,14 @@ public class Theme {
         NetworkResponse response = Api.getWebClient().get("https://4pda.ru/forum/zka.php?i=".concat(Integer.toString(postId)).concat("&v=").concat(type ? "1" : "-1"));
         String result = null;
 
+        String alreadyVote = "Ошибка: Вы уже голосовали за это сообщение";
+
         Matcher m = Pattern.compile("ok:\\s*?((?:\\+|\\-)?\\d+)").matcher(response.getBody());
         if (m.find()) {
             int code = Integer.parseInt(m.group(1));
             switch (code) {
                 case 0:
-                    result = "Ошибка: Вы уже голосовали за это сообщение";
+                    result = alreadyVote;
                     break;
                 case 1:
                     result = "Репутация поста повышена";
@@ -208,7 +217,12 @@ public class Theme {
                     break;
             }
         }
-        if (result == null) result = "Ошибка изменения репутации поста";
+        if (response.getBody().equals("evote")) {
+            result = alreadyVote;
+        }
+        if (result == null) {
+            throw new Exception("Ошибка изменения репутации поста");
+        }
         return result;
     }
 }

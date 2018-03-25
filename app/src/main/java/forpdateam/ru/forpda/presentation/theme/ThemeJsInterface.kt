@@ -1,4 +1,4 @@
-package forpdateam.ru.forpda.ui.fragments.theme
+package forpdateam.ru.forpda.presentation.theme
 
 import android.os.Handler
 import android.os.Looper

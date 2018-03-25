@@ -47,6 +47,20 @@ class ThemeRepository(
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 
+    fun reportPost(themeId: Int, postId: Int, message: String): Observable<Boolean> = Observable
+            .fromCallable { themeApi.reportPost(themeId, postId, message) }
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.ui())
+
+    fun deletePost(postId: Int): Observable<Boolean> = Observable
+            .fromCallable { themeApi.deletePost(postId) }
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.ui())
+
+    fun votePost(postId: Int, type: Boolean): Observable<String> = Observable
+            .fromCallable { themeApi.votePost(postId, type) }
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.ui())
 
     @Throws(Exception::class)
     fun transform(page: ThemePage, withHtml: Boolean): ThemePage {

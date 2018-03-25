@@ -1,4 +1,4 @@
-package forpdateam.ru.forpda.ui.fragments.theme
+package forpdateam.ru.forpda.presentation.theme
 
 /**
  * Created by radiationx on 17.03.18.
@@ -36,4 +36,22 @@ interface IThemePresenter {
 
     fun onPollHeaderClick(bValue: Boolean)
     fun onHatHeaderClick(bValue: Boolean)
+
+    fun openProfile(postId: Int)
+    fun openQms(postId: Int)
+    fun openSearchUserTopic(postId: Int)
+    fun openSearchInTopic(postId: Int)
+    fun openSearchUserMessages(postId: Int)
+
+    fun onChangeReputationClick(postId: Int, type: Boolean)
+    fun changeReputation(postId: Int, type: Boolean, message: String)
+    fun votePost(postId: Int, type: Boolean)
+    fun openReputationHistory(postId: Int)
+
+    fun quoteFromBuffer(postId: Int)
+    fun reportPost(postId: Int, message: String)
+    fun deletePost(postId: Int)
+    fun createNote(postId: Int)
+    fun copyPostLink(postId: Int)
+    fun sharePostLink(postId: Int)
 }

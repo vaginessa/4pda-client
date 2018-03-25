@@ -424,7 +424,7 @@ function improveSpoilBlock() {
                     var postId = e.target.getAttribute("data-post-id");
                     var spoilerNumber = e.target.getAttribute("data-spoil-number");
                     console.log(postId + " : " + spoilerNumber);
-                    ITheme.copySpoilerLink(postId, spoilerNumber);
+                    IThemePresenter.copySpoilerLink(postId, spoilerNumber);
                 });
             } catch (error) {
                 console.log(error);

@@ -27,6 +27,7 @@ import forpdateam.ru.forpda.api.IBaseForumPost;
 import forpdateam.ru.forpda.api.theme.models.ThemePage;
 import forpdateam.ru.forpda.common.webview.CustomWebChromeClient;
 import forpdateam.ru.forpda.common.webview.CustomWebViewClient;
+import forpdateam.ru.forpda.presentation.theme.ThemeJsInterface;
 import forpdateam.ru.forpda.presentation.theme.ThemePresenter;
 import forpdateam.ru.forpda.ui.views.ExtendedWebView;
 
@@ -36,7 +37,7 @@ import forpdateam.ru.forpda.ui.views.ExtendedWebView;
 
 public class ThemeFragmentWeb extends ThemeFragment implements ExtendedWebView.JsLifeCycleListener {
     private final static String LOG_TAG = ThemeFragmentWeb.class.getSimpleName();
-    public final static String JS_INTERFACE = "ITheme";
+    public final static String JS_INTERFACE = "IThemePresenter";
     private ExtendedWebView webView;
     private WebViewClient webViewClient;
     private WebChromeClient chromeClient;

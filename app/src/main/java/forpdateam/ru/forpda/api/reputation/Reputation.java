@@ -60,21 +60,18 @@ public class Reputation {
         return data;
     }
 
-    public String editReputation(int postId, int userId, boolean type, String message) throws Exception {
+    public Boolean editReputation(int postId, int userId, boolean type, String message) throws Exception {
         NetworkRequest.Builder builder = new NetworkRequest.Builder()
                 .url("https://4pda.ru/forum/index.php")
                 .formHeader("act", "rep")
                 .formHeader("mid", Integer.toString(userId))
                 .formHeader("type", type ? "add" : "minus")
                 .formHeader("message", message);
-        if (postId > 0)
+        if (postId > 0) {
             builder.formHeader("p", Integer.toString(postId));
-        try {
-            Api.getWebClient().request(builder.build());
-        } catch (Exception exception) {
-            return exception.getMessage();
         }
-        return "";
+        Api.getWebClient().request(builder.build());
+        return true;
     }
 
     public static RepData fromUrl(String url) {

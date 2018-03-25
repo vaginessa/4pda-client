@@ -13,7 +13,7 @@ public class ReputationRx {
         return Observable.fromCallable(() -> Api.Reputation().getReputation(data));
     }
 
-    public Observable<String> editReputation(int postId, int userId, boolean type, String message) {
+    public Observable<Boolean> editReputation(int postId, int userId, boolean type, String message) {
         return Observable.fromCallable(() -> Api.Reputation().editReputation(postId, userId, type, message));
     }
 }

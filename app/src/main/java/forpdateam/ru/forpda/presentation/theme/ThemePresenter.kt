@@ -4,8 +4,9 @@ import android.net.Uri
 import android.util.Log
 import com.arellomobile.mvp.InjectViewState
 import forpdateam.ru.forpda.App
-import forpdateam.ru.forpda.api.ApiUtils
+import forpdateam.ru.forpda.R
 import forpdateam.ru.forpda.api.IBaseForumPost
+import forpdateam.ru.forpda.api.search.models.SearchSettings
 import forpdateam.ru.forpda.api.theme.Theme
 import forpdateam.ru.forpda.api.theme.editpost.models.AttachmentItem
 import forpdateam.ru.forpda.api.theme.editpost.models.EditPostForm
@@ -14,10 +15,11 @@ import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.Utils
 
 import forpdateam.ru.forpda.common.mvp.BasePresenter
+import forpdateam.ru.forpda.model.repository.reputation.ReputationRepository
 import forpdateam.ru.forpda.model.repository.theme.ThemeRepository
 import forpdateam.ru.forpda.ui.TabManager
 import forpdateam.ru.forpda.ui.activities.imageviewer.ImageViewerActivity
-import forpdateam.ru.forpda.ui.fragments.theme.IThemePresenter
+import forpdateam.ru.forpda.ui.fragments.notes.NotesAddPopup
 import forpdateam.ru.forpda.ui.fragments.theme.ThemeFragmentWeb
 import forpdateam.ru.forpda.ui.fragments.theme.editpost.EditPostFragment
 import org.acra.ACRA
@@ -31,7 +33,8 @@ import java.util.regex.Pattern
  */
 @InjectViewState
 class ThemePresenter(
-        private val themeRepository: ThemeRepository
+        private val themeRepository: ThemeRepository,
+        private val reputationRepository: ReputationRepository
 ) : BasePresenter<ThemeView>(), IThemePresenter {
 
 
@@ -448,6 +451,152 @@ class ThemePresenter(
             return true
         }
         return false
+    }
+
+
+    override fun openProfile(postId: Int) {
+        getPostById(postId)?.let {
+            IntentHandler.handle("https://4pda.ru/forum/index.php?showuser=${it.userId}")
+        }
+    }
+
+    override fun openQms(postId: Int) {
+        getPostById(postId)?.let {
+            IntentHandler.handle("https://4pda.ru/forum/index.php?act=qms&amp;mid=${it.userId}")
+        }
+    }
+
+    override fun openSearchUserTopic(postId: Int) {
+        getPostById(postId)?.let {
+            IntentHandler.handle(SearchSettings().apply {
+                source = SearchSettings.SOURCE_ALL.first
+                nick = it.nick
+                result = SearchSettings.RESULT_TOPICS.first
+            }.toUrl())
+        }
+    }
+
+    override fun openSearchInTopic(postId: Int) {
+        getPostById(postId)?.let {
+            IntentHandler.handle(SearchSettings().apply {
+                addForum(Integer.toString(it.forumId))
+                addTopic(Integer.toString(it.topicId))
+                source = SearchSettings.SOURCE_CONTENT.first
+                nick = it.nick
+                result = SearchSettings.RESULT_POSTS.first
+                subforums = SearchSettings.SUB_FORUMS_FALSE
+            }.toUrl())
+        }
+    }
+
+    override fun openSearchUserMessages(postId: Int) {
+        getPostById(postId)?.let {
+            IntentHandler.handle(SearchSettings().apply {
+                source = SearchSettings.SOURCE_CONTENT.first
+                nick = it.getNick()
+                result = SearchSettings.RESULT_POSTS.first
+                subforums = SearchSettings.SUB_FORUMS_FALSE
+            }.toUrl())
+        }
+    }
+
+    override fun onChangeReputationClick(postId: Int, type: Boolean) {
+        getPostById(postId)?.let { viewState.showChangeReputation(it, type) }
+    }
+
+    override fun changeReputation(postId: Int, type: Boolean, message: String) {
+        getPostById(postId)?.let {
+            reputationRepository
+                    .changeReputation(it.id, it.userId, type, message)
+                    .subscribe({
+                        toast(App.get().getString(R.string.reputation_changed))
+                    }, {
+                        this.handleErrorRx(it)
+                    })
+                    .addToDisposable()
+        }
+    }
+
+    override fun votePost(postId: Int, type: Boolean) {
+        getPostById(postId)?.let {
+            themeRepository
+                    .votePost(it.id, type)
+                    .subscribe({
+                        toast(it)
+                    }, {
+                        this.handleErrorRx(it)
+                    })
+                    .addToDisposable()
+        }
+    }
+
+    override fun openReputationHistory(postId: Int) {
+        getPostById(postId)?.let {
+            IntentHandler.handle("https://4pda.ru/forum/index.php?act=rep&view=history&amp;mid=${it.userId}")
+        }
+    }
+
+    override fun quoteFromBuffer(postId: Int) {
+        getPostById(postId)?.let {
+            val text = Utils.readFromClipboard()
+            if (!text.isNullOrEmpty()) {
+                onQuotePostClick(postId, text)
+            }
+        }
+    }
+
+    override fun reportPost(postId: Int, message: String) {
+        getPostById(postId)?.let { post ->
+            currentPage?.let {
+                themeRepository
+                        .reportPost(it.id, post.id, message)
+                        .subscribe({
+                            toast("Жалоба отправлена")
+                        }, {
+                            this.handleErrorRx(it)
+                        })
+                        .addToDisposable()
+            }
+        }
+    }
+
+    override fun deletePost(postId: Int) {
+        getPostById(postId)?.let { post ->
+            themeRepository
+                    .deletePost(post.id)
+                    .subscribe({
+                        if (it) {
+                            viewState.deletePostUi(post)
+                        }
+                        toast(App.get().getString(R.string.message_deleted))
+                    }, {
+                        this.handleErrorRx(it)
+                    })
+                    .addToDisposable()
+        }
+    }
+
+    override fun createNote(postId: Int) {
+        getPostById(postId)?.let {
+            val themeTitle: String = currentPage?.title.orEmpty()
+            val title = String.format(App.get().getString(R.string.post_Topic_Nick_Number), themeTitle, it.nick, it.id)
+            val url = "https://4pda.ru/forum/index.php?s=&showtopic=" + it.topicId + "&view=findpost&p=" + it.id
+            viewState.showNoteCreate(title, url)
+        }
+    }
+
+    override fun copyPostLink(postId: Int) {
+        getPostById(postId)?.let {
+            val url = "https://4pda.ru/forum/index.php?s=&showtopic=${it.topicId}&view=findpost&p=${it.id}"
+            copyText(url)
+        }
+    }
+
+    override fun sharePostLink(postId: Int) {
+        getPostById(postId)?.let {
+            val url = "https://4pda.ru/forum/index.php?s=&showtopic=${it.topicId}&view=findpost&p=${it.id}"
+            shareText(url)
+        }
     }
 
     enum class ActionState(private val id: Int) {

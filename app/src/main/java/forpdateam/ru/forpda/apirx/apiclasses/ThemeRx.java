@@ -33,7 +33,7 @@ public class ThemeRx {
         return Observable.fromCallable(() -> transform(Api.Theme().getTheme(url, hatOpen, pollOpen), withHtml));
     }
 
-    public Observable<String> reportPost(int themeId, int postId, String message) {
+    public Observable<Boolean> reportPost(int themeId, int postId, String message) {
         return Observable.fromCallable(() -> Api.Theme().reportPost(themeId, postId, message));
     }
 

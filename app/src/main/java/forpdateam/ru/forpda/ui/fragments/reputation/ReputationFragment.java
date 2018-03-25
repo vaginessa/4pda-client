@@ -191,8 +191,8 @@ public class ReputationFragment extends RecyclerFragment implements ReputationVi
     }
 
     @Override
-    public void onChangeReputation(String result) {
-        Toast.makeText(getContext(), result.isEmpty() ? getString(R.string.reputation_changed) : result, Toast.LENGTH_SHORT).show();
+    public void onChangeReputation(boolean result) {
+        Toast.makeText(getContext(), getString(R.string.reputation_changed), Toast.LENGTH_SHORT).show();
     }
 
     @Override

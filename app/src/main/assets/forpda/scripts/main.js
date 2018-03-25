@@ -296,9 +296,9 @@ function toggleButton(button, bodyClass, name) {
             //body.removeAttribute("hidden");
         }
         if (name === "poll") {
-            ITheme.setPollOpen("true");
+            IThemePresenter.setPollOpen("true");
         } else if (name === "hat") {
-            ITheme.setHatOpen("true");
+            IThemePresenter.setHatOpen("true");
         }
     } else {
         parent.classList.remove("open");
@@ -309,9 +309,9 @@ function toggleButton(button, bodyClass, name) {
             //body.setAttribute("hidden", "");
         }
         if (name === "poll") {
-            ITheme.setPollOpen("false");
+            IThemePresenter.setPollOpen("false");
         } else if (name === "hat") {
-            ITheme.setHatOpen("false");
+            IThemePresenter.setHatOpen("false");
         }
     }
 }

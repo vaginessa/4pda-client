@@ -19,7 +19,7 @@ class ReputationRepository(
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 
-    fun changeReputation(postId: Int, userId: Int, type: Boolean, message: String): Observable<String> = Observable
+    fun changeReputation(postId: Int, userId: Int, type: Boolean, message: String): Observable<Boolean> = Observable
             .fromCallable { reputationApi.editReputation(postId, userId, type, message) }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())

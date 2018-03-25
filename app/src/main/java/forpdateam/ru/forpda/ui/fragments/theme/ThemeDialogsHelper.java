@@ -17,7 +17,6 @@ import forpdateam.ru.forpda.api.search.models.SearchSettings;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.common.Utils;
-import forpdateam.ru.forpda.common.webview.jsinterfaces.IPostFunctions;
 import forpdateam.ru.forpda.presentation.theme.ThemeView;
 import forpdateam.ru.forpda.ui.fragments.notes.NotesAddPopup;
 import forpdateam.ru.forpda.ui.fragments.search.SearchFragment;
@@ -79,9 +78,9 @@ public class ThemeDialogsHelper {
     public static void showReputationMenu(Context context, ThemeView theme, IBaseForumPost post) {
         if (reputationMenu == null) {
             reputationMenu = new DynamicDialogMenu<>();
-            reputationMenu.addItem(App.get().getString(R.string.increase), (context1, data) -> context1.changeReputation(data, true));
+            reputationMenu.addItem(App.get().getString(R.string.increase), (context1, data) -> context1.showChangeReputation(data, true));
             reputationMenu.addItem(App.get().getString(R.string.look), (context1, data) -> IntentHandler.handle("https://4pda.ru/forum/index.php?act=rep&view=history&amp;mid=" + data.getUserId()));
-            reputationMenu.addItem(App.get().getString(R.string.decrease), (context1, data) -> context1.changeReputation(data, false));
+            reputationMenu.addItem(App.get().getString(R.string.decrease), (context1, data) -> context1.showChangeReputation(data, false));
         }
         reputationMenu.disallowAll();
         if (ClientHelper.getAuthState() == ClientHelper.AUTH_STATE_LOGIN) {

@@ -71,6 +71,7 @@ import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import forpdateam.ru.forpda.ui.fragments.favorites.FavoritesFragment;
 import forpdateam.ru.forpda.ui.fragments.favorites.FavoritesHelper;
 import forpdateam.ru.forpda.ui.fragments.history.HistoryFragment;
+import forpdateam.ru.forpda.ui.fragments.notes.NotesAddPopup;
 import forpdateam.ru.forpda.ui.fragments.theme.editpost.EditPostFragment;
 import forpdateam.ru.forpda.ui.fragments.topics.TopicsFragment;
 import forpdateam.ru.forpda.ui.views.FabOnScroll;
@@ -86,6 +87,8 @@ import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip;
 public abstract class ThemeFragment extends TabFragment implements ThemeView {
     //Указывают на произведенное действие: переход назад, обновление, обычный переход по ссылке
     private final static String LOG_TAG = ThemeFragment.class.getSimpleName();
+
+    private ThemeDialogsHelper_V2 dialogsHelper;
 
     protected MenuItem toggleMessagePanelItem;
     protected MenuItem refreshMenuItem;
@@ -152,7 +155,10 @@ public abstract class ThemeFragment extends TabFragment implements ThemeView {
 
     @ProvidePresenter
     ThemePresenter provideThemePresenter() {
-        return new ThemePresenter(App.get().Di().getThemeRepository());
+        return new ThemePresenter(
+                App.get().Di().getThemeRepository(),
+                App.get().Di().getReputationRepository()
+        );
     }
 
 
@@ -200,6 +206,7 @@ public abstract class ThemeFragment extends TabFragment implements ThemeView {
         if (getArguments() != null) {
             presenter.setThemeUrl(getArguments().getString(ARG_TAB, ""));
         }
+        dialogsHelper = new ThemeDialogsHelper_V2(getContext());
     }
 
     @Override
@@ -757,6 +764,10 @@ public abstract class ThemeFragment extends TabFragment implements ThemeView {
     *
     * */
 
+    @Override
+    public void showNoteCreate(@NotNull String title, @NotNull String url) {
+        NotesAddPopup.showAddNoteDialog(getContext(), title, url);
+    }
 
     @Override
     public void firstPage() {
@@ -811,52 +822,36 @@ public abstract class ThemeFragment extends TabFragment implements ThemeView {
 
     @Override
     public void showUserMenu(@NotNull IBaseForumPost post) {
-        //ThemeDialogsHelper.showUserMenu(getContext(), this, post);
+        dialogsHelper.showUserMenu(presenter, post);
     }
 
     @Override
     public void showReputationMenu(@NotNull IBaseForumPost post) {
-        //ThemeDialogsHelper.showReputationMenu(getContext(), this, post);
+        dialogsHelper.showReputationMenu(presenter, post);
     }
 
     @Override
     public void showPostMenu(@NotNull IBaseForumPost post) {
-        //ThemeDialogsHelper.showPostMenu(getContext(), this, post);
+        dialogsHelper.showPostMenu(presenter, post);
     }
 
     @Override
     public void reportPost(@NotNull IBaseForumPost post) {
-        //ThemeDialogsHelper.tryReportPost(getContext(), post);
+        dialogsHelper.tryReportPost(presenter, post);
     }
 
-    //Удаление сообщения
     @Override
     public void deletePost(@NotNull IBaseForumPost post) {
-        /*ThemeDialogsHelper.deletePost(getContext(), post, aBoolean -> {
-            if (aBoolean){
-                deletePostUi(post);
-            }
-        });*/
+        dialogsHelper.deletePost(presenter, post);
     }
 
-    //Изменение репутации сообщения
     @Override
     public void votePost(@NotNull IBaseForumPost post, boolean type) {
-        if (getContext() == null)
-            return;
-        new AlertDialog.Builder(getContext())
-                .setMessage(String.format(getString(R.string.change_post_reputation_Type_Nick), getString(type ? R.string.increase : R.string.decrease), post.getNick()))
-                .setPositiveButton(R.string.ok, (dialog, which) -> ThemeHelper.votePost(s -> toast(s.isEmpty() ? getString(R.string.unknown_error) : s), post.getId(), type))
-                .setNegativeButton(R.string.cancel, null)
-                .show();
+        dialogsHelper.votePost(presenter, post, type);
     }
 
-    //Изменение репутации пользователя
-    @SuppressLint("InflateParams")
     @Override
-    public void changeReputation(@NotNull IBaseForumPost post, boolean type) {
-        if (getContext() == null)
-            return;
-        //ThemeDialogsHelper.changeReputation(getContext(), post, type);
+    public void showChangeReputation(@NotNull IBaseForumPost post, boolean type) {
+        dialogsHelper.changeReputation(presenter, post, type);
     }
 }
