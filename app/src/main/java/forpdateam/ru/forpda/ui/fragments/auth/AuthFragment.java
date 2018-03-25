@@ -27,7 +27,6 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
 import forpdateam.ru.forpda.App;
-import forpdateam.ru.forpda.Dependencies;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.api.ApiUtils;
 import forpdateam.ru.forpda.api.auth.models.AuthForm;

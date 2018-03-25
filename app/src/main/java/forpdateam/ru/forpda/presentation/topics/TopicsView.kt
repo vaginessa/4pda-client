@@ -1,7 +1,5 @@
 package forpdateam.ru.forpda.presentation.topics
 
-import forpdateam.ru.forpda.api.reputation.models.RepData
-import forpdateam.ru.forpda.api.reputation.models.RepItem
 import forpdateam.ru.forpda.api.topcis.models.TopicItem
 import forpdateam.ru.forpda.api.topcis.models.TopicsData
 import forpdateam.ru.forpda.common.mvp.IBaseView

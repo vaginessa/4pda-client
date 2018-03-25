@@ -1,7 +1,6 @@
 package forpdateam.ru.forpda.model.system
 
 import forpdateam.ru.forpda.model.SchedulersProvider
-import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 

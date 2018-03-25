@@ -7,22 +7,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.api.IBaseForumPost;
-import forpdateam.ru.forpda.api.search.models.SearchItem;
-import forpdateam.ru.forpda.api.search.models.SearchSettings;
 import forpdateam.ru.forpda.client.ClientHelper;
-import forpdateam.ru.forpda.common.IntentHandler;
-import forpdateam.ru.forpda.common.Utils;
 import forpdateam.ru.forpda.presentation.theme.IThemePresenter;
-import forpdateam.ru.forpda.presentation.theme.ThemeView;
-import forpdateam.ru.forpda.ui.fragments.notes.NotesAddPopup;
-import forpdateam.ru.forpda.ui.fragments.search.SearchFragment;
 import forpdateam.ru.forpda.ui.views.DynamicDialogMenu;
-import io.reactivex.functions.Consumer;
 
 /**
  * Created by radiationx on 01.11.16.

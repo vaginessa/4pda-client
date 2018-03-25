@@ -13,13 +13,11 @@ import forpdateam.ru.forpda.api.theme.editpost.models.EditPostForm
 import forpdateam.ru.forpda.api.theme.models.ThemePage
 import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.Utils
-
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.model.repository.reputation.ReputationRepository
 import forpdateam.ru.forpda.model.repository.theme.ThemeRepository
 import forpdateam.ru.forpda.ui.TabManager
 import forpdateam.ru.forpda.ui.activities.imageviewer.ImageViewerActivity
-import forpdateam.ru.forpda.ui.fragments.notes.NotesAddPopup
 import forpdateam.ru.forpda.ui.fragments.theme.ThemeFragmentWeb
 import forpdateam.ru.forpda.ui.fragments.theme.editpost.EditPostFragment
 import org.acra.ACRA

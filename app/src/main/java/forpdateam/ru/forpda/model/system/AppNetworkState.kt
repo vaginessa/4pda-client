@@ -2,11 +2,7 @@ package forpdateam.ru.forpda.model.system
 
 import android.content.Context
 import android.net.ConnectivityManager
-import android.net.NetworkInfo
-import android.util.Log
-
 import com.jakewharton.rxrelay2.BehaviorRelay
-
 import forpdateam.ru.forpda.model.NetworkStateProvider
 import io.reactivex.Observable
 

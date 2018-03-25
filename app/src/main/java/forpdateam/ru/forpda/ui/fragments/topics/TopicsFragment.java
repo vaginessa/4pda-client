@@ -17,7 +17,6 @@ import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 
 import forpdateam.ru.forpda.App;
-import forpdateam.ru.forpda.Dependencies;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.api.topcis.models.TopicItem;
 import forpdateam.ru.forpda.api.topcis.models.TopicsData;

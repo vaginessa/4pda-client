@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Observer;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 
@@ -26,7 +25,6 @@ import forpdateam.ru.forpda.api.ApiUtils;
 import forpdateam.ru.forpda.api.IWebClient;
 import forpdateam.ru.forpda.api.NetworkRequest;
 import forpdateam.ru.forpda.api.NetworkResponse;
-import forpdateam.ru.forpda.common.simple.SimpleObservable;
 import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.other.GoogleCaptchaFragment;
 import okhttp3.Cookie;

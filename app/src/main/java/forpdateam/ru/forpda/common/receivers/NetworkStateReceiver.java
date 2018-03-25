@@ -3,13 +3,11 @@ package forpdateam.ru.forpda.common.receivers;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
 import forpdateam.ru.forpda.App;
-import forpdateam.ru.forpda.client.Client;
 
 /**
  * Created by RadiationX on 13.08.2016.

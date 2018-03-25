@@ -1,15 +1,13 @@
 package forpdateam.ru.forpda.model.repository.history
 
-import java.util.ArrayList
-
 import forpdateam.ru.forpda.entity.app.history.HistoryItem
 import forpdateam.ru.forpda.entity.db.history.HistoryItemBd
 import forpdateam.ru.forpda.model.SchedulersProvider
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.realm.Realm
-import io.realm.RealmResults
 import io.realm.Sort
+import java.util.*
 
 /**
  * Created by radiationx on 01.01.18.

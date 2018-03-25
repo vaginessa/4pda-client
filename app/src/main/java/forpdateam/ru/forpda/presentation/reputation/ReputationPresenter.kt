@@ -1,14 +1,12 @@
 package forpdateam.ru.forpda.presentation.reputation
 
 import com.arellomobile.mvp.InjectViewState
-
 import forpdateam.ru.forpda.api.reputation.Reputation
 import forpdateam.ru.forpda.api.reputation.models.RepData
 import forpdateam.ru.forpda.api.reputation.models.RepItem
 import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.model.repository.reputation.ReputationRepository
-import io.reactivex.disposables.Disposable
 
 /**
  * Created by radiationx on 03.01.18.

@@ -1,6 +1,5 @@
 package forpdateam.ru.forpda.ui.fragments.theme;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
@@ -43,26 +42,20 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Observer;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.api.ApiUtils;
 import forpdateam.ru.forpda.api.IBaseForumPost;
 import forpdateam.ru.forpda.api.RequestFile;
 import forpdateam.ru.forpda.api.events.models.NotificationEvent;
 import forpdateam.ru.forpda.api.others.pagination.Pagination;
 import forpdateam.ru.forpda.api.theme.editpost.models.AttachmentItem;
-import forpdateam.ru.forpda.api.theme.editpost.models.EditPostForm;
 import forpdateam.ru.forpda.api.theme.models.ThemePage;
 import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.FilePickHelper;
-import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.common.Preferences;
-import forpdateam.ru.forpda.common.Utils;
-import forpdateam.ru.forpda.common.webview.jsinterfaces.IPostFunctions;
 import forpdateam.ru.forpda.entity.app.TabNotification;
 import forpdateam.ru.forpda.presentation.theme.ThemePresenter;
 import forpdateam.ru.forpda.presentation.theme.ThemeView;
@@ -72,7 +65,6 @@ import forpdateam.ru.forpda.ui.fragments.favorites.FavoritesFragment;
 import forpdateam.ru.forpda.ui.fragments.favorites.FavoritesHelper;
 import forpdateam.ru.forpda.ui.fragments.history.HistoryFragment;
 import forpdateam.ru.forpda.ui.fragments.notes.NotesAddPopup;
-import forpdateam.ru.forpda.ui.fragments.theme.editpost.EditPostFragment;
 import forpdateam.ru.forpda.ui.fragments.topics.TopicsFragment;
 import forpdateam.ru.forpda.ui.views.FabOnScroll;
 import forpdateam.ru.forpda.ui.views.messagepanel.MessagePanel;

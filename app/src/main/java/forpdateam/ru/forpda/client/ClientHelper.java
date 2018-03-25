@@ -1,8 +1,5 @@
 package forpdateam.ru.forpda.client;
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.util.Log;
 
 import java.util.Observer;

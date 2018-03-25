@@ -1,7 +1,5 @@
 package forpdateam.ru.forpda.model.repository.forum
 
-import java.util.ArrayList
-
 import forpdateam.ru.forpda.api.forum.Forum
 import forpdateam.ru.forpda.api.forum.models.ForumItemFlat
 import forpdateam.ru.forpda.api.forum.models.ForumItemTree
@@ -10,7 +8,7 @@ import forpdateam.ru.forpda.model.SchedulersProvider
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.realm.Realm
-import io.realm.RealmResults
+import java.util.*
 
 /**
  * Created by radiationx on 03.01.18.

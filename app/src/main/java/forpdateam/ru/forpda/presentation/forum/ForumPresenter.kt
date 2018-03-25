@@ -1,9 +1,7 @@
 package forpdateam.ru.forpda.presentation.forum
 
 import android.os.Bundle
-
 import com.arellomobile.mvp.InjectViewState
-
 import forpdateam.ru.forpda.api.forum.models.ForumItemTree
 import forpdateam.ru.forpda.common.Utils
 import forpdateam.ru.forpda.common.mvp.BasePresenter
@@ -12,7 +10,6 @@ import forpdateam.ru.forpda.ui.TabManager
 import forpdateam.ru.forpda.ui.fragments.TabFragment
 import forpdateam.ru.forpda.ui.fragments.search.SearchFragment
 import forpdateam.ru.forpda.ui.fragments.topics.TopicsFragment
-import io.reactivex.disposables.Disposable
 
 /**
  * Created by radiationx on 03.01.18.

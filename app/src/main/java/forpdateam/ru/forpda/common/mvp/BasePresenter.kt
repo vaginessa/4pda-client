@@ -3,21 +3,17 @@ package forpdateam.ru.forpda.common.mvp
 import android.os.Handler
 import android.os.Looper
 import android.view.View
-
 import com.arellomobile.mvp.MvpPresenter
 import com.arellomobile.mvp.MvpView
-
-import org.acra.ACRA
-
 import forpdateam.ru.forpda.common.ErrorHandler
 import forpdateam.ru.forpda.ui.TabManager
-import forpdateam.ru.forpda.ui.fragments.TabFragment
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
+import org.acra.ACRA
 
 /**
  * Created by radiationx on 05.11.17.

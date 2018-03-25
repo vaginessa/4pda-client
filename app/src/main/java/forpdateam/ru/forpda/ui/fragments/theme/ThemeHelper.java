@@ -2,10 +2,7 @@ package forpdateam.ru.forpda.ui.fragments.theme;
 
 import android.support.annotation.NonNull;
 
-import forpdateam.ru.forpda.apirx.RxApi;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by radiationx on 27.04.17.

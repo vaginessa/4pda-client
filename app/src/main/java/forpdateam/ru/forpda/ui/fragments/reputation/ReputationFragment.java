@@ -21,7 +21,6 @@ import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import forpdateam.ru.forpda.App;
-import forpdateam.ru.forpda.Dependencies;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.api.others.user.ForumUser;
 import forpdateam.ru.forpda.api.reputation.Reputation;

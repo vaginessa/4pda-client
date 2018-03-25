@@ -1,12 +1,10 @@
 package forpdateam.ru.forpda.presentation.auth
 
 import com.arellomobile.mvp.InjectViewState
-
 import forpdateam.ru.forpda.api.auth.models.AuthForm
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.model.repository.auth.AuthRepository
 import forpdateam.ru.forpda.model.repository.profile.ProfileRepository
-import io.reactivex.disposables.Disposable
 
 /**
  * Created by radiationx on 02.01.18.

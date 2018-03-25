@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Locale;
 
 import forpdateam.ru.forpda.App;
-import forpdateam.ru.forpda.Dependencies;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.entity.app.history.HistoryItem;
 import forpdateam.ru.forpda.entity.db.history.HistoryItemBd;
