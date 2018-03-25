@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.NotNull;
+
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.api.IBaseForumPost;
@@ -159,6 +161,22 @@ public class ThemeDialogsHelper_V2 {
         new AlertDialog.Builder(context)
                 .setMessage(String.format(context.getString(R.string.change_post_reputation_Type_Nick), context.getString(type ? R.string.increase : R.string.decrease), post.getNick()))
                 .setPositiveButton(R.string.ok, (dialog, which) -> presenter.votePost(post.getId(), type))
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    public void openAnchorDialog(IThemePresenter presenter, @NotNull IBaseForumPost post, @NotNull String anchorName) {
+        new AlertDialog.Builder(context)
+                .setTitle(R.string.link_to_anchor)
+                .setPositiveButton(R.string.copy, (dialog, which) -> presenter.copyAnchorLink(post.getId(), anchorName))
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    public void openSpoilerLinkDialog(IThemePresenter presenter, @NotNull IBaseForumPost post, @NotNull String spoilNumber) {
+        new AlertDialog.Builder(context)
+                .setMessage(R.string.spoiler_link_copy_ask)
+                .setPositiveButton(R.string.ok, (dialog, which) -> presenter.copySpoilerLink(post.getId(), spoilNumber))
                 .setNegativeButton(R.string.cancel, null)
                 .show();
     }

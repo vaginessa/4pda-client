@@ -80,7 +80,7 @@ public abstract class ThemeFragment extends TabFragment implements ThemeView {
     //Указывают на произведенное действие: переход назад, обновление, обычный переход по ссылке
     private final static String LOG_TAG = ThemeFragment.class.getSimpleName();
 
-    private ThemeDialogsHelper_V2 dialogsHelper;
+    protected ThemeDialogsHelper_V2 dialogsHelper;
 
     protected MenuItem toggleMessagePanelItem;
     protected MenuItem refreshMenuItem;

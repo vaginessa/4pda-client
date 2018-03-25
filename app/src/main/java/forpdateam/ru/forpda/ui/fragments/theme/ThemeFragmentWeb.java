@@ -43,12 +43,10 @@ public class ThemeFragmentWeb extends ThemeFragment implements ExtendedWebView.J
     private WebChromeClient chromeClient;
     private ThemeJsInterface jsInterface;
 
-
     @Override
     public void scrollToAnchor(String anchor) {
         webView.evalJs("scrollToElement(\"" + anchor + "\")");
     }
-
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -195,6 +193,34 @@ public class ThemeFragmentWeb extends ThemeFragment implements ExtendedWebView.J
         getMainActivity().getWebViewsProvider().push(webView);
     }
 
+    @Override
+    public void onDomContentComplete(final ArrayList<String> actions) {
+        Log.d(LOG_TAG, "DOMContentLoaded");
+        actions.add("setLoadAction(" + presenter.getLoadAction() + ");");
+        //Log.e("WebConsole", "" + currentPage.getScrollY() + " : " + App.get().getDensity() + " : " + ((int) (currentPage.getScrollY() / App.get().getDensity())));
+        actions.add("setLoadScrollY(" + ((int) (presenter.getPageScrollY() / App.get().getDensity())) + ");");
+    }
+
+    @Override
+    public void onPageComplete(final ArrayList<String> actions) {
+        presenter.setLoadAction(ThemePresenter.ActionState.NORMAL);
+        actions.add("setLoadAction(" + ThemePresenter.ActionState.NORMAL + ");");
+    }
+
+    @Override
+    public void deletePostUi(@NotNull IBaseForumPost post) {
+        webView.evalJs("onDeletePostClick(" + post.getId() + ");");
+    }
+
+    @Override
+    public void openAnchorDialog(@NotNull IBaseForumPost post, @NotNull String anchorName) {
+        dialogsHelper.openAnchorDialog(presenter, post, anchorName);
+    }
+
+    @Override
+    public void openSpoilerLinkDialog(@NotNull IBaseForumPost post, @NotNull String spoilNumber) {
+        dialogsHelper.openSpoilerLinkDialog(presenter, post, spoilNumber);
+    }
 
     private class ThemeWebViewClient extends CustomWebViewClient {
         private final Pattern p = Pattern.compile("\\.(jpg|png|gif|bmp)");
@@ -239,60 +265,4 @@ public class ThemeFragmentWeb extends ThemeFragment implements ExtendedWebView.J
         }
     }
 
-
-    @Override
-    public void onDomContentComplete(final ArrayList<String> actions) {
-        Log.d(LOG_TAG, "DOMContentLoaded");
-        actions.add("setLoadAction(" + presenter.getLoadAction() + ");");
-        //Log.e("WebConsole", "" + currentPage.getScrollY() + " : " + App.get().getDensity() + " : " + ((int) (currentPage.getScrollY() / App.get().getDensity())));
-        actions.add("setLoadScrollY(" + ((int) (presenter.getPageScrollY() / App.get().getDensity())) + ");");
-    }
-
-    @Override
-    public void onPageComplete(final ArrayList<String> actions) {
-        presenter.setLoadAction(ThemePresenter.ActionState.NORMAL);
-        actions.add("setLoadAction(" + ThemePresenter.ActionState.NORMAL + ");");
-    }
-
-    /*
-    *
-    * JavaScript Interface functions
-    *
-    * */
-
-    @Override
-    public void deletePostUi(@NotNull IBaseForumPost post) {
-        webView.evalJs("onDeletePostClick(" + post.getId() + ");");
-    }
-
-    @Override
-    public void openAnchorDialog(@NotNull IBaseForumPost post, @NotNull String anchorName) {
-        if (getContext() == null) {
-            return;
-        }
-        String link = "https://4pda.ru/forum/index.php?act=findpost&pid=" + post.getId() + "&anchor=" + anchorName;
-        new AlertDialog.Builder(getContext())
-                .setTitle(R.string.link_to_anchor)
-                .setMessage(link)
-                .setPositiveButton(R.string.copy, (dialog, which) -> {
-                    presenter.copyText(link);
-                })
-                .setNegativeButton(R.string.cancel, null)
-                .show();
-    }
-
-    @Override
-    public void openSpoilerLinkDialog(@NotNull IBaseForumPost post, @NotNull String spoilNumber) {
-        if (getContext() == null) {
-            return;
-        }
-        new AlertDialog.Builder(getContext())
-                .setMessage(R.string.spoiler_link_copy_ask)
-                .setPositiveButton(R.string.ok, (dialog, which) -> {
-                    String s = "https://4pda.ru/forum/index.php?act=findpost&pid=" + post.getId() + "&anchor=Spoil-" + post.getId() + "-" + spoilNumber;
-                    presenter.copyText(s);
-                })
-                .setNegativeButton(R.string.cancel, null)
-                .show();
-    }
 }

@@ -597,6 +597,20 @@ class ThemePresenter(
         }
     }
 
+    override fun copyAnchorLink(postId: Int, name: String) {
+        getPostById(postId)?.let {
+            val url = "https://4pda.ru/forum/index.php?act=findpost&pid=${it.id}&anchor=$name"
+            copyText(url)
+        }
+    }
+
+    override fun copySpoilerLink(postId: Int, spoilNumber: String) {
+        getPostById(postId)?.let {
+            val url = "https://4pda.ru/forum/index.php?act=findpost&pid=${it.id}&anchor=Spoil-${it.id}-$spoilNumber"
+            copyText(url)
+        }
+    }
+
     enum class ActionState(private val id: Int) {
         BACK(0),
         REFRESH(2),

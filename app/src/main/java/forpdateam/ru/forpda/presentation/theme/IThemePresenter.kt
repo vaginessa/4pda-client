@@ -54,4 +54,6 @@ interface IThemePresenter {
     fun createNote(postId: Int)
     fun copyPostLink(postId: Int)
     fun sharePostLink(postId: Int)
+    fun copyAnchorLink(postId: Int, name: String)
+    fun copySpoilerLink(postId: Int, spoilNumber: String)
 }
