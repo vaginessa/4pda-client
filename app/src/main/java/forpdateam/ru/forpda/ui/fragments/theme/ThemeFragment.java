@@ -691,14 +691,13 @@ public abstract class ThemeFragment extends TabFragment implements ThemeView {
         return attachmentsPopup;
     }
 
-
-    public void onSendPostCompleted(ThemePage themePage) throws Exception {
+    public void onSendPostCompleted(ThemePage themePage) {
         messagePanel.clearAttachments();
         messagePanel.clearMessage();
         onLoadData(themePage);
     }
 
-    public void onEditPostCompleted(ThemePage themePage) throws Exception {
+    public void onEditPostCompleted(ThemePage themePage) {
         onLoadData(themePage);
     }
 
