@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import forpdateam.ru.forpda.model.data.remote.api.Api;
+import forpdateam.ru.forpda.model.data.remote.IWebClient;
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkRequest;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
@@ -123,6 +123,11 @@ public class NewsApi {
     private final Pattern karmaPattern = Pattern.compile("\\\"(\\d+)\\\":\\[(.+?),(.+?),(.+?),(.+?)\\]");
     private final Pattern karmaSourcePattern = Pattern.compile("ModKarma\\(([\\s\\S]*?)\\)<\\/script>");
 
+    private IWebClient webClient;
+
+    public NewsApi(IWebClient webClient) {
+        this.webClient = webClient;
+    }
 
     public String getLink(@Nullable String category, int pageNumber) {
         String link = getUrlCategory(category);
@@ -134,7 +139,7 @@ public class NewsApi {
 
     public List<NewsItem> getNews(String category, int pageNumber) throws Exception {
         String url = getLink(category, pageNumber);
-        String response = Api.getWebClient().get(url).getBody();
+        String response = webClient.get(url).getBody();
         ArrayList<NewsItem> items = new ArrayList<>();
         final String regex = RegexStorage.News.List.getListPattern();
         final Pattern pattern = Pattern.compile(regex);
@@ -170,12 +175,12 @@ public class NewsApi {
 
 
     public DetailsPage getDetails(int id) throws Exception {
-        String response = Api.getWebClient().get("https://4pda.ru/index.php?p=" + id).getBody();
+        String response = webClient.get("https://4pda.ru/index.php?p=" + id).getBody();
         return parseArticle(response);
     }
 
     public DetailsPage getDetails(String url) throws Exception {
-        String response = Api.getWebClient().get(url).getBody();
+        String response = webClient.get(url).getBody();
         return parseArticle(response);
     }
 
@@ -353,7 +358,7 @@ public class NewsApi {
 
     public Boolean likeComment(int articleId, int commentId) throws Exception {
         String url = "https://4pda.ru/wp-content/plugins/karma/ajax.php?p=" + articleId + "&c=" + commentId + "&v=1";
-        Api.getWebClient().request(new NetworkRequest.Builder().url(url).xhrHeader().build());
+        webClient.request(new NetworkRequest.Builder().url(url).xhrHeader().build());
         return true;
     }
 
@@ -369,7 +374,7 @@ public class NewsApi {
                 .formHeader("comment_reply_ID", Integer.toString(commentId))
                 .formHeader("comment_reply_dp", commentId == 0 ? "0" : "1")
                 .formHeader("comment", comment, true);
-        NetworkResponse response = Api.getWebClient().request(builder.build());
+        NetworkResponse response = webClient.request(builder.build());
 
         DetailsPage newArticle = parseArticle(response.getBody());
 
@@ -400,7 +405,7 @@ public class NewsApi {
             rBuilder.formHeader("answer[]", Integer.toString(answersId[i]));
         }
 
-        NetworkResponse response = Api.getWebClient().request(rBuilder.build());
+        NetworkResponse response = webClient.request(rBuilder.build());
         return parseArticle(response.getBody());
     }
 

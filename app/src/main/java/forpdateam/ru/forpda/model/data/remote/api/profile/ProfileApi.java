@@ -3,7 +3,7 @@ package forpdateam.ru.forpda.model.data.remote.api.profile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import forpdateam.ru.forpda.model.data.remote.api.Api;
+import forpdateam.ru.forpda.model.data.remote.IWebClient;
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkRequest;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
@@ -12,7 +12,7 @@ import forpdateam.ru.forpda.entity.remote.profile.ProfileModel;
 /**
  * Created by radiationx on 03.08.16.
  */
-public class Profile {
+public class ProfileApi {
     private static final Pattern mainPattern = Pattern.compile("<div[^>]*?user-box[\\s\\S]*?<img src=\"([^\"]*?)\"[\\s\\S]*?<h1>([^<]*?)<\\/h1>[\\s\\S]*?(?=<span class=\"title\">([^<]*?)<\\/span>| )[\\s\\S]*?<h2>(?:<span style[^>]*?>|)([^\"<]*?)(?:<\\/span>|)<\\/h2>[\\s\\S]*?(<ul[\\s\\S]*?\\/ul>)[\\s\\S]*?<div class=\"u-note\">([\\s\\S]*?)<\\/div>[^<]*?(?:<\\/li>|<div)[\\s\\S]*?(<ul[\\s\\S]*?\\/ul>)[\\s\\S]*?(<ul[\\s\\S]*?\\/ul>)[\\s\\S]*?(<ul[\\s\\S]*?\\/ul>)[\\s\\S]*?(<ul[\\s\\S]*?\\/ul>)[\\s\\S]*?(<ul[\\s\\S]*?\\/ul>)");
     private static final Pattern info = Pattern.compile("<li[\\s\\S]*?title[^>]*?>([^>]*?)<[\\s\\S]*?div[^>]*>([\\s\\S]*?)</div>");
     private static final Pattern personal = Pattern.compile("<li[\\s\\S]*?title[^>]*?>([^>]*?)<[\\s\\S]*?(?=<div[^>]*>([^<]*)[\\s\\S]*?</div>|)<");
@@ -23,10 +23,16 @@ public class Profile {
     private static final Pattern note = Pattern.compile("<textarea[^>]*?profile-textarea\"[^>]*?>([\\s\\S]*?)</textarea>");
     private static final Pattern about = Pattern.compile("<div[^>]*?div-custom-about[^>]*?>([\\s\\S]*?)</div>");
     private static final Pattern warnings = Pattern.compile("<li class=\"wlog-([^\"]*?)\"[^>]*?>[\\s\\S]*?<span class=\"date\">([^<]*?)<\\/span>[\\s\\S]*?<span style[^>]*?>([^<]*?)<\\/span>[\\s\\S]*?<div class=\"a-content\">([\\s\\S]*?)<div class=\"profile-edit-links");
+    
+    private IWebClient webClient;
+
+    public ProfileApi(IWebClient webClient) {
+        this.webClient = webClient;
+    }
 
     public ProfileModel getProfile(String url) throws Exception {
         ProfileModel profile = new ProfileModel();
-        NetworkResponse response = Api.getWebClient().get(url);
+        NetworkResponse response = webClient.get(url);
 
 
         final Matcher mainMatcher = mainPattern.matcher(response.getBody());
@@ -213,7 +219,7 @@ public class Profile {
         NetworkRequest.Builder builder = new NetworkRequest.Builder()
                 .url("https://4pda.ru/forum/index.php?act=profile-xhr&action=save-note")
                 .formHeader("note", note);
-        NetworkResponse response = Api.getWebClient().request(builder.build());
+        NetworkResponse response = webClient.request(builder.build());
         return response.getBody().equals("1");
     }
 

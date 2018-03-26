@@ -5,7 +5,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import forpdateam.ru.forpda.App;
-import forpdateam.ru.forpda.model.data.remote.api.Api;
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
 import forpdateam.ru.forpda.model.data.remote.IWebClient;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkRequest;
@@ -17,13 +16,19 @@ import forpdateam.ru.forpda.client.ClientHelper;
  * Created by radiationx on 25.03.17.
  */
 
-public class Auth {
+public class AuthApi {
     public final static String AUTH_BASE_URL = "https://4pda.ru/forum/index.php?act=auth";
     private final static Pattern captchaPattern = Pattern.compile("captcha-time\" value=\"([^\"]*?)\"[\\s\\S]*?captcha-sig\" value=\"([^\"]*?)\"[\\s\\S]*?src=\"([^\"]*?)\"");
     private final static Pattern errorPattern = Pattern.compile("errors-list\">([\\s\\S]*?)</ul>");
 
+    private IWebClient webClient = null;
+
+    public AuthApi(IWebClient webClient) {
+        this.webClient = webClient;
+    }
+
     public AuthForm getForm() throws Exception {
-        NetworkResponse response = Api.getWebClient().get(AUTH_BASE_URL);
+        NetworkResponse response = webClient.get(AUTH_BASE_URL);
 
         if (response.getBody() == null || response.getBody().isEmpty())
             throw new Exception("Page empty!");
@@ -55,7 +60,7 @@ public class Auth {
                 .formHeader("password", URLEncoder.encode(form.getPassword(), "windows-1251"), true)
                 .formHeader("remember", form.getRememberField())
                 .formHeader("hidden", form.isHidden() ? "1" : "0");
-        NetworkResponse response = Api.getWebClient().request(builder.build());
+        NetworkResponse response = webClient.request(builder.build());
         Matcher matcher = errorPattern.matcher(response.getBody());
         if (matcher.find()) {
             throw new Exception(ApiUtils.fromHtml(matcher.group(1)).replaceAll("\\.", ".\n").trim());
@@ -74,17 +79,17 @@ public class Auth {
     }
 
     public boolean logout() throws Exception {
-        NetworkResponse response =Api.getWebClient().get("https://4pda.ru/forum/index.php?act=logout&CODE=03&k=".concat(Api.getWebClient().getAuthKey()));
+        NetworkResponse response =webClient.get("https://4pda.ru/forum/index.php?act=logout&CODE=03&k=".concat(webClient.getAuthKey()));
 
         Matcher matcher = Pattern.compile("wr va-m text").matcher(response.getBody());
         if (matcher.find())
             throw new Exception("You already logout");
 
-        Api.getWebClient().clearCookies();
+        webClient.clearCookies();
         App.get().getPreferences().edit().remove("cookie_member_id").remove("cookie_pass_hash").apply();
         ClientHelper.setAuthState(ClientHelper.AUTH_STATE_LOGOUT);
 
-        return !checkLogin(Api.getWebClient().get(IWebClient.MINIMAL_PAGE).getBody());
+        return !checkLogin(webClient.get(IWebClient.MINIMAL_PAGE).getBody());
     }
 
 }

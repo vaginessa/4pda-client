@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import forpdateam.ru.forpda.model.data.remote.api.Api;
+import forpdateam.ru.forpda.model.data.remote.IWebClient;
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkRequest;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
@@ -29,7 +29,7 @@ import forpdateam.ru.forpda.entity.remote.theme.ThemePage;
  * Created by radiationx on 10.01.17.
  */
 
-public class EditPost {
+public class EditPostApi {
     private final static Pattern pollInfoPattern = Pattern.compile("is_mod\\s*?=\\s*?(\\d+)[\\s\\S]*?poll_questions\\s*?=\\s*?(\\{[\\s\\S]*?\\})\\n,[\\s\\S]*?poll_choices\\s*?=\\s*?(\\{[\\s\\S]*?\\})\\n[\\s\\S]*?poll_votes\\s*?=\\s*?(\\{[\\s\\S]*?\\})\\n[\\s\\S]*?poll_multi\\s*?=\\s*?(\\{[\\s\\S]*?\\})\\n[\\s\\S]*?max_poll_questions\\s*?=\\s*?(\\d+)[\\s\\S]*?max_poll_choices\\s*?=\\s*?(\\d+)[\\s\\S]*?<input[^>]*?name=\"poll_question\"[^>]*?value=\"([^\"]*?)\"");
 
     private final static Pattern fckngInvalidJsonPattern = Pattern.compile("(?:\\{|\\,)[\\\"\\']?(\\d+)(?:_(\\d+))?[\\\"\\']?\\s*?\\:\\s*?[\\\"\\']([^\\'\\\"]*?)[\\\"\\'](?:\\})?");
@@ -41,6 +41,12 @@ public class EditPost {
     private final static Pattern statusInfo = Pattern.compile("can_upload = parseInt\\([\"'](\\d+)'\\)[\\s\\S]*?status_msg_files = .([\\s\\S]*?).;[\\s\\S]*?status_msg = .([\\s\\S]*?).;[\\s\\S]*?status_is_error = ([\\s\\S]*?);");
 
     private final static Pattern attachmentsPattern = Pattern.compile("(\\d+)\u0002([^\u0002]*?)\u0002([^\u0002]*?)\u0002(\\/\\/[^\u0002]*?)\u0002(\\d+)\u0002([0-9a-fA-F]+)(?:(?:\u0002(\\/\\/[^\u0002]*?)\u0002(\\d+)\u0002(\\d+))?(?:\u0003\u0004(\\d+)\u0003\u0004([^\u0002]*?)\u0003\u0004([^\u0002]*?)\u0003)?)?");
+
+    private IWebClient webClient;
+
+    public EditPostApi(IWebClient webClient) {
+        this.webClient = webClient;
+    }
 
     public static void printPoll(EditPoll poll) {
         if (poll != null) {
@@ -64,7 +70,7 @@ public class EditPost {
         String url = "https://4pda.ru/forum/index.php?act=post&do=edit_post&p=".concat(Integer.toString(postId));
         //url = url.concat("&t=").concat(Integer.toString(topicId)).concat("&f=").concat(Integer.toString(forumId));
 
-        NetworkResponse response = Api.getWebClient().get(url);
+        NetworkResponse response = webClient.get(url);
         if (response.getBody().equals("nopermission")) {
             form.setErrorCode(EditPostForm.ERROR_NO_PERMISSION);
             return form;
@@ -78,10 +84,10 @@ public class EditPost {
         if (matcher.find()) {
             EditPoll poll = createPoll(matcher);
             form.setPoll(poll);
-            EditPost.printPoll(poll);
+            EditPostApi.printPoll(poll);
         }
 
-        response = Api.getWebClient().get("https://4pda.ru/forum/index.php?act=attach&index=1&relId=" + postId + "&maxSize=134217728&allowExt=&code=init&unlinked=");
+        response = webClient.get("https://4pda.ru/forum/index.php?act=attach&index=1&relId=" + postId + "&maxSize=134217728&allowExt=&code=init&unlinked=");
         matcher = attachmentsPattern.matcher(response.getBody());
         while (matcher.find()) {
             form.addAttachment(fillAttachmentV2(new AttachmentItem(), matcher));
@@ -163,7 +169,7 @@ public class EditPost {
                     .url(url)
                     .file(file);
 
-            response = Api.getWebClient().request(builder.build());
+            response = webClient.request(builder.build());
             matcher = loadedAttachments.matcher(response.getBody());
             if (matcher.find())
                 item = fillAttachment(item, matcher);
@@ -207,7 +213,7 @@ public class EditPost {
                     .formHeader("size", "" + file.getFileStream().available())
                     .formHeader("name", file.getFileName());
 
-            response = Api.getWebClient().request(builder.build());
+            response = webClient.request(builder.build());
             if (response.getBody().equals("0")) {
                 NetworkRequest.Builder uploadRequest = new NetworkRequest.Builder()
                         .url("https://4pda.ru/forum/index.php?act=attach")
@@ -219,7 +225,7 @@ public class EditPost {
                         .formHeader("forum-attach-files", "")
                         .formHeader("code", "upload")
                         .file(file);
-                response = Api.getWebClient().request(uploadRequest.build(), item.getProgressListener());
+                response = webClient.request(uploadRequest.build(), item.getProgressListener());
             }
             if (matcher == null) {
                 matcher = attachmentsPattern.matcher(response.getBody());
@@ -251,7 +257,7 @@ public class EditPost {
         NetworkResponse response;
         Matcher matcher;
         for (AttachmentItem item : items) {
-            response = Api.getWebClient().get("https://4pda.ru/forum/index.php?&act=attach&code=attach_upload_remove&attach_rel_id=".concat(postId == 0 ? "" : Integer.toString(postId)).concat("&attach_id=").concat(Integer.toString(item.getId())));
+            response = webClient.get("https://4pda.ru/forum/index.php?&act=attach&code=attach_upload_remove&attach_rel_id=".concat(postId == 0 ? "" : Integer.toString(postId)).concat("&attach_id=").concat(Integer.toString(item.getId())));
             matcher = statusInfo.matcher(response.getBody());
             if (matcher.find())
                 fillAttachmentStatus(item, matcher);
@@ -271,7 +277,7 @@ public class EditPost {
                     .formHeader("allowExt", "")
                     .formHeader("code", "remove")
                     .formHeader("id", Integer.toString(item.getId()));
-            response = Api.getWebClient().request(builder.build());
+            response = webClient.request(builder.build());
             //todo проверка на ошибки, я хз че еще может быть кроме 0
             if (response.getBody().equals("0")) {
                 item.setStatus(AttachmentItem.STATUS_REMOVED);
@@ -361,7 +367,7 @@ public class EditPost {
                 .formHeader("CODE", form.getType() == EditPostForm.TYPE_NEW_POST ? "03" : "9")
                 .formHeader("f", "" + form.getForumId())
                 .formHeader("t", "" + form.getTopicId())
-                .formHeader("auth_key", Api.getWebClient().getAuthKey())
+                .formHeader("auth_key", webClient.getAuthKey())
                 .formHeader("Post", form.getMessage())
                 .formHeader("enablesig", "yes")
                 .formHeader("enableemo", "yes")
@@ -375,7 +381,7 @@ public class EditPost {
                 .formHeader("_upload_single_file", "1");
         EditPoll poll = form.getPoll();
         if (poll != null) {
-            EditPost.printPoll(poll);
+            EditPostApi.printPoll(poll);
             builder.formHeader("poll_question", poll.getTitle().replaceAll("\n", " "));
             for (int i = 0; i < poll.getQuestions().size(); i++) {
                 EditPoll.Question question = poll.getQuestion(i);
@@ -406,6 +412,6 @@ public class EditPost {
         builder.formHeader("file-list", ids.toString());
         if (form.getPostId() != 0)
             builder.formHeader("p", "" + form.getPostId());
-        return Api.Theme().parsePage(url, Api.getWebClient().request(builder.build()), false, false);
+        return Api.Theme().parsePage(url, webClient.request(builder.build()), false, false);
     }
 }

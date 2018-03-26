@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.model.data.remote.api.favorites.Favorites;
+import forpdateam.ru.forpda.model.data.remote.api.favorites.FavoritesApi;
 import forpdateam.ru.forpda.apirx.RxApi;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
@@ -17,15 +17,15 @@ import io.reactivex.schedulers.Schedulers;
 
 public class FavoritesHelper {
     public static void addForum(@NonNull Consumer<Boolean> onNext, int id, String subType) {
-        changeFav(onNext, Favorites.ACTION_ADD_FORUM, -1, id, subType);
+        changeFav(onNext, FavoritesApi.ACTION_ADD_FORUM, -1, id, subType);
     }
 
     public static void add(@NonNull Consumer<Boolean> onNext, int id, String subType) {
-        changeFav(onNext, Favorites.ACTION_ADD, -1, id, subType);
+        changeFav(onNext, FavoritesApi.ACTION_ADD, -1, id, subType);
     }
 
     public static void delete(@NonNull Consumer<Boolean> onNext, int favId) {
-        changeFav(onNext, Favorites.ACTION_DELETE, favId, -1, null);
+        changeFav(onNext, FavoritesApi.ACTION_DELETE, favId, -1, null);
     }
 
     /*public static void changePinState(@NonNull Consumer<Boolean> onNext, int favId, String pinState) {
@@ -40,7 +40,7 @@ public class FavoritesHelper {
         new AlertDialog.Builder(context)
                 .setTitle(R.string.favorites_subscribe_email)
                 .setItems(FavoritesFragment.SUB_NAMES, (dialog1, which1) -> {
-                    addForum(onNext, id, Favorites.SUB_TYPES[which1]);
+                    addForum(onNext, id, FavoritesApi.SUB_TYPES[which1]);
                 })
                 .show();
     }
@@ -49,7 +49,7 @@ public class FavoritesHelper {
         new AlertDialog.Builder(context)
                 .setTitle(R.string.favorites_subscribe_email)
                 .setItems(FavoritesFragment.SUB_NAMES, (dialog1, which1) -> {
-                    add(onNext, id, Favorites.SUB_TYPES[which1]);
+                    add(onNext, id, FavoritesApi.SUB_TYPES[which1]);
                 })
                 .show();
     }

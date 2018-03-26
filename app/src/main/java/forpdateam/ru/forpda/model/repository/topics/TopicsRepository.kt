@@ -1,6 +1,6 @@
 package forpdateam.ru.forpda.model.repository.topics
 
-import forpdateam.ru.forpda.model.data.remote.api.topcis.Topics
+import forpdateam.ru.forpda.model.data.remote.api.topcis.TopicsApi
 import forpdateam.ru.forpda.entity.remote.topics.TopicsData
 import forpdateam.ru.forpda.model.SchedulersProvider
 import io.reactivex.Observable
@@ -11,7 +11,7 @@ import io.reactivex.Observable
 
 class TopicsRepository(
         private val schedulers: SchedulersProvider,
-        private val topicsApi: Topics
+        private val topicsApi: TopicsApi
 ) {
 
     fun getTopics(id: Int, st: Int): Observable<TopicsData> = Observable

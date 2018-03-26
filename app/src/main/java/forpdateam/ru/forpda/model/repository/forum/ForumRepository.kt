@@ -1,7 +1,7 @@
 package forpdateam.ru.forpda.model.repository.forum
 
 import forpdateam.ru.forpda.App
-import forpdateam.ru.forpda.model.data.remote.api.forum.Forum
+import forpdateam.ru.forpda.model.data.remote.api.forum.ForumApi
 import forpdateam.ru.forpda.entity.remote.forum.ForumItemFlat
 import forpdateam.ru.forpda.entity.remote.forum.ForumItemTree
 import forpdateam.ru.forpda.entity.db.forum.ForumItemFlatBd
@@ -19,7 +19,7 @@ import java.util.*
 
 class ForumRepository(
         private val schedulers: SchedulersProvider,
-        private val forumApi: Forum
+        private val forumApi: ForumApi
 ) {
 
     fun getForums(): Observable<ForumItemTree> = Observable

@@ -42,7 +42,6 @@ import java.util.concurrent.TimeoutException;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.model.data.remote.api.Api;
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
 import forpdateam.ru.forpda.entity.remote.events.NotificationEvent;
 import forpdateam.ru.forpda.entity.remote.others.user.ForumUser;

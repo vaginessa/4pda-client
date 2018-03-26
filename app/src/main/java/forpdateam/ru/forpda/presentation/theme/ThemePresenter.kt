@@ -5,9 +5,9 @@ import android.util.Log
 import com.arellomobile.mvp.InjectViewState
 import forpdateam.ru.forpda.App
 import forpdateam.ru.forpda.R
-import forpdateam.ru.forpda.model.data.remote.api.IBaseForumPost
+import forpdateam.ru.forpda.entity.remote.IBaseForumPost
 import forpdateam.ru.forpda.entity.remote.search.SearchSettings
-import forpdateam.ru.forpda.model.data.remote.api.theme.Theme
+import forpdateam.ru.forpda.model.data.remote.api.theme.ThemeApi
 import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem
 import forpdateam.ru.forpda.entity.remote.editpost.EditPostForm
 import forpdateam.ru.forpda.entity.remote.theme.ThemePage
@@ -364,7 +364,7 @@ class ThemePresenter(
                         }
                         Log.d(LOG_TAG, "param postId: $postId")
                         if (postId != null && getPostById(Integer.parseInt(postId.trim { it <= ' ' })) != null) {
-                            val matcher = Theme.elemToScrollPattern.matcher(url)
+                            val matcher = ThemeApi.elemToScrollPattern.matcher(url)
                             var elem: String? = null
                             while (matcher.find()) {
                                 elem = matcher.group(1)
@@ -387,7 +387,7 @@ class ThemePresenter(
                 }
             }
 
-            if (Theme.attachImagesPattern.matcher(url).find()) {
+            if (ThemeApi.attachImagesPattern.matcher(url).find()) {
                 currentPage?.let {
                     for (post in it.getPosts()) {
                         for (image in post.attachImages) {

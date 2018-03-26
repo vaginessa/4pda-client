@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import forpdateam.ru.forpda.entity.remote.others.pagination.Pagination;
-import forpdateam.ru.forpda.model.data.remote.api.reputation.Reputation;
+import forpdateam.ru.forpda.model.data.remote.api.reputation.ReputationApi;
 
 /**
  * Created by radiationx on 20.03.17.
@@ -12,7 +12,7 @@ import forpdateam.ru.forpda.model.data.remote.api.reputation.Reputation;
 
 public class RepData {
     private int id = 0, positive = 0, negative = 0;
-    private String nick, mode = Reputation.MODE_TO, sort = Reputation.SORT_DESC;
+    private String nick, mode = ReputationApi.MODE_TO, sort = ReputationApi.SORT_DESC;
     private Pagination pagination = new Pagination();
     private List<RepItem> items = new ArrayList<>();
 

@@ -1,6 +1,6 @@
 package forpdateam.ru.forpda.model.repository.mentions
 
-import forpdateam.ru.forpda.model.data.remote.api.mentions.Mentions
+import forpdateam.ru.forpda.model.data.remote.api.mentions.MentionsApi
 import forpdateam.ru.forpda.entity.remote.mentions.MentionsData
 import forpdateam.ru.forpda.model.SchedulersProvider
 import io.reactivex.Observable
@@ -11,7 +11,7 @@ import io.reactivex.Observable
 
 class MentionsRepository(
         private val schedulers: SchedulersProvider,
-        private val mentionsApi: Mentions
+        private val mentionsApi: MentionsApi
 ) {
 
     fun getMentions(page: Int): Observable<MentionsData> = Observable

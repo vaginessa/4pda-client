@@ -28,7 +28,7 @@ import java.util.Observer;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.model.data.remote.api.favorites.Favorites;
+import forpdateam.ru.forpda.model.data.remote.api.favorites.FavoritesApi;
 import forpdateam.ru.forpda.model.data.remote.api.favorites.Sorting;
 import forpdateam.ru.forpda.entity.remote.favorites.FavData;
 import forpdateam.ru.forpda.entity.remote.favorites.FavItem;
@@ -158,8 +158,8 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
         dialogMenu.addItem(getString(R.string.attachments), (context, data) -> presenter.openAttachments(data));
         dialogMenu.addItem(getString(R.string.open_theme_forum), (context, data) -> presenter.openForum(data));
         dialogMenu.addItem(getString(R.string.fav_change_subscribe_type), (context, data) -> presenter.showSubscribeDialog(data));
-        dialogMenu.addItem(getPinText(false), (context, data) -> presenter.changeFav(Favorites.ACTION_EDIT_PIN_STATE, data.isPin() ? "unpin" : "pin", data.getFavId()));
-        dialogMenu.addItem(getString(R.string.delete), (context, data) -> presenter.changeFav(Favorites.ACTION_DELETE, null, data.getFavId()));
+        dialogMenu.addItem(getPinText(false), (context, data) -> presenter.changeFav(FavoritesApi.ACTION_EDIT_PIN_STATE, data.isPin() ? "unpin" : "pin", data.getFavId()));
+        dialogMenu.addItem(getString(R.string.delete), (context, data) -> presenter.changeFav(FavoritesApi.ACTION_DELETE, null, data.getFavId()));
 
         refreshLayout.setOnRefreshListener(this::loadData);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -366,11 +366,11 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
 
     @Override
     public void showSubscribeDialog(FavItem item) {
-        int subTypeIndex = Arrays.asList(Favorites.SUB_TYPES).indexOf(item.getSubType());
+        int subTypeIndex = Arrays.asList(FavoritesApi.SUB_TYPES).indexOf(item.getSubType());
         new AlertDialog.Builder(getContext())
                 .setTitle(R.string.favorites_subscribe_email)
                 .setSingleChoiceItems(FavoritesFragment.SUB_NAMES, subTypeIndex, (dialog, which1) -> {
-                    presenter.changeFav(Favorites.ACTION_EDIT_SUB_TYPE, Favorites.SUB_TYPES[which1], item.getFavId());
+                    presenter.changeFav(FavoritesApi.ACTION_EDIT_SUB_TYPE, FavoritesApi.SUB_TYPES[which1], item.getFavId());
                     dialog.dismiss();
                 })
                 .show();
@@ -392,7 +392,7 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
         if (index != -1)
             dialogMenu.changeTitle(index, getPinText(item.isPin()));
 
-        int subTypeIndex = Arrays.asList(Favorites.SUB_TYPES).indexOf(item.getSubType());
+        int subTypeIndex = Arrays.asList(FavoritesApi.SUB_TYPES).indexOf(item.getSubType());
         dialogMenu.changeTitle(3, getSubText(subTypeIndex));
 
         dialogMenu.show(getContext(), FavoritesFragment.this, item);

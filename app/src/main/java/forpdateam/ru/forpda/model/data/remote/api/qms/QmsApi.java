@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import forpdateam.ru.forpda.model.data.remote.api.Api;
+import forpdateam.ru.forpda.model.data.remote.IWebClient;
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkRequest;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
@@ -26,7 +26,7 @@ import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem;
 /**
  * Created by radiationx on 29.07.16.
  */
-public class Qms {
+public class QmsApi {
     private final static Pattern contactsPattern = Pattern.compile("<a class=\"list-group-item[^>]*?data-member-id=\"([^\"]*?)\" (?=data-unread-count=\"([^\"]*?)\"|)[^>]*?>[\\s\\S]*?<img[^>]*?src=\"([^\"]*?)\" title=\"([^\"]*?)\"");
     private final static Pattern threadPattern = Pattern.compile("<a class=\"list-group-item[^>]*?data-thread-id=\"([^\"]*?)\"[^>]*?>[\\s\\S]*?<div class=\"bage[^>]*?>([\\s\\S]*?)<\\/div>[^<]*?(?:<strong>)?([^<]*?)\\((\\d+)(?: \\/ (\\d+))?\\)");
     private final static Pattern threadNickPattern = Pattern.compile("<div class=\"nav\">[\\s\\S]*?<b>(?:<a[^>]*?>)?([\\s\\S]*?)(?:<\\/a>)?<\\/b>");
@@ -38,12 +38,18 @@ public class Qms {
     private final static Pattern blackListMsgPattern = Pattern.compile("<div class=\"list-group-item msgbox ([^\"]*?)\"[^>]*?>[^<]*?<a[^>]*?>[^<]*?<\\/a>([\\s\\S]*?)<\\/div>");
 
     private final static Pattern findUserPattern = Pattern.compile("\\[(\\d+),\"([\\s\\S]*?)\",\\d+,\"<span[^>]*?background:url\\(([^\\)]*?)\\)");
+    
+    private IWebClient webClient = null;
+
+    public QmsApi(IWebClient webClient) {
+        this.webClient = webClient;
+    }
 
     public ArrayList<QmsContact> getBlackList() throws Exception {
         NetworkRequest.Builder builder = new NetworkRequest.Builder()
                 .url("https://4pda.ru/forum/index.php?act=qms&settings=blacklist")
                 .formHeader("xhr", "body");
-        NetworkResponse response = Api.getWebClient().request(builder.build());
+        NetworkResponse response = webClient.request(builder.build());
         return parseBlackList(response.getBody());
     }
 
@@ -69,7 +75,7 @@ public class Qms {
             strId = Integer.toString(id);
             builder.formHeader("user-id[".concat(strId).concat("]"), strId);
         }
-        NetworkResponse response = Api.getWebClient().request(builder.build());
+        NetworkResponse response = webClient.request(builder.build());
         checkOperation(response.getBody());
         return parseBlackList(response.getBody());
     }
@@ -79,7 +85,7 @@ public class Qms {
                 .url("https://4pda.ru/forum/index.php?act=qms&settings=blacklist&xhr=blacklist-form&do=1")
                 .formHeader("action", "add-user")
                 .formHeader("username", nick);
-        NetworkResponse response = Api.getWebClient().request(builder.build());
+        NetworkResponse response = webClient.request(builder.build());
         checkOperation(response.getBody());
         return parseBlackList(response.getBody());
     }
@@ -95,7 +101,7 @@ public class Qms {
 
     public ArrayList<QmsContact> getContactList() throws Exception {
         ArrayList<QmsContact> list = new ArrayList<>();
-        NetworkResponse response = Api.getWebClient().request(new NetworkRequest.Builder().url("https://4pda.ru/forum/index.php?&act=qms-xhr&action=userlist").build());
+        NetworkResponse response = webClient.request(new NetworkRequest.Builder().url("https://4pda.ru/forum/index.php?&act=qms-xhr&action=userlist").build());
         final Matcher matcher = contactsPattern.matcher(response.getBody());
         QmsContact contact;
         String temp;
@@ -116,7 +122,7 @@ public class Qms {
         NetworkRequest.Builder builder = new NetworkRequest.Builder()
                 .url("https://4pda.ru/forum/index.php?act=qms&mid=" + id)
                 .formHeader("xhr", "body");
-        NetworkResponse response = Api.getWebClient().request(builder.build());
+        NetworkResponse response = webClient.request(builder.build());
         return parseThemes(response.getBody(), id);
     }
 
@@ -126,7 +132,7 @@ public class Qms {
                 .formHeader("xhr", "body")
                 .formHeader("action", "delete-threads")
                 .formHeader("thread-id[" + themeId + "]", "" + themeId);
-        NetworkResponse response = Api.getWebClient().request(builder.build());
+        NetworkResponse response = webClient.request(builder.build());
         return parseThemes(response.getBody(), id);
     }
 
@@ -155,7 +161,7 @@ public class Qms {
         NetworkRequest.Builder builder = new NetworkRequest.Builder()
                 .url("https://4pda.ru/forum/index.php?act=qms&mid=" + userId + "&t=" + themeId)
                 .formHeader("xhr", "body");
-        NetworkResponse response = Api.getWebClient().request(builder.build());
+        NetworkResponse response = webClient.request(builder.build());
         return parseChat(response.getBody());
     }
 
@@ -195,7 +201,7 @@ public class Qms {
 
     public List<ForumUser> findUser(final String nick) throws Exception {
         String encodedNick = URLEncoder.encode(nick, "UTF-8");
-        NetworkResponse response = Api.getWebClient().get("https://4pda.ru/forum/index.php?act=qms-xhr&action=autocomplete-username&q=" + encodedNick /*+ "&limit=150&timestamp=" + System.currentTimeMillis()*/);
+        NetworkResponse response = webClient.get("https://4pda.ru/forum/index.php?act=qms-xhr&action=autocomplete-username&q=" + encodedNick /*+ "&limit=150&timestamp=" + System.currentTimeMillis()*/);
         List<ForumUser> list = new ArrayList<>();
         Matcher m = findUserPattern.matcher(response.getBody());
         while (m.find()) {
@@ -220,7 +226,7 @@ public class Qms {
                 .formHeader("username", nick)
                 .formHeader("title", title)
                 .formHeader("message", mess);
-        NetworkResponse response = Api.getWebClient().request(builder.build());
+        NetworkResponse response = webClient.request(builder.build());
         return parseChat(response.getBody());
     }
 
@@ -233,7 +239,7 @@ public class Qms {
                 .formHeader("message", text)
                 .formHeader("mid", Integer.toString(userId))
                 .formHeader("t", Integer.toString(themeId));
-        NetworkResponse response = Api.getWebClient().request(builder.build());
+        NetworkResponse response = webClient.request(builder.build());
         Matcher matcher = chatPattern.matcher(response.getBody());
         QmsMessage item = new QmsMessage();
         if (matcher.find()) {
@@ -270,7 +276,7 @@ public class Qms {
                 .formHeader("action", "message-info")
                 .formHeader("t", Integer.toString(themeId))
                 .formHeader("msg-id", Integer.toString(messageId));
-        NetworkResponse messInfoResponse = Api.getWebClient().request(messInfoBuilder.build());
+        NetworkResponse messInfoResponse = webClient.request(messInfoBuilder.build());
 
         Matcher matcher = messageInfoPattern.matcher(messInfoResponse.getBody());
         int userId = 0;
@@ -289,7 +295,7 @@ public class Qms {
                 .formHeader("mid", Integer.toString(userId))
                 .formHeader("t", Integer.toString(themeId))
                 .formHeader("after-message", Integer.toString(afterMessageId));
-        NetworkResponse threadMessagesResponse = Api.getWebClient().request(threadMessagesBuilder.build());
+        NetworkResponse threadMessagesResponse = webClient.request(threadMessagesBuilder.build());
 
         Matcher matcher = chatPattern.matcher(threadMessagesResponse.getBody());
         while (matcher.find()) {
@@ -320,7 +326,7 @@ public class Qms {
                 .formHeader("act", "qms-xhr")
                 .formHeader("action", "del-member")
                 .formHeader("del-mid", Integer.toString(mid));
-        return Api.getWebClient().request(builder.build()).getBody();
+        return webClient.request(builder.build()).getBody();
     }
 
     private Pattern imgBbPattern = Pattern.compile("PF\\.obj\\.config\\.json_api=\"([^\"]*?)\"[\\s\\S]*?PF\\.obj\\.config\\.auth_token=\"([^\"]*?)\"");
@@ -330,7 +336,7 @@ public class Qms {
         String uploadUrl = "https://ru.imgbb.com/json";
         String authToken = "null";
 
-        NetworkResponse baseResponse = Api.getWebClient().get(baseUrl);
+        NetworkResponse baseResponse = webClient.get(baseUrl);
         Matcher baseMatcher = imgBbPattern.matcher(baseResponse.getBody());
         if (baseMatcher.find()) {
             uploadUrl = baseMatcher.group(1);
@@ -355,7 +361,7 @@ public class Qms {
                     .url(uploadUrl)
                     .formHeaders(headers)
                     .file(file);
-            NetworkResponse response = Api.getWebClient().request(builder.build(), item.getItemProgressListener());
+            NetworkResponse response = webClient.request(builder.build(), item.getItemProgressListener());
 
             JSONObject responseJson = new JSONObject(response.getBody());
             forpdateam.ru.forpda.common.Utils.longLog(responseJson.toString(4));

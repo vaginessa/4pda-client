@@ -44,7 +44,7 @@ import java.util.Observer;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.model.data.remote.api.IBaseForumPost;
+import forpdateam.ru.forpda.entity.remote.IBaseForumPost;
 import forpdateam.ru.forpda.entity.remote.search.SearchItem;
 import forpdateam.ru.forpda.entity.remote.search.SearchResult;
 import forpdateam.ru.forpda.entity.remote.search.SearchSettings;

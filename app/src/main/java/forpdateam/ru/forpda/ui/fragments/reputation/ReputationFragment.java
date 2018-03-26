@@ -23,7 +23,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.entity.remote.others.user.ForumUser;
-import forpdateam.ru.forpda.model.data.remote.api.reputation.Reputation;
+import forpdateam.ru.forpda.model.data.remote.api.reputation.ReputationApi;
 import forpdateam.ru.forpda.entity.remote.reputation.RepData;
 import forpdateam.ru.forpda.entity.remote.reputation.RepItem;
 import forpdateam.ru.forpda.apirx.ForumUsersCache;
@@ -74,7 +74,7 @@ public class ReputationFragment extends RecyclerFragment implements ReputationVi
         if (getArguments() != null) {
             String url = getArguments().getString(ARG_TAB);
             if (url != null) {
-                presenter.setCurrentData(Reputation.fromUrl(url));
+                presenter.setCurrentData(ReputationApi.fromUrl(url));
             }
         }
     }
@@ -119,14 +119,14 @@ public class ReputationFragment extends RecyclerFragment implements ReputationVi
         subMenu.getItem().setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
         subMenu.getItem().setIcon(App.getVecDrawable(getContext(), R.drawable.ic_toolbar_sort));
         descSortMenuItem = subMenu.add(R.string.sorting_desc).setOnMenuItemClickListener(menuItem -> {
-            presenter.setSort(Reputation.SORT_DESC);
+            presenter.setSort(ReputationApi.SORT_DESC);
             return false;
         });
         ascSortMenuItem = subMenu.add(R.string.sorting_asc).setOnMenuItemClickListener(menuItem -> {
-            presenter.setSort(Reputation.SORT_ASC);
+            presenter.setSort(ReputationApi.SORT_ASC);
             return false;
         });
-        repModeMenuItem = menu.add(getString(presenter.getCurrentData().getMode().equals(Reputation.MODE_FROM) ? R.string.reputation_mode_from : R.string.reputation_mode_to))
+        repModeMenuItem = menu.add(getString(presenter.getCurrentData().getMode().equals(ReputationApi.MODE_FROM) ? R.string.reputation_mode_from : R.string.reputation_mode_to))
                 .setOnMenuItemClickListener(item -> {
                     presenter.changeReputationMode();
                     return false;
@@ -151,7 +151,7 @@ public class ReputationFragment extends RecyclerFragment implements ReputationVi
             descSortMenuItem.setEnabled(true);
             ascSortMenuItem.setEnabled(true);
             repModeMenuItem.setEnabled(true);
-            repModeMenuItem.setTitle(getString(presenter.getCurrentData().getMode().equals(Reputation.MODE_FROM) ? R.string.reputation_mode_from : R.string.reputation_mode_to));
+            repModeMenuItem.setTitle(getString(presenter.getCurrentData().getMode().equals(ReputationApi.MODE_FROM) ? R.string.reputation_mode_from : R.string.reputation_mode_to));
             if (presenter.getCurrentData().getId() != ClientHelper.getUserId()) {
                 upRepMenuItem.setEnabled(true);
                 upRepMenuItem.setVisible(true);
@@ -243,8 +243,8 @@ public class ReputationFragment extends RecyclerFragment implements ReputationVi
         paginationHelper.updatePagination(repData.getPagination());
         refreshToolbarMenuItems(true);
         setSubtitle("" + (repData.getPositive() - repData.getNegative()) + " (+" + repData.getPositive() + " / -" + repData.getNegative() + ")");
-        setTabTitle("Репутация " + repData.getNick() + (repData.getMode().equals(Reputation.MODE_FROM) ? ": кому изменял" : ""));
-        setTitle("Репутация " + repData.getNick() + (repData.getMode().equals(Reputation.MODE_FROM) ? ": кому изменял" : ""));
+        setTabTitle("Репутация " + repData.getNick() + (repData.getMode().equals(ReputationApi.MODE_FROM) ? ": кому изменял" : ""));
+        setTitle("Репутация " + repData.getNick() + (repData.getMode().equals(ReputationApi.MODE_FROM) ? ": кому изменял" : ""));
         listScrollTop();
     }
 

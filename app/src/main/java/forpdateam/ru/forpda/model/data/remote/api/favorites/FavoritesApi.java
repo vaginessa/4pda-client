@@ -7,7 +7,7 @@ import java.util.Comparator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import forpdateam.ru.forpda.model.data.remote.api.Api;
+import forpdateam.ru.forpda.model.data.remote.IWebClient;
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkRequest;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
@@ -19,7 +19,7 @@ import forpdateam.ru.forpda.entity.remote.others.pagination.Pagination;
  * Created by radiationx on 22.09.16.
  */
 
-public class Favorites {
+public class FavoritesApi {
     private final static Pattern mainPattern = Pattern.compile("<div data-item-fid=\"([^\"]*)\" data-item-track=\"([^\"]*)\" data-item-pin=\"([^\"]*)\">[\\s\\S]*?(?:class=\"(?:modifier|forum_img_with_link)\"[^>]*?>(?:<font color=\"([^\"]*)\">)?([^< ]*)(?:<\\/font>)?<\\/(?:span|a)>)?[^<]*?<a href=\"[^\"]*=(\\d*)[^\"]*?\"[^>]*?>(<strong>)?([^<]*)(?:<\\/strong>)?<\\/a>(?:[^<]*?<a[^>]*?tpg\\(\\d+,(\\d+)\\)[^>]*?>[^<]*?<\\/a>[\\s\\S]*?)?(?:<\\/div><div class=\"topic_body\"><span class=\"topic_desc\">([^<]*|)(<br[^>]*>|)[\\s\\S]*?showforum=([^\"]*?)\">([^<]*)<\\/a><br[^>]*>[\\s\\S]*?showuser=([^\"]*)\">([^<]*)<\\/a>[\\s\\S]*?showuser=([^\"]*)\">([^<]*)<\\/a> ([^<]*?)|[^<]*?<\\/div>[^<]*?<div class=\"board-forum-lastpost[\\s\\S]*?<div class=\"topic_body\">([^<]*?) <a href=\"[^\"]*?(\\d+)\"[^>]*?>([^<]*?))<(?:span class=\"forumdesc\"[^\"]*?>[^>]*?<br[^>]*?>[^<]*?<a href=\"[^\"]*?=(\\d+)\"[^>]*?>([\\s\\S]*?)<\\/a><\\/span><)?\\/div>[^<]*?<script[^>]*?>wr_fav_subscribe\\([^\"]*?\"([^\"]*?)\"\\)");
     private final static Pattern checkPattern = Pattern.compile("<div style=\"[^\"]*background:#dff0d8[^\"]*\">[\\s\\S]*<div id=\"navstrip");
     private final static Pattern pagesPattern = Pattern.compile("parseInt\\((\\d*)\\)[\\s\\S]*?parseInt\\(st\\*(\\d*)\\)[\\s\\S]*?pagination\">[\\s\\S]*?<span[^>]*?>([^<]*?)<\\/span>");
@@ -32,6 +32,12 @@ public class Favorites {
 
     private final static Comparator<FavItem> DESC_ORDER = (item1, item2) -> item1.getTopicTitle().compareToIgnoreCase(item2.getTopicTitle());
     private final static Comparator<FavItem> ASC_ORDER = (item1, item2) -> item2.getTopicTitle().compareToIgnoreCase(item1.getTopicTitle());
+
+    private IWebClient webClient;
+
+    public FavoritesApi(IWebClient webClient) {
+        this.webClient = webClient;
+    }
 
     public FavData getFavorites(int st, boolean all, Sorting sorting) throws Exception {
         FavData data = new FavData();
@@ -46,7 +52,7 @@ public class Favorites {
         builder.appendQueryParameter(Sorting.Key.HEADER, sorting.getKey());
         builder.appendQueryParameter(Sorting.Order.HEADER, sorting.getOrder());
 
-        NetworkResponse response = Api.getWebClient().get(builder.build().toString());
+        NetworkResponse response = webClient.get(builder.build().toString());
         Matcher matcher = mainPattern.matcher(response.getBody());
         FavItem item;
         while (matcher.find()) {
@@ -138,7 +144,7 @@ public class Favorites {
     }
 
     public boolean editSubscribeType(String type, int favId) throws Exception {
-        NetworkResponse response = Api.getWebClient().get("https://4pda.ru/forum/index.php?act=fav&sort_key=&sort_by=&type=all&st=0&tact=" + type + "&selectedtids=" + favId);
+        NetworkResponse response = webClient.get("https://4pda.ru/forum/index.php?act=fav&sort_key=&sort_by=&type=all&st=0&tact=" + type + "&selectedtids=" + favId);
         return checkIsComplete(response.getBody());
     }
 
@@ -147,7 +153,7 @@ public class Favorites {
                 .url("https://4pda.ru/forum/index.php?act=fav")
                 .formHeader("selectedtids", Integer.toString(favId))
                 .formHeader("tact", type);
-        NetworkResponse response = Api.getWebClient().request(builder.build());
+        NetworkResponse response = webClient.request(builder.build());
         return checkIsComplete(response.getBody());
     }
 
@@ -157,7 +163,7 @@ public class Favorites {
                 .xhrHeader()
                 .formHeader("selectedtids", Integer.toString(favId))
                 .formHeader("tact", "delete");
-        NetworkResponse response = Api.getWebClient().request(builder.build());
+        NetworkResponse response = webClient.request(builder.build());
         return checkIsComplete(response.getBody());
     }
 
@@ -169,7 +175,7 @@ public class Favorites {
             url += "&t=";
         }
         url += id;
-        NetworkResponse response = Api.getWebClient().request(new NetworkRequest.Builder().url(url).build());
+        NetworkResponse response = webClient.request(new NetworkRequest.Builder().url(url).build());
         return checkIsComplete(response.getBody());
     }
 

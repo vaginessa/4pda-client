@@ -4,7 +4,7 @@ import java.net.URLEncoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import forpdateam.ru.forpda.model.data.remote.api.Api;
+import forpdateam.ru.forpda.model.data.remote.IWebClient;
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkRequest;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
@@ -19,7 +19,7 @@ import forpdateam.ru.forpda.client.ClientHelper;
 /**
  * Created by radiationx on 04.08.16.
  */
-public class Theme {
+public class ThemeApi {
     //y: Oh God... Why?
     //g: Because it is faster
     private final static Pattern postsPattern = Pattern.compile("<a name=\"entry([^\"]*?)\"[^>]*?><\\/a><div class=\"post_header_container\"><div class=\"post_header\"><span class=\"post_date\">([^&]*?)&[^<]*?<a[^>]*?>#(\\d+)<\\/a>[^<]*?<\\/span>[\\s\\S]*?<font color=\"([^\"]*?)\">[^<]*?<\\/font>[\\s\\S]*?<a[^>]*?data-av=\"([^\"]*?)\"[^>]*?>([^<]*?)<[\\s\\S]*?<a[^>]*?showuser=([^\"]*?)\"[^>]*?>[^<]*?<\\/a>[\\s\\S]*?<span[^>]*?post_user_info[^>]>(<strong[\\s\\S]*?<\\/strong>(?:<br[^>]*?>))?(?:<span[^<]*?color:([^;']*)[^>]*?>)?([\\s\\S]*?)(?:<\\/span>|)(?:  \\| [^<]*?)?<\\/span>[\\s\\S]*?(<a[^>]*?win_minus[^>]*?>[\\s\\S]*?<\\/a>|) \\([\\s\\S]*?ajaxrep[^>]*?>([^<]*?)<\\/span><\\/a>\\)[^<]*(<a[^>]*?win_add[^>]*?>[\\s\\S]*?<\\/a>|)<br[^>]*?>[^<]*?<span class=\"post_action\">(<a[^>]*?report[^>]*?>[^<]*?<\\/a>|)[^<]*(<a[^>]*?edit_post[^>]*?>[^<]*?<\\/a>|)[^<]*(<a[^>]*?delete[^>]*?>[^<]*?<\\/a>|)[^<]*(<a[^>]*?CODE=02[^>]*?>[^<]*?<\\/a>|)[^<]*[^<]*[\\s\\S]*?<div class=\"post_body[^>]*?>([\\s\\S]*?)<\\/div><\\/div>(?:<div data-post|<!-- TABLE FOOTER -->|<div class=\"topic_foot_nav\">)");
@@ -39,12 +39,14 @@ public class Theme {
     private final static Pattern pollButtons = Pattern.compile("<input[^>]*?value=\"([^\"]*?)\"");
     public final static Pattern attachImagesPattern = Pattern.compile("(4pda\\.ru\\/forum\\/dl\\/post\\/\\d+\\/[^\"']*?\\.(?:jpe?g|png|gif|bmp))\"?(?:[^>]*?title=\"([^\"']*?\\.(?:jpe?g|png|gif|bmp)) - [^\"']*?\")?");
 
-    public Theme() {
+    private IWebClient webClient;
+
+    public ThemeApi(IWebClient webClient) {
+        this.webClient = webClient;
     }
 
-
     public ThemePage getTheme(final String url, boolean hatOpen, boolean pollOpen) throws Exception {
-        NetworkResponse response = Api.getWebClient().get(url);
+        NetworkResponse response = webClient.get(url);
         return parsePage(url, response, hatOpen, pollOpen);
     }
 
@@ -172,7 +174,7 @@ public class Theme {
                 .url("https://4pda.ru/forum/index.php?act=report&send=1&t=" + Integer.toString(topicId) + "&p=" + Integer.toString(postId))
                 .formHeader("message", URLEncoder.encode(message, "windows-1251"), true)
                 .build();
-        NetworkResponse response = Api.getWebClient().request(request);
+        NetworkResponse response = webClient.request(request);
         Pattern p = Pattern.compile("<div class=\"errorwrap\">\n" +
                 "\\s*<h4>Причина:</h4>\n" +
                 "\\s*\n" +
@@ -186,8 +188,8 @@ public class Theme {
 
 
     public Boolean deletePost(int postId) throws Exception {
-        String url = "https://4pda.ru/forum/index.php?act=zmod&auth_key=".concat(Api.getWebClient().getAuthKey()).concat("&code=postchoice&tact=delete&selectedpids=").concat(Integer.toString(postId));
-        NetworkResponse response = Api.getWebClient().request(new NetworkRequest.Builder().url(url).xhrHeader().build());
+        String url = "https://4pda.ru/forum/index.php?act=zmod&auth_key=".concat(webClient.getAuthKey()).concat("&code=postchoice&tact=delete&selectedpids=").concat(Integer.toString(postId));
+        NetworkResponse response = webClient.request(new NetworkRequest.Builder().url(url).xhrHeader().build());
         String body = response.getBody();
         if (!body.equals("ok")) {
             throw new Exception("Ошибка изменения репутации поста");
@@ -197,7 +199,7 @@ public class Theme {
 
 
     public String votePost(int postId, boolean type) throws Exception {
-        NetworkResponse response = Api.getWebClient().get("https://4pda.ru/forum/zka.php?i=".concat(Integer.toString(postId)).concat("&v=").concat(type ? "1" : "-1"));
+        NetworkResponse response = webClient.get("https://4pda.ru/forum/zka.php?i=".concat(Integer.toString(postId)).concat("&v=").concat(type ? "1" : "-1"));
         String result = null;
 
         String alreadyVote = "Ошибка: Вы уже голосовали за это сообщение";

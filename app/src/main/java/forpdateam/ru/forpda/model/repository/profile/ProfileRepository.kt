@@ -3,7 +3,7 @@ package forpdateam.ru.forpda.model.repository.profile
 import android.support.annotation.DrawableRes
 import android.support.annotation.StringRes
 import forpdateam.ru.forpda.R
-import forpdateam.ru.forpda.model.data.remote.api.profile.Profile
+import forpdateam.ru.forpda.model.data.remote.api.profile.ProfileApi
 import forpdateam.ru.forpda.entity.remote.profile.ProfileModel
 import forpdateam.ru.forpda.model.SchedulersProvider
 import io.reactivex.Observable
@@ -14,7 +14,7 @@ import io.reactivex.Observable
 
 class ProfileRepository(
         private val schedulers: SchedulersProvider,
-        private val profileApi: Profile
+        private val profileApi: ProfileApi
 ) {
 
     fun loadProfile(url: String): Observable<ProfileModel> = Observable

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import forpdateam.ru.forpda.model.data.remote.api.Api;
+import forpdateam.ru.forpda.model.data.remote.IWebClient;
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkRequest;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
@@ -20,7 +20,7 @@ import forpdateam.ru.forpda.entity.remote.forum.ForumRules;
  * Created by radiationx on 15.02.17.
  */
 
-public class Forum {
+public class ForumApi {
     private final static Pattern rulesHeaders = Pattern.compile("<b>([\\d\\.]+)\\s?([\\s\\S]*?)<\\/b>[^<]*?<[^>]*?br[^>]*?>([\\s\\S]*?<[^>]*?br[^>]*?>)(?=<[^>]*?br[^>]*?>(?:<b>|<[^>]*?br[^>]*?>))");
     private final static Pattern rulesItems = Pattern.compile("([\\d\\.]+)\\s?([\\s\\S]*?)<[^>]*?br[^>]*?>(?=[\\d\\.]+|$)");
     private final static Pattern announcePattern = Pattern.compile("<title>([\\s\\S]*?)(?: - 4PDA)?<\\/title>[\\s\\S]*?<div[^>]*?class=\"[^\"]*?postcolor[^\"]*?\"[^>]*?>([\\s\\S]*?)<\\/div>[^<]*?<\\/td>");
@@ -31,8 +31,14 @@ public class Forum {
     //private final static Pattern rootPattern = Pattern.compile("<div[^>]*?id=[\"']fo_(\\d+)[\"'][^>]*?>[^<]*?<div[^>]*?cat_name[^>]*?>[^<]*?<div[\\s\\S]*?\\/div>[^<]*?<a[^>]*?>([\\s\\S]*?)<\\/a>[^<]*?<\\/div>([\\s\\S]*?)<\\/div>[^<]*?(?=<div id=['\"]fc|<div class=[\"']stat)");
     //private final static Pattern boardsPattern = Pattern.compile("<div[^>]*?board_forum_row[^>]*><div[^>]*?forum_name[^>]*?>[\\s\\S]*?<a[^>]*?showforum=(\\d+)[^>]*?>([^<]*?)<\\/a>[^<]*?<\\/div>");
 
+    private IWebClient webClient;
+
+    public ForumApi(IWebClient webClient) {
+        this.webClient = webClient;
+    }
+
     public ForumItemTree getForums() throws Exception {
-        NetworkResponse response = Api.getWebClient().get("https://4pda.ru/forum/index.php?act=search");
+        NetworkResponse response = webClient.get("https://4pda.ru/forum/index.php?act=search");
         Matcher matcher = forumsFromSearch.matcher(response.getBody());
         final ForumItemTree root = new ForumItemTree();
         if (matcher.find()) {
@@ -93,19 +99,19 @@ public class Forum {
     }
 
     public Object markAllRead() throws Exception {
-        Api.getWebClient().request(new NetworkRequest.Builder().url("https://4pda.ru/forum/index.php?act=login&CODE=05").withoutBody().build());
+        webClient.request(new NetworkRequest.Builder().url("https://4pda.ru/forum/index.php?act=login&CODE=05").withoutBody().build());
         return new Object();
     }
 
     public Object markRead(int id) throws Exception {
-        Api.getWebClient().request(new NetworkRequest.Builder().url("https://4pda.ru/forum/index.php?act=auth&action=markforum&f=" + id + "&fromforum=" + id).withoutBody().build());
+        webClient.request(new NetworkRequest.Builder().url("https://4pda.ru/forum/index.php?act=auth&action=markforum&f=" + id + "&fromforum=" + id).withoutBody().build());
         return new Object();
     }
 
     public ForumRules getRules() throws Exception {
         ForumRules rules = new ForumRules();
 
-        String response = Api.getWebClient().get("https://4pda.ru/forum/index.php?act=boardrules").getBody();
+        String response = webClient.get("https://4pda.ru/forum/index.php?act=boardrules").getBody();
         Matcher headerMatcher = rulesHeaders.matcher(response);
         Matcher itemMatcher = null;
         while (headerMatcher.find()) {
@@ -131,7 +137,7 @@ public class Forum {
         Announce announce = new Announce();
         announce.setId(id);
         announce.setForumId(forumId);
-        String response = Api.getWebClient().get("https://4pda.ru/forum/index.php?act=announce&f=" + forumId + "&st=" + id).getBody();
+        String response = webClient.get("https://4pda.ru/forum/index.php?act=announce&f=" + forumId + "&st=" + id).getBody();
         Matcher matcher = announcePattern.matcher(response);
         if (matcher.find()) {
             announce.setTitle(matcher.group(1));

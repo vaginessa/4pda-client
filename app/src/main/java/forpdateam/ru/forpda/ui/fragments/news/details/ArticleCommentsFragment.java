@@ -24,7 +24,6 @@ import java.util.Observer;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.model.data.remote.api.Api;
 import forpdateam.ru.forpda.entity.remote.news.Comment;
 import forpdateam.ru.forpda.entity.remote.news.DetailsPage;
 import forpdateam.ru.forpda.apirx.RxApi;

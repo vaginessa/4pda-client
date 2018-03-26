@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import forpdateam.ru.forpda.model.data.remote.api.Api;
+import forpdateam.ru.forpda.model.data.remote.IWebClient;
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
 import forpdateam.ru.forpda.entity.remote.events.NotificationEvent;
@@ -14,10 +14,16 @@ import forpdateam.ru.forpda.entity.remote.events.NotificationEvent;
  * Created by radiationx on 31.07.17.
  */
 
-public class NotificationEvents {
+public class NotificationEventsApi {
     public final static Pattern inspectorFavoritesPattern = Pattern.compile("(\\d+) \"([\\s\\S]*?)\" (\\d+) (\\d+) \"([\\s\\S]*?)\" (\\d+) (\\d+) (\\d+)");
     public final static Pattern inspectorQmsPattern = Pattern.compile("(\\d+) \"([\\s\\S]*?)\" (\\d+) \"([\\s\\S]*?)\" (\\d+) (\\d+) (\\d+)");
     public final static Pattern webSocketEventPattern = Pattern.compile("\\[(\\d+),(\\d+),\"([\\s\\S])(\\d+)\",(\\d+),(\\d+)\\]");
+
+    private IWebClient webClient;
+
+    public NotificationEventsApi(IWebClient webClient) {
+        this.webClient = webClient;
+    }
 
     public NotificationEvent parseWebSocketEvent(String message) {
         Matcher matcher = webSocketEventPattern.matcher(message);
@@ -70,7 +76,7 @@ public class NotificationEvents {
     }
 
     public List<NotificationEvent> getFavoritesEvents() throws Exception {
-        NetworkResponse response = Api.getWebClient().get("https://4pda.ru/forum/index.php?act=inspector&CODE=fav");
+        NetworkResponse response = webClient.get("https://4pda.ru/forum/index.php?act=inspector&CODE=fav");
         return getFavoritesEvents(response.getBody());
     }
 
@@ -101,7 +107,7 @@ public class NotificationEvents {
     }
 
     public List<NotificationEvent> getQmsEvents() throws Exception {
-        NetworkResponse response = Api.getWebClient().get("https://4pda.ru/forum/index.php?act=inspector&CODE=qms");
+        NetworkResponse response = webClient.get("https://4pda.ru/forum/index.php?act=inspector&CODE=qms");
         return getQmsEvents(response.getBody());
     }
 

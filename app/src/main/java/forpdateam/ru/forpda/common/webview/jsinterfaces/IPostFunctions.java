@@ -1,6 +1,6 @@
 package forpdateam.ru.forpda.common.webview.jsinterfaces;
 
-import forpdateam.ru.forpda.model.data.remote.api.IBaseForumPost;
+import forpdateam.ru.forpda.entity.remote.IBaseForumPost;
 
 /**
  * Created by radiationx on 27.04.17.

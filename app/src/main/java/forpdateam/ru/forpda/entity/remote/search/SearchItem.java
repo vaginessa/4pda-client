@@ -1,7 +1,6 @@
 package forpdateam.ru.forpda.entity.remote.search;
 
-import forpdateam.ru.forpda.model.data.remote.api.BaseForumPost;
-import forpdateam.ru.forpda.entity.remote.search.ISearchItem;
+import forpdateam.ru.forpda.entity.remote.BaseForumPost;
 
 /**
  * Created by radiationx on 01.02.17.

@@ -3,7 +3,7 @@ package forpdateam.ru.forpda.model.data.remote.api.reputation;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import forpdateam.ru.forpda.model.data.remote.api.Api;
+import forpdateam.ru.forpda.model.data.remote.IWebClient;
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkRequest;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
@@ -15,7 +15,7 @@ import forpdateam.ru.forpda.entity.remote.reputation.RepItem;
  * Created by radiationx on 20.03.17.
  */
 
-public class Reputation {
+public class ReputationApi {
     public final static String MODE_TO = "to";
     public final static String MODE_FROM = "from";
     public final static String SORT_ASC = "asc";
@@ -23,9 +23,15 @@ public class Reputation {
     private final static Pattern listPattern = Pattern.compile("<tr>[^<]*?<td[^>]*?><strong><a [^>]*?showuser=(\\d+)[^\"]*\">([\\s\\S]*?)<\\/a><\\/strong><\\/td>[^<]*?<td[^>]*?>(?:<strong><a href=\"([^\"]*?)\">([\\s\\S]*?)<\\/a><\\/strong>)?[^<]*?<\\/td>[^<]*?<td[^>]*?>([\\s\\S]*?)<\\/td>[^<]*?<td[^>]*?><img[^>]*?src=\"([^\"]*?)\"[^>]*?><\\/td>[^<]*?<td[^>]*?>([\\s\\S]*?)<\\/td>[^<]*?<\\/tr>");
     private final static Pattern infoPattern = Pattern.compile("<div class=\"maintitle\">[\\s\\S]*?<a href=\"[^\"]*?showuser=(\\d+)\"[^>]*?>([\\s\\S]*?)<\\/a>[^\\[]*?\\[\\+(\\d+)?\\/\\-(\\d+)?\\]");
 
+    private IWebClient webClient;
+
+    public ReputationApi(IWebClient webClient) {
+        this.webClient = webClient;
+    }
+
     public RepData getReputation(RepData data) throws Exception {
         if (data == null) return null;
-        NetworkResponse response = Api.getWebClient().get("https://4pda.ru/forum/index.php?act=rep&view=history&mid=" + data.getId() + "&mode=" + data.getMode() + "&order=" + data.getSort() + "&st=" + data.getPagination().getSt());
+        NetworkResponse response = webClient.get("https://4pda.ru/forum/index.php?act=rep&view=history&mid=" + data.getId() + "&mode=" + data.getMode() + "&order=" + data.getSort() + "&st=" + data.getPagination().getSt());
         Matcher matcher = infoPattern.matcher(response.getBody());
         if (matcher.find()) {
             data.setId(Integer.parseInt(matcher.group(1)));
@@ -70,7 +76,7 @@ public class Reputation {
         if (postId > 0) {
             builder.formHeader("p", Integer.toString(postId));
         }
-        Api.getWebClient().request(builder.build());
+        webClient.request(builder.build());
         return true;
     }
 

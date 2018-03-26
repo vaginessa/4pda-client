@@ -2,16 +2,16 @@ package forpdateam.ru.forpda.model.repository.theme
 
 import forpdateam.ru.forpda.App
 import forpdateam.ru.forpda.R
-import forpdateam.ru.forpda.model.data.remote.api.Api
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils
 import forpdateam.ru.forpda.entity.remote.others.user.ForumUser
-import forpdateam.ru.forpda.model.data.remote.api.theme.Theme
+import forpdateam.ru.forpda.model.data.remote.api.theme.ThemeApi
 import forpdateam.ru.forpda.entity.remote.editpost.EditPostForm
 import forpdateam.ru.forpda.entity.remote.theme.ThemePage
 import forpdateam.ru.forpda.apirx.ForumUsersCache
 import forpdateam.ru.forpda.client.ClientHelper
 import forpdateam.ru.forpda.common.Preferences
 import forpdateam.ru.forpda.model.SchedulersProvider
+import forpdateam.ru.forpda.model.data.remote.api.editpost.EditPostApi
 import io.reactivex.Observable
 import java.util.*
 import java.util.regex.Matcher
@@ -23,7 +23,8 @@ import java.util.regex.Pattern
 
 class ThemeRepository(
         private val schedulers: SchedulersProvider,
-        private val themeApi: Theme
+        private val themeApi: ThemeApi,
+        private val editPostApi: EditPostApi
 ) {
 
     private val firstLetter = Pattern.compile("([a-zA-Zа-яА-Я])")
@@ -39,7 +40,7 @@ class ThemeRepository(
             .observeOn(schedulers.ui())
 
     fun sendPost(form: EditPostForm): Observable<ThemePage> = Observable
-            .fromCallable { Api.EditPost().sendPost(form) }
+            .fromCallable { editPostApi.sendPost(form) }
             .map {
                 transform(it, true)
             }

@@ -1,6 +1,6 @@
 package forpdateam.ru.forpda.model.repository.reputation
 
-import forpdateam.ru.forpda.model.data.remote.api.reputation.Reputation
+import forpdateam.ru.forpda.model.data.remote.api.reputation.ReputationApi
 import forpdateam.ru.forpda.entity.remote.reputation.RepData
 import forpdateam.ru.forpda.model.SchedulersProvider
 import io.reactivex.Observable
@@ -11,7 +11,7 @@ import io.reactivex.Observable
 
 class ReputationRepository(
         private val schedulers: SchedulersProvider,
-        private val reputationApi: Reputation
+        private val reputationApi: ReputationApi
 ) {
 
     fun loadReputation(repData: RepData): Observable<RepData> = Observable

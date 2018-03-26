@@ -3,7 +3,7 @@ package forpdateam.ru.forpda.model.repository.search
 import forpdateam.ru.forpda.App
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils
 import forpdateam.ru.forpda.entity.remote.others.user.ForumUser
-import forpdateam.ru.forpda.model.data.remote.api.search.Search
+import forpdateam.ru.forpda.model.data.remote.api.search.SearchApi
 import forpdateam.ru.forpda.entity.remote.search.SearchResult
 import forpdateam.ru.forpda.entity.remote.search.SearchSettings
 import forpdateam.ru.forpda.apirx.ForumUsersCache
@@ -21,7 +21,7 @@ import java.util.regex.Pattern
 
 class SearchRepository(
         private val schedulers: SchedulersProvider,
-        private val searchApi: Search
+        private val searchApi: SearchApi
 ) {
 
     private val firstLetter = Pattern.compile("([a-zA-Zа-яА-Я])")

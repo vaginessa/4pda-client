@@ -1,6 +1,6 @@
 package forpdateam.ru.forpda.model.repository.auth
 
-import forpdateam.ru.forpda.model.data.remote.api.auth.Auth
+import forpdateam.ru.forpda.model.data.remote.api.auth.AuthApi
 import forpdateam.ru.forpda.entity.remote.auth.AuthForm
 import forpdateam.ru.forpda.model.SchedulersProvider
 import io.reactivex.Observable
@@ -11,7 +11,7 @@ import io.reactivex.Observable
 
 class AuthRepository(
         private val schedulers: SchedulersProvider,
-        private val authApi: Auth
+        private val authApi: AuthApi
 ) {
 
     fun loadForm(): Observable<AuthForm> = Observable

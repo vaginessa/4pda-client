@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import forpdateam.ru.forpda.entity.remote.events.NotificationEvent;
-import forpdateam.ru.forpda.model.data.remote.api.favorites.Favorites;
+import forpdateam.ru.forpda.model.data.remote.api.favorites.FavoritesApi;
 import forpdateam.ru.forpda.model.data.remote.api.favorites.Sorting;
 import forpdateam.ru.forpda.entity.remote.favorites.IFavItem;
 import forpdateam.ru.forpda.entity.remote.favorites.FavData;
@@ -26,9 +26,9 @@ import io.realm.RealmResults;
 public class FavoritesRepository {
 
     private SchedulersProvider schedulers;
-    private Favorites favoritesApi;
+    private FavoritesApi favoritesApi;
 
-    public FavoritesRepository(SchedulersProvider schedulers, Favorites favoritesApi) {
+    public FavoritesRepository(SchedulersProvider schedulers, FavoritesApi favoritesApi) {
         this.schedulers = schedulers;
         this.favoritesApi = favoritesApi;
     }
@@ -42,14 +42,14 @@ public class FavoritesRepository {
 
     public Observable<Boolean> editFavorites(int act, int favId, int id, String type) {
         switch (act) {
-            case Favorites.ACTION_EDIT_SUB_TYPE:
+            case FavoritesApi.ACTION_EDIT_SUB_TYPE:
                 return Observable.fromCallable(() -> favoritesApi.editSubscribeType(type, favId));
-            case Favorites.ACTION_EDIT_PIN_STATE:
+            case FavoritesApi.ACTION_EDIT_PIN_STATE:
                 return Observable.fromCallable(() -> favoritesApi.editPinState(type, favId));
-            case Favorites.ACTION_DELETE:
+            case FavoritesApi.ACTION_DELETE:
                 return Observable.fromCallable(() -> favoritesApi.delete(favId));
-            case Favorites.ACTION_ADD:
-            case Favorites.ACTION_ADD_FORUM:
+            case FavoritesApi.ACTION_ADD:
+            case FavoritesApi.ACTION_ADD_FORUM:
                 return Observable.fromCallable(() -> favoritesApi.add(id, act, type));
             default:
                 return Observable.just(false);

@@ -1,6 +1,6 @@
 package forpdateam.ru.forpda.model.repository.devdb
 
-import forpdateam.ru.forpda.model.data.remote.api.devdb.DevDb
+import forpdateam.ru.forpda.model.data.remote.api.devdb.DevDbApi
 import forpdateam.ru.forpda.entity.remote.devdb.Brand
 import forpdateam.ru.forpda.entity.remote.devdb.Brands
 import forpdateam.ru.forpda.entity.remote.devdb.Device
@@ -14,7 +14,7 @@ import io.reactivex.Observable
 
 class DevDbRepository(
         private val schedulers: SchedulersProvider,
-        private val devDbApi: DevDb
+        private val devDbApi: DevDbApi
 ) {
 
     fun getBrands(catId: String): Observable<Brands> = Observable

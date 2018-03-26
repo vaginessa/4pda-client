@@ -1,6 +1,6 @@
 package forpdateam.ru.forpda.presentation.theme
 
-import forpdateam.ru.forpda.model.data.remote.api.IBaseForumPost
+import forpdateam.ru.forpda.entity.remote.IBaseForumPost
 import forpdateam.ru.forpda.entity.remote.theme.ThemePage
 import forpdateam.ru.forpda.common.mvp.IBaseView
 

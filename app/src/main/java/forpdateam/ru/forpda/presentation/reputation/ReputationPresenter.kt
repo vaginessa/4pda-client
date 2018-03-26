@@ -1,7 +1,7 @@
 package forpdateam.ru.forpda.presentation.reputation
 
 import com.arellomobile.mvp.InjectViewState
-import forpdateam.ru.forpda.model.data.remote.api.reputation.Reputation
+import forpdateam.ru.forpda.model.data.remote.api.reputation.ReputationApi
 import forpdateam.ru.forpda.entity.remote.reputation.RepData
 import forpdateam.ru.forpda.entity.remote.reputation.RepItem
 import forpdateam.ru.forpda.common.IntentHandler
@@ -57,7 +57,7 @@ class ReputationPresenter(
     }
 
     fun changeReputationMode() {
-        currentData.mode = if (currentData.mode == Reputation.MODE_FROM) Reputation.MODE_TO else Reputation.MODE_FROM
+        currentData.mode = if (currentData.mode == ReputationApi.MODE_FROM) ReputationApi.MODE_TO else ReputationApi.MODE_FROM
         loadReputation()
     }
 

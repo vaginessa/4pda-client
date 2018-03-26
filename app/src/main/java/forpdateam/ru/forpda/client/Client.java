@@ -20,7 +20,6 @@ import java.util.regex.Matcher;
 import javax.net.ssl.SSLContext;
 
 import forpdateam.ru.forpda.App;
-import forpdateam.ru.forpda.model.data.remote.api.Api;
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
 import forpdateam.ru.forpda.model.data.remote.IWebClient;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkRequest;
@@ -43,7 +42,6 @@ import okhttp3.WebSocketListener;
 public class Client implements IWebClient {
     private final static String LOG_TAG = Client.class.getSimpleName();
     private static final String USER_AGENT = "Mozilla/5.0 (Linux; Android 4.4; Nexus 5 Build/_BuildID_) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/30.0.0.0 Mobile Safari/537.36";
-    private static Client INSTANCE = null;
     private Map<String, Cookie> clientCookies = new HashMap<>();
     private Handler observerHandler = new Handler(Looper.getMainLooper());
     private List<String> privateHeaders = new ArrayList<>(Arrays.asList("pass_hash", "session_id", "auth_key", "password"));
@@ -55,7 +53,6 @@ public class Client implements IWebClient {
         if (context == null) {
             context = App.getContext();
         }
-        Api.setWebClient(this);
         String member_id = App.getPreferences(context).getString("cookie_member_id", null);
         String pass_hash = App.getPreferences(context).getString("cookie_pass_hash", null);
         String session_id = App.getPreferences(context).getString("cookie_session_id", null);
@@ -86,15 +83,6 @@ public class Client implements IWebClient {
 
     public String getAuthKey() {
         return App.get().getPreferences().getString("auth_key", "0");
-    }
-
-    public static Client get() {
-        return get(App.getContext());
-    }
-
-    public static Client get(Context context) {
-        if (INSTANCE == null) INSTANCE = new Client(context);
-        return INSTANCE;
     }
 
     private Cookie parseCookie(String cookieFields) {

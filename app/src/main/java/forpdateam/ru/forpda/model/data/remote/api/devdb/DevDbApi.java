@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import forpdateam.ru.forpda.model.data.remote.api.Api;
+import forpdateam.ru.forpda.model.data.remote.IWebClient;
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
 import forpdateam.ru.forpda.entity.remote.devdb.Brand;
@@ -19,12 +19,17 @@ import forpdateam.ru.forpda.entity.remote.devdb.DeviceSearch;
  * Created by radiationx on 06.08.17.
  */
 
-public class DevDb {
+public class DevDbApi {
     public final static Pattern MAIN_PATTERN = Pattern.compile("<div class=\"breadcrumbs-back\"><ul class=\"breadcrumbs\">([\\s\\S]*?)<\\/ul><\\/div>[^<]*?<div[^>]*?>[\\s\\S]*?<\\/div>[^<]*?<\\/div>(?:[^<]*?<div class=\"rating r\\d\">[^<]*?<div class=\"num\">(\\d+)<\\/div>[^<]*?<div class=\"text\">([\\s\\S]*?)<\\/div>[^<]*?<\\/div>)?[\\s\\S]*?<h1 class=\"product-name\">(?:<a[^>]*?>[^<]*?<\\/a>)? ?([\\s\\S]*?)<\\/h1>(?:<div class=\"version\"><span[^>]*?>[^<]*?<\\/span><a[^>]*?>(\\d+)<\\/a><span[^>]*?>[^<]*?<\\/span>*<a[^>]*?>(\\d+)<\\/a>)?");
     private final static Pattern BREADCRUMB_PATTERN = Pattern.compile("<a href=\"[^\"]*?devdb\\/([^\"\\/]+?)(?:\\/([^\"]+?))?\">([^<]*?)<\\/a>");
     private final static Pattern SPECS_PATTERN = Pattern.compile("<dl[^>]*?>[^<]*?<dt>([^<]*?)<\\/dt>[^<]*<dd>(?:<span[^>]*?>)?([^<]*?)(?:<\\/span>[\\s\\S]*?)?<\\/dd>");
     private final static Pattern SEARCH_PATTERN = Pattern.compile("<li[^>]*?>[^<]*?<div[^>]*?>[^<]*?<a[^>]*?>[^<]*?<img src=\"([^\"]*?)\"[^>]*?>[^<]*?<\\/a>[\\s\\S]*?<div class=\"name\"[^>]*?>[^<]*?<a href=\"[^\"]*?devdb\\/([^\"]*?)\"[^>]*?>([\\s\\S]*?)<\\/a>");
 
+    private IWebClient webClient;
+
+    public DevDbApi(IWebClient webClient) {
+        this.webClient = webClient;
+    }
 
     public int getRatingCode(int rating) {
         return Math.max(Math.round(rating / 2.0f), 1);
@@ -32,7 +37,7 @@ public class DevDb {
 
     public Brands getBrands(String catId) throws Exception {
         Brands data = new Brands();
-        NetworkResponse response = Api.getWebClient().get("https://4pda.ru/devdb/" + catId + "/all");
+        NetworkResponse response = webClient.get("https://4pda.ru/devdb/" + catId + "/all");
         Matcher matcher = Brands.LETTERS_PATTERN.matcher(response.getBody());
         while (matcher.find()) {
             String letter = matcher.group(1);
@@ -65,7 +70,7 @@ public class DevDb {
 
     public Brand getBrand(String catId, String brandId) throws Exception {
         Brand data = new Brand();
-        NetworkResponse response = Api.getWebClient().get("https://4pda.ru/devdb/" + catId + "/" + brandId + "/all");
+        NetworkResponse response = webClient.get("https://4pda.ru/devdb/" + catId + "/" + brandId + "/all");
 
         Matcher matcher = Brand.DEVICES_PATTERN.matcher(response.getBody());
         while (matcher.find()) {
@@ -108,7 +113,7 @@ public class DevDb {
 
     public Device getDevice(String devId) throws Exception {
         Device data = new Device();
-        NetworkResponse response = Api.getWebClient().get("https://4pda.ru/devdb/" + devId);
+        NetworkResponse response = webClient.get("https://4pda.ru/devdb/" + devId);
 
         Matcher matcher = Device.PATTERN_1.matcher(response.getBody());
         if (matcher.find()) {
@@ -221,7 +226,7 @@ public class DevDb {
         } catch (Exception ignore) {
         }
 
-        NetworkResponse response = Api.getWebClient().get("http://4pda.ru/devdb/search?s=" + query);
+        NetworkResponse response = webClient.get("http://4pda.ru/devdb/search?s=" + query);
         Matcher matcher = SEARCH_PATTERN.matcher(response.getBody());
         while (matcher.find()) {
             DeviceSearch.DeviceItem item = new DeviceSearch.DeviceItem();

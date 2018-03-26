@@ -5,7 +5,7 @@ import forpdateam.ru.forpda.App
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils
 import forpdateam.ru.forpda.model.data.remote.api.RequestFile
 import forpdateam.ru.forpda.entity.remote.others.user.ForumUser
-import forpdateam.ru.forpda.model.data.remote.api.qms.Qms
+import forpdateam.ru.forpda.model.data.remote.api.qms.QmsApi
 import forpdateam.ru.forpda.entity.remote.qms.QmsChatModel
 import forpdateam.ru.forpda.entity.remote.qms.QmsContact
 import forpdateam.ru.forpda.entity.remote.qms.QmsMessage
@@ -22,7 +22,7 @@ import java.util.ArrayList
 
 class QmsRepository(
         private val schedulers: SchedulersProvider,
-        private val qmsApi: Qms
+        private val qmsApi: QmsApi
 ) {
 
     //Common

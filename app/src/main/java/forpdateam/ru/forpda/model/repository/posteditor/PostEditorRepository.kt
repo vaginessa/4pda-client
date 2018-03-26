@@ -1,7 +1,7 @@
 package forpdateam.ru.forpda.model.repository.posteditor
 
 import forpdateam.ru.forpda.model.data.remote.api.RequestFile
-import forpdateam.ru.forpda.model.data.remote.api.editpost.EditPost
+import forpdateam.ru.forpda.model.data.remote.api.editpost.EditPostApi
 import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem
 import forpdateam.ru.forpda.entity.remote.editpost.EditPostForm
 import forpdateam.ru.forpda.entity.remote.theme.ThemePage
@@ -14,7 +14,7 @@ import io.reactivex.Observable
 
 class PostEditorRepository(
         private val schedulers: SchedulersProvider,
-        private val editPostApi: EditPost
+        private val editPostApi: EditPostApi
 ) {
 
     fun loadForm(postId: Int): Observable<EditPostForm> = Observable

@@ -1,4 +1,4 @@
-package forpdateam.ru.forpda.model.data.remote.api;
+package forpdateam.ru.forpda.entity.remote;
 
 /**
  * Created by radiationx on 27.04.17.

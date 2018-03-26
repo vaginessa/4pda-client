@@ -3,7 +3,7 @@ package forpdateam.ru.forpda.model.data.remote.api.topcis;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import forpdateam.ru.forpda.model.data.remote.api.Api;
+import forpdateam.ru.forpda.model.data.remote.IWebClient;
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
 import forpdateam.ru.forpda.entity.remote.others.pagination.Pagination;
@@ -14,7 +14,7 @@ import forpdateam.ru.forpda.entity.remote.topics.TopicsData;
  * Created by radiationx on 01.03.17.
  */
 
-public class Topics {
+public class TopicsApi {
     public final static Pattern navStripPattern = Pattern.compile("<div[^>]*?id=\"navstrip\"[^>]*?>([\\s\\S]*?)<\\/div>");
     public final static Pattern navItemPattern = Pattern.compile("<a[^>]*?href=\"[^\"]*?showforum=(\\d+)[^\"]*?\"[^>]*?>([\\s\\S]*?)<\\/a>");
 
@@ -23,10 +23,16 @@ public class Topics {
     private final static Pattern announcePattern = Pattern.compile("<div[^>]*?anonce_body[^>]*?>[\\s\\S]*?<a[^>]*?href=['\"]([^\"']*?)[\"'][^>]*?>([\\s\\S]*?)<\\/a>[^<]*?<\\/div>");
     private final static Pattern forumPattern = Pattern.compile("<div[^>]*?board_forum_row[^>]*?>[\\s\\S]*?<a[^>]*?showforum=(\\d+)[^>]*?>([\\s\\S]*?)<\\/a>");
     private final static Pattern topicsPattern = Pattern.compile("<div[^>]*?data-topic=\"(\\d+)\"[^>]*?>[^<]*?<div[^>]*?class=\"topic_title\"[^>]*?>[^<]*?<span[^>]*?class=\"modifier\"[^>]*?>(?:[^<]*?<font[^>]*?>)?([^<]*?)(?:<\\/font>)?<\\/span>[^<]*?(\\(!\\))?[^<]*?<a[^>]*?href=\"[^\"]*?\"[^>]*?>([\\s\\S]*?)<\\/a>(?: ?&nbsp;[\\s\\S]*?<\\/div>|<\\/div>)[^<]*?<div[^>]*?class=\"topic_body\"[^>]*?>(?:[^<]*?<span[^>]*?class=\"topic_desc\"[^>]*?>(?!автор)([\\s\\S]*?)<br\\s?\\/>[^<]*?<\\/span>)?[^<]*?<span[^>]*?class=\"topic_desc\"[^>]*?>[^<]*?<a[^>]*?showuser=(\\d+)[^>]*?>([^<]*?)<\\/a>[^<]*?<\\/span>[\\s\\S]*?showuser=(\\d+)[^>]*?>([^<]*?)<\\/a>\\s?([^<]*?)(?:<span[\\s\\S]*?showuser=(\\d+)[^>]*?>([^<]*?)<\\/a>[^<]*?<\\/span>)?<\\/div>[^<]*?<\\/div>");
+    
+    private IWebClient webClient;
+
+    public TopicsApi(IWebClient webClient) {
+        this.webClient = webClient;
+    }
 
     public TopicsData getTopics(int id, int st) throws Exception {
         TopicsData data = new TopicsData();
-        NetworkResponse response = Api.getWebClient().get("https://4pda.ru/forum/index.php?showforum=".concat(Integer.toString(id)).concat("&st=").concat(Integer.toString(st)));
+        NetworkResponse response = webClient.get("https://4pda.ru/forum/index.php?showforum=".concat(Integer.toString(id)).concat("&st=").concat(Integer.toString(st)));
 
         Matcher matcher = titlePattern.matcher(response.getBody());
         if (matcher.find()) {

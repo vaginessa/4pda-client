@@ -5,7 +5,7 @@ import android.util.Pair;
 import java.util.ArrayList;
 import java.util.List;
 
-import forpdateam.ru.forpda.model.data.remote.api.BaseForumPost;
+import forpdateam.ru.forpda.entity.remote.BaseForumPost;
 
 /**
  * Created by radiationx on 04.08.16.

@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.model.data.remote.api.IBaseForumPost;
+import forpdateam.ru.forpda.entity.remote.IBaseForumPost;
 import forpdateam.ru.forpda.entity.remote.theme.ThemePage;
 import forpdateam.ru.forpda.common.webview.CustomWebChromeClient;
 import forpdateam.ru.forpda.common.webview.CustomWebViewClient;
