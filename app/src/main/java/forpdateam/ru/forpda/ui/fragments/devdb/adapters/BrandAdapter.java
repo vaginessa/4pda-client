@@ -13,7 +13,7 @@ import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListene
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.api.devdb.models.Brand;
+import forpdateam.ru.forpda.entity.remote.devdb.Brand;
 import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.ui.views.adapters.BaseAdapter;
 import forpdateam.ru.forpda.ui.views.adapters.BaseViewHolder;

@@ -15,7 +15,7 @@ import java.util.Collections;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.api.profile.models.ProfileModel;
+import forpdateam.ru.forpda.entity.remote.profile.ProfileModel;
 import forpdateam.ru.forpda.common.LinkMovementMethod;
 import forpdateam.ru.forpda.ui.fragments.devdb.BrandFragment;
 import forpdateam.ru.forpda.ui.views.DividerItemDecoration;

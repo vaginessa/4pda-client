@@ -1,16 +1,12 @@
 package forpdateam.ru.forpda.model.repository.search
 
 import forpdateam.ru.forpda.App
-import forpdateam.ru.forpda.api.Api
-import forpdateam.ru.forpda.api.ApiUtils
-import forpdateam.ru.forpda.api.mentions.Mentions
-import forpdateam.ru.forpda.api.mentions.models.MentionsData
-import forpdateam.ru.forpda.api.others.user.ForumUser
-import forpdateam.ru.forpda.api.search.Search
-import forpdateam.ru.forpda.api.search.models.SearchResult
-import forpdateam.ru.forpda.api.search.models.SearchSettings
+import forpdateam.ru.forpda.model.data.remote.api.ApiUtils
+import forpdateam.ru.forpda.entity.remote.others.user.ForumUser
+import forpdateam.ru.forpda.model.data.remote.api.search.Search
+import forpdateam.ru.forpda.entity.remote.search.SearchResult
+import forpdateam.ru.forpda.entity.remote.search.SearchSettings
 import forpdateam.ru.forpda.apirx.ForumUsersCache
-import forpdateam.ru.forpda.apirx.apiclasses.ThemeRx
 import forpdateam.ru.forpda.client.ClientHelper
 import forpdateam.ru.forpda.common.Preferences
 import forpdateam.ru.forpda.model.SchedulersProvider

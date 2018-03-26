@@ -42,10 +42,10 @@ import java.util.concurrent.TimeoutException;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.api.Api;
-import forpdateam.ru.forpda.api.ApiUtils;
-import forpdateam.ru.forpda.api.events.models.NotificationEvent;
-import forpdateam.ru.forpda.api.others.user.ForumUser;
+import forpdateam.ru.forpda.model.data.remote.api.Api;
+import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
+import forpdateam.ru.forpda.entity.remote.events.NotificationEvent;
+import forpdateam.ru.forpda.entity.remote.others.user.ForumUser;
 import forpdateam.ru.forpda.apirx.ForumUsersCache;
 import forpdateam.ru.forpda.client.Client;
 import forpdateam.ru.forpda.client.ClientHelper;

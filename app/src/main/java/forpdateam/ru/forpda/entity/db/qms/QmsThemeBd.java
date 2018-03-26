@@ -1,6 +1,6 @@
 package forpdateam.ru.forpda.entity.db.qms;
 
-import forpdateam.ru.forpda.api.qms.interfaces.IQmsTheme;
+import forpdateam.ru.forpda.entity.remote.qms.IQmsTheme;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 

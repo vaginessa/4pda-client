@@ -10,7 +10,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.api.search.models.SearchItem;
+import forpdateam.ru.forpda.entity.remote.search.SearchItem;
 import forpdateam.ru.forpda.ui.views.adapters.BaseAdapter;
 import forpdateam.ru.forpda.ui.views.adapters.BaseViewHolder;
 

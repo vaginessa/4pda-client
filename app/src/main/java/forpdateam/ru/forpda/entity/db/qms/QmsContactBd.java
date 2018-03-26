@@ -1,6 +1,6 @@
 package forpdateam.ru.forpda.entity.db.qms;
 
-import forpdateam.ru.forpda.api.qms.interfaces.IQmsContact;
+import forpdateam.ru.forpda.entity.remote.qms.IQmsContact;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 

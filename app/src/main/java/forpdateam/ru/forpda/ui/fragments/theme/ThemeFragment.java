@@ -46,12 +46,12 @@ import java.util.Observer;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.api.IBaseForumPost;
-import forpdateam.ru.forpda.api.RequestFile;
-import forpdateam.ru.forpda.api.events.models.NotificationEvent;
-import forpdateam.ru.forpda.api.others.pagination.Pagination;
-import forpdateam.ru.forpda.api.theme.editpost.models.AttachmentItem;
-import forpdateam.ru.forpda.api.theme.models.ThemePage;
+import forpdateam.ru.forpda.model.data.remote.api.IBaseForumPost;
+import forpdateam.ru.forpda.model.data.remote.api.RequestFile;
+import forpdateam.ru.forpda.entity.remote.events.NotificationEvent;
+import forpdateam.ru.forpda.entity.remote.others.pagination.Pagination;
+import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem;
+import forpdateam.ru.forpda.entity.remote.theme.ThemePage;
 import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.FilePickHelper;

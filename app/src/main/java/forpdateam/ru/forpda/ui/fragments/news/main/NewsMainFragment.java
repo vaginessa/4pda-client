@@ -16,8 +16,8 @@ import java.util.List;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.api.news.Constants;
-import forpdateam.ru.forpda.api.news.models.NewsItem;
+import forpdateam.ru.forpda.model.data.remote.api.news.Constants;
+import forpdateam.ru.forpda.entity.remote.news.NewsItem;
 import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.common.Utils;

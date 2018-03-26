@@ -1,7 +1,7 @@
 package forpdateam.ru.forpda.presentation.reputation
 
-import forpdateam.ru.forpda.api.reputation.models.RepData
-import forpdateam.ru.forpda.api.reputation.models.RepItem
+import forpdateam.ru.forpda.entity.remote.reputation.RepData
+import forpdateam.ru.forpda.entity.remote.reputation.RepItem
 import forpdateam.ru.forpda.common.mvp.IBaseView
 
 /**

@@ -2,12 +2,12 @@ package forpdateam.ru.forpda.model.repository.theme
 
 import forpdateam.ru.forpda.App
 import forpdateam.ru.forpda.R
-import forpdateam.ru.forpda.api.Api
-import forpdateam.ru.forpda.api.ApiUtils
-import forpdateam.ru.forpda.api.others.user.ForumUser
-import forpdateam.ru.forpda.api.theme.Theme
-import forpdateam.ru.forpda.api.theme.editpost.models.EditPostForm
-import forpdateam.ru.forpda.api.theme.models.ThemePage
+import forpdateam.ru.forpda.model.data.remote.api.Api
+import forpdateam.ru.forpda.model.data.remote.api.ApiUtils
+import forpdateam.ru.forpda.entity.remote.others.user.ForumUser
+import forpdateam.ru.forpda.model.data.remote.api.theme.Theme
+import forpdateam.ru.forpda.entity.remote.editpost.EditPostForm
+import forpdateam.ru.forpda.entity.remote.theme.ThemePage
 import forpdateam.ru.forpda.apirx.ForumUsersCache
 import forpdateam.ru.forpda.client.ClientHelper
 import forpdateam.ru.forpda.common.Preferences

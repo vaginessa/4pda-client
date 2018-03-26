@@ -1,6 +1,6 @@
 package forpdateam.ru.forpda.entity.db;
 
-import forpdateam.ru.forpda.api.others.user.IForumUser;
+import forpdateam.ru.forpda.entity.remote.others.user.IForumUser;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 

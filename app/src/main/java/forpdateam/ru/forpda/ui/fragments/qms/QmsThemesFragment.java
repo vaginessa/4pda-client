@@ -19,10 +19,10 @@ import java.util.Observer;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.api.events.models.NotificationEvent;
-import forpdateam.ru.forpda.api.qms.interfaces.IQmsTheme;
-import forpdateam.ru.forpda.api.qms.models.QmsTheme;
-import forpdateam.ru.forpda.api.qms.models.QmsThemes;
+import forpdateam.ru.forpda.entity.remote.events.NotificationEvent;
+import forpdateam.ru.forpda.entity.remote.qms.IQmsTheme;
+import forpdateam.ru.forpda.entity.remote.qms.QmsTheme;
+import forpdateam.ru.forpda.entity.remote.qms.QmsThemes;
 import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.entity.app.TabNotification;

@@ -14,7 +14,7 @@ import java.util.Map;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.api.devdb.models.Brands;
+import forpdateam.ru.forpda.entity.remote.devdb.Brands;
 import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.RecyclerFragment;

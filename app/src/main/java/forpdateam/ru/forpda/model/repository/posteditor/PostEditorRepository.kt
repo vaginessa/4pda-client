@@ -1,14 +1,10 @@
 package forpdateam.ru.forpda.model.repository.posteditor
 
-import forpdateam.ru.forpda.api.Api
-import forpdateam.ru.forpda.api.RequestFile
-import forpdateam.ru.forpda.api.mentions.Mentions
-import forpdateam.ru.forpda.api.mentions.models.MentionsData
-import forpdateam.ru.forpda.api.theme.editpost.EditPost
-import forpdateam.ru.forpda.api.theme.editpost.models.AttachmentItem
-import forpdateam.ru.forpda.api.theme.editpost.models.EditPostForm
-import forpdateam.ru.forpda.api.theme.models.ThemePage
-import forpdateam.ru.forpda.apirx.apiclasses.ThemeRx
+import forpdateam.ru.forpda.model.data.remote.api.RequestFile
+import forpdateam.ru.forpda.model.data.remote.api.editpost.EditPost
+import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem
+import forpdateam.ru.forpda.entity.remote.editpost.EditPostForm
+import forpdateam.ru.forpda.entity.remote.theme.ThemePage
 import forpdateam.ru.forpda.model.SchedulersProvider
 import io.reactivex.Observable
 

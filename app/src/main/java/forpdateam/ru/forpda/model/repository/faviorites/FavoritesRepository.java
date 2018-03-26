@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import forpdateam.ru.forpda.api.events.models.NotificationEvent;
-import forpdateam.ru.forpda.api.favorites.Favorites;
-import forpdateam.ru.forpda.api.favorites.Sorting;
-import forpdateam.ru.forpda.api.favorites.interfaces.IFavItem;
-import forpdateam.ru.forpda.api.favorites.models.FavData;
-import forpdateam.ru.forpda.api.favorites.models.FavItem;
+import forpdateam.ru.forpda.entity.remote.events.NotificationEvent;
+import forpdateam.ru.forpda.model.data.remote.api.favorites.Favorites;
+import forpdateam.ru.forpda.model.data.remote.api.favorites.Sorting;
+import forpdateam.ru.forpda.entity.remote.favorites.IFavItem;
+import forpdateam.ru.forpda.entity.remote.favorites.FavData;
+import forpdateam.ru.forpda.entity.remote.favorites.FavItem;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.entity.app.TabNotification;
 import forpdateam.ru.forpda.entity.db.favorites.FavItemBd;
@@ -38,6 +38,22 @@ public class FavoritesRepository {
                 .fromCallable(() -> favoritesApi.getFavorites(st, all, sorting))
                 .subscribeOn(schedulers.io())
                 .observeOn(schedulers.ui());
+    }
+
+    public Observable<Boolean> editFavorites(int act, int favId, int id, String type) {
+        switch (act) {
+            case Favorites.ACTION_EDIT_SUB_TYPE:
+                return Observable.fromCallable(() -> favoritesApi.editSubscribeType(type, favId));
+            case Favorites.ACTION_EDIT_PIN_STATE:
+                return Observable.fromCallable(() -> favoritesApi.editPinState(type, favId));
+            case Favorites.ACTION_DELETE:
+                return Observable.fromCallable(() -> favoritesApi.delete(favId));
+            case Favorites.ACTION_ADD:
+            case Favorites.ACTION_ADD_FORUM:
+                return Observable.fromCallable(() -> favoritesApi.add(id, act, type));
+            default:
+                return Observable.just(false);
+        }
     }
 
     public Observable<List<FavItem>> getCache() {

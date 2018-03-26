@@ -44,10 +44,10 @@ import java.util.Observer;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.api.IBaseForumPost;
-import forpdateam.ru.forpda.api.search.models.SearchItem;
-import forpdateam.ru.forpda.api.search.models.SearchResult;
-import forpdateam.ru.forpda.api.search.models.SearchSettings;
+import forpdateam.ru.forpda.model.data.remote.api.IBaseForumPost;
+import forpdateam.ru.forpda.entity.remote.search.SearchItem;
+import forpdateam.ru.forpda.entity.remote.search.SearchResult;
+import forpdateam.ru.forpda.entity.remote.search.SearchSettings;
 import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.common.Preferences;

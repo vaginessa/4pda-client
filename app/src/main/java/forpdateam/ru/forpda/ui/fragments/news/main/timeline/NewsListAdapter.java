@@ -18,7 +18,7 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.api.news.models.NewsItem;
+import forpdateam.ru.forpda.entity.remote.news.NewsItem;
 import forpdateam.ru.forpda.ui.views.adapters.BaseAdapter;
 import forpdateam.ru.forpda.ui.views.adapters.BaseViewHolder;
 

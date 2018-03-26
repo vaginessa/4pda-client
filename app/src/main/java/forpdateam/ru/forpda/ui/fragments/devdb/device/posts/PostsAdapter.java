@@ -8,8 +8,8 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.api.ApiUtils;
-import forpdateam.ru.forpda.api.devdb.models.Device;
+import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
+import forpdateam.ru.forpda.entity.remote.devdb.Device;
 import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.ui.views.adapters.BaseAdapter;
 import forpdateam.ru.forpda.ui.views.adapters.BaseViewHolder;

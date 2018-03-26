@@ -3,7 +3,7 @@ package forpdateam.ru.forpda.entity.app;
 import java.util.ArrayList;
 import java.util.List;
 
-import forpdateam.ru.forpda.api.events.models.NotificationEvent;
+import forpdateam.ru.forpda.entity.remote.events.NotificationEvent;
 
 /**
  * Created by radiationx on 26.09.17.

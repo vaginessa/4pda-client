@@ -1,7 +1,7 @@
 package forpdateam.ru.forpda.entity.db.forum;
 
-import forpdateam.ru.forpda.api.forum.interfaces.IForumItemFlat;
-import forpdateam.ru.forpda.api.forum.models.ForumItemTree;
+import forpdateam.ru.forpda.entity.remote.forum.IForumItemFlat;
+import forpdateam.ru.forpda.entity.remote.forum.ForumItemTree;
 import io.realm.RealmObject;
 
 /**

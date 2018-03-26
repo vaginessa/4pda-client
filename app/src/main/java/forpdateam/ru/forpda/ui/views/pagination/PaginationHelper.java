@@ -21,7 +21,7 @@ import java.util.Observer;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.api.others.pagination.Pagination;
+import forpdateam.ru.forpda.entity.remote.others.pagination.Pagination;
 
 /**
  * Created by radiationx on 03.03.17.

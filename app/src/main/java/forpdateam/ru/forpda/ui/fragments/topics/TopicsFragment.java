@@ -18,8 +18,8 @@ import com.arellomobile.mvp.presenter.ProvidePresenter;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.api.topcis.models.TopicItem;
-import forpdateam.ru.forpda.api.topcis.models.TopicsData;
+import forpdateam.ru.forpda.entity.remote.topics.TopicItem;
+import forpdateam.ru.forpda.entity.remote.topics.TopicsData;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.common.Utils;

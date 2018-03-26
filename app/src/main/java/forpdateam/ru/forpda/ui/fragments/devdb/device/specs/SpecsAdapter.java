@@ -12,7 +12,7 @@ import java.util.Collection;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.api.ApiUtils;
+import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
 
 /**
  * Created by radiationx on 08.08.17.

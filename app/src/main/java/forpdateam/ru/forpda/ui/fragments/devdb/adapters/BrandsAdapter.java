@@ -5,8 +5,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.api.devdb.models.Brands;
-import forpdateam.ru.forpda.api.topcis.models.TopicItem;
+import forpdateam.ru.forpda.entity.remote.devdb.Brands;
+import forpdateam.ru.forpda.entity.remote.topics.TopicItem;
 import forpdateam.ru.forpda.ui.views.adapters.BaseSectionedAdapter;
 import forpdateam.ru.forpda.ui.views.adapters.BaseSectionedViewHolder;
 

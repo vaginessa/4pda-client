@@ -14,8 +14,8 @@ import com.arellomobile.mvp.presenter.ProvidePresenter;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.api.mentions.models.MentionItem;
-import forpdateam.ru.forpda.api.mentions.models.MentionsData;
+import forpdateam.ru.forpda.entity.remote.mentions.MentionItem;
+import forpdateam.ru.forpda.entity.remote.mentions.MentionsData;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.presentation.mentions.MentionsPresenter;
 import forpdateam.ru.forpda.presentation.mentions.MentionsView;

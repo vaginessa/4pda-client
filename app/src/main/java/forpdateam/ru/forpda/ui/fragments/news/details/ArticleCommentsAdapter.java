@@ -17,7 +17,7 @@ import java.util.Collection;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.api.news.models.Comment;
+import forpdateam.ru.forpda.entity.remote.news.Comment;
 import forpdateam.ru.forpda.client.ClientHelper;
 
 /**

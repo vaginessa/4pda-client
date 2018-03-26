@@ -21,7 +21,7 @@ import java.util.ArrayList;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.api.forum.models.Announce;
+import forpdateam.ru.forpda.entity.remote.forum.Announce;
 import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.common.webview.CustomWebChromeClient;
 import forpdateam.ru.forpda.common.webview.CustomWebViewClient;

@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 
-import forpdateam.ru.forpda.api.news.models.DetailsPage;
+import forpdateam.ru.forpda.entity.remote.news.DetailsPage;
 import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.common.webview.CustomWebChromeClient;
 import forpdateam.ru.forpda.common.webview.CustomWebViewClient;

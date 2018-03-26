@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.api.favorites.models.FavItem;
+import forpdateam.ru.forpda.entity.remote.favorites.FavItem;
 import forpdateam.ru.forpda.common.Preferences;
 import forpdateam.ru.forpda.ui.views.adapters.BaseSectionedAdapter;
 import forpdateam.ru.forpda.ui.views.adapters.BaseSectionedViewHolder;

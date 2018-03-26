@@ -1,14 +1,11 @@
 package forpdateam.ru.forpda.model.repository.news
 
 import forpdateam.ru.forpda.App
-import forpdateam.ru.forpda.api.Api
-import forpdateam.ru.forpda.api.ApiUtils
-import forpdateam.ru.forpda.api.mentions.Mentions
-import forpdateam.ru.forpda.api.mentions.models.MentionsData
-import forpdateam.ru.forpda.api.news.NewsApi
-import forpdateam.ru.forpda.api.news.models.Comment
-import forpdateam.ru.forpda.api.news.models.DetailsPage
-import forpdateam.ru.forpda.api.news.models.NewsItem
+import forpdateam.ru.forpda.model.data.remote.api.ApiUtils
+import forpdateam.ru.forpda.model.data.remote.api.news.NewsApi
+import forpdateam.ru.forpda.entity.remote.news.Comment
+import forpdateam.ru.forpda.entity.remote.news.DetailsPage
+import forpdateam.ru.forpda.entity.remote.news.NewsItem
 import forpdateam.ru.forpda.model.SchedulersProvider
 import io.reactivex.Observable
 

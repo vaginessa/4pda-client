@@ -20,7 +20,7 @@ import java.net.URLDecoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import forpdateam.ru.forpda.api.others.user.ForumUser;
+import forpdateam.ru.forpda.entity.remote.others.user.ForumUser;
 import forpdateam.ru.forpda.apirx.ForumUsersCache;
 import forpdateam.ru.forpda.common.IntentHandler;
 

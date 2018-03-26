@@ -1,14 +1,14 @@
 package forpdateam.ru.forpda
 
 import android.content.Context
-import forpdateam.ru.forpda.api.auth.Auth
-import forpdateam.ru.forpda.api.favorites.Favorites
-import forpdateam.ru.forpda.api.forum.Forum
-import forpdateam.ru.forpda.api.mentions.Mentions
-import forpdateam.ru.forpda.api.profile.Profile
-import forpdateam.ru.forpda.api.reputation.Reputation
-import forpdateam.ru.forpda.api.theme.Theme
-import forpdateam.ru.forpda.api.topcis.Topics
+import forpdateam.ru.forpda.model.data.remote.api.auth.Auth
+import forpdateam.ru.forpda.model.data.remote.api.favorites.Favorites
+import forpdateam.ru.forpda.model.data.remote.api.forum.Forum
+import forpdateam.ru.forpda.model.data.remote.api.mentions.Mentions
+import forpdateam.ru.forpda.model.data.remote.api.profile.Profile
+import forpdateam.ru.forpda.model.data.remote.api.reputation.Reputation
+import forpdateam.ru.forpda.model.data.remote.api.theme.Theme
+import forpdateam.ru.forpda.model.data.remote.api.topcis.Topics
 import forpdateam.ru.forpda.model.NetworkStateProvider
 import forpdateam.ru.forpda.model.SchedulersProvider
 import forpdateam.ru.forpda.model.repository.auth.AuthRepository

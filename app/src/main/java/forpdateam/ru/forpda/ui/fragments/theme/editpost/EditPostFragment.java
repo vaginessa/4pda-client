@@ -17,10 +17,10 @@ import java.util.List;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.api.RequestFile;
-import forpdateam.ru.forpda.api.theme.editpost.models.AttachmentItem;
-import forpdateam.ru.forpda.api.theme.editpost.models.EditPostForm;
-import forpdateam.ru.forpda.api.theme.models.ThemePage;
+import forpdateam.ru.forpda.model.data.remote.api.RequestFile;
+import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem;
+import forpdateam.ru.forpda.entity.remote.editpost.EditPostForm;
+import forpdateam.ru.forpda.entity.remote.theme.ThemePage;
 import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.common.FilePickHelper;
 import forpdateam.ru.forpda.ui.TabManager;
@@ -29,10 +29,10 @@ import forpdateam.ru.forpda.ui.fragments.theme.ThemeFragment;
 import forpdateam.ru.forpda.ui.views.messagepanel.MessagePanel;
 import forpdateam.ru.forpda.ui.views.messagepanel.attachments.AttachmentsPopup;
 
-import static forpdateam.ru.forpda.api.theme.editpost.models.EditPostForm.ARG_TYPE;
-import static forpdateam.ru.forpda.api.theme.editpost.models.EditPostForm.ERROR_NONE;
-import static forpdateam.ru.forpda.api.theme.editpost.models.EditPostForm.TYPE_EDIT_POST;
-import static forpdateam.ru.forpda.api.theme.editpost.models.EditPostForm.TYPE_NEW_POST;
+import static forpdateam.ru.forpda.entity.remote.editpost.EditPostForm.ARG_TYPE;
+import static forpdateam.ru.forpda.entity.remote.editpost.EditPostForm.ERROR_NONE;
+import static forpdateam.ru.forpda.entity.remote.editpost.EditPostForm.TYPE_EDIT_POST;
+import static forpdateam.ru.forpda.entity.remote.editpost.EditPostForm.TYPE_NEW_POST;
 
 /**
  * Created by radiationx on 14.01.17.

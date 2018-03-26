@@ -3,8 +3,8 @@ package forpdateam.ru.forpda.apirx;
 import java.util.ArrayList;
 import java.util.List;
 
-import forpdateam.ru.forpda.api.Api;
-import forpdateam.ru.forpda.api.others.user.ForumUser;
+import forpdateam.ru.forpda.model.data.remote.api.Api;
+import forpdateam.ru.forpda.entity.remote.others.user.ForumUser;
 import forpdateam.ru.forpda.entity.db.ForumUserBd;
 import io.realm.Realm;
 

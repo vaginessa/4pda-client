@@ -22,7 +22,7 @@ import java.util.ArrayList;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.api.forum.models.ForumRules;
+import forpdateam.ru.forpda.entity.remote.forum.ForumRules;
 import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.common.Utils;
 import forpdateam.ru.forpda.common.webview.CustomWebChromeClient;

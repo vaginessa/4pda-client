@@ -2,8 +2,8 @@ package forpdateam.ru.forpda.presentation.favorites
 
 import android.os.Bundle
 import com.arellomobile.mvp.InjectViewState
-import forpdateam.ru.forpda.api.favorites.Sorting
-import forpdateam.ru.forpda.api.favorites.models.FavItem
+import forpdateam.ru.forpda.model.data.remote.api.favorites.Sorting
+import forpdateam.ru.forpda.entity.remote.favorites.FavItem
 import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.Utils
 import forpdateam.ru.forpda.common.mvp.BasePresenter

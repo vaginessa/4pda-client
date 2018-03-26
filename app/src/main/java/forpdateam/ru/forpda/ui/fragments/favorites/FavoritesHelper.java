@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.api.favorites.Favorites;
+import forpdateam.ru.forpda.model.data.remote.api.favorites.Favorites;
 import forpdateam.ru.forpda.apirx.RxApi;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;

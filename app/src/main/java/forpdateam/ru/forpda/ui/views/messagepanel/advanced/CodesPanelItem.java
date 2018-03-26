@@ -21,7 +21,7 @@ import java.util.Map;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.api.ApiUtils;
+import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
 import forpdateam.ru.forpda.common.simple.SimpleTextWatcher;
 import forpdateam.ru.forpda.ui.views.messagepanel.MessagePanel;
 import forpdateam.ru.forpda.ui.views.messagepanel.SimpleInstruction;

@@ -2,7 +2,7 @@ package forpdateam.ru.forpda.ui.fragments.devdb.device;
 
 import android.support.v4.app.Fragment;
 
-import forpdateam.ru.forpda.api.devdb.models.Device;
+import forpdateam.ru.forpda.entity.remote.devdb.Device;
 
 /**
  * Created by radiationx on 09.08.17.

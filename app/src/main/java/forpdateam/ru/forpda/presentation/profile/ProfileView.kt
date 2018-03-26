@@ -1,6 +1,6 @@
 package forpdateam.ru.forpda.presentation.profile
 
-import forpdateam.ru.forpda.api.profile.models.ProfileModel
+import forpdateam.ru.forpda.entity.remote.profile.ProfileModel
 import forpdateam.ru.forpda.common.mvp.IBaseView
 
 /**

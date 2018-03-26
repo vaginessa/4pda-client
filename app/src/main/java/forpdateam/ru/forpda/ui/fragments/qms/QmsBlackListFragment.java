@@ -17,9 +17,9 @@ import java.util.List;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.api.others.user.ForumUser;
-import forpdateam.ru.forpda.api.qms.interfaces.IQmsContact;
-import forpdateam.ru.forpda.api.qms.models.QmsContact;
+import forpdateam.ru.forpda.entity.remote.others.user.ForumUser;
+import forpdateam.ru.forpda.entity.remote.qms.IQmsContact;
+import forpdateam.ru.forpda.entity.remote.qms.QmsContact;
 import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.common.simple.SimpleTextWatcher;

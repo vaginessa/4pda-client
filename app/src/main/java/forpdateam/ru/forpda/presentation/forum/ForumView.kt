@@ -1,6 +1,6 @@
 package forpdateam.ru.forpda.presentation.forum
 
-import forpdateam.ru.forpda.api.forum.models.ForumItemTree
+import forpdateam.ru.forpda.entity.remote.forum.ForumItemTree
 import forpdateam.ru.forpda.common.mvp.IBaseView
 
 /**

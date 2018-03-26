@@ -1,7 +1,7 @@
 package forpdateam.ru.forpda.presentation.favorites
 
-import forpdateam.ru.forpda.api.favorites.models.FavData
-import forpdateam.ru.forpda.api.favorites.models.FavItem
+import forpdateam.ru.forpda.entity.remote.favorites.FavData
+import forpdateam.ru.forpda.entity.remote.favorites.FavItem
 import forpdateam.ru.forpda.common.mvp.IBaseView
 
 /**

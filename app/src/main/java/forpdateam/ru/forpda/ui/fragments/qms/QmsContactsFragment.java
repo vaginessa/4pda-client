@@ -23,9 +23,9 @@ import java.util.Observer;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.api.events.models.NotificationEvent;
-import forpdateam.ru.forpda.api.qms.interfaces.IQmsContact;
-import forpdateam.ru.forpda.api.qms.models.QmsContact;
+import forpdateam.ru.forpda.entity.remote.events.NotificationEvent;
+import forpdateam.ru.forpda.entity.remote.qms.IQmsContact;
+import forpdateam.ru.forpda.entity.remote.qms.QmsContact;
 import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.IntentHandler;

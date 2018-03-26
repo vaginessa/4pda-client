@@ -2,8 +2,8 @@ package forpdateam.ru.forpda.presentation.topics
 
 import android.os.Bundle
 import com.arellomobile.mvp.InjectViewState
-import forpdateam.ru.forpda.api.topcis.models.TopicItem
-import forpdateam.ru.forpda.api.topcis.models.TopicsData
+import forpdateam.ru.forpda.entity.remote.topics.TopicItem
+import forpdateam.ru.forpda.entity.remote.topics.TopicsData
 import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.model.repository.topics.TopicsRepository

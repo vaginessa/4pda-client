@@ -1,7 +1,7 @@
 package forpdateam.ru.forpda.presentation.profile
 
 import com.arellomobile.mvp.InjectViewState
-import forpdateam.ru.forpda.api.profile.models.ProfileModel
+import forpdateam.ru.forpda.entity.remote.profile.ProfileModel
 import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.Utils
 import forpdateam.ru.forpda.common.mvp.BasePresenter

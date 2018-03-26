@@ -8,15 +8,15 @@ import java.util.List;
 
 import biz.source_code.miniTemplator.MiniTemplator;
 import forpdateam.ru.forpda.App;
-import forpdateam.ru.forpda.api.Api;
-import forpdateam.ru.forpda.api.ApiUtils;
-import forpdateam.ru.forpda.api.RequestFile;
-import forpdateam.ru.forpda.api.others.user.ForumUser;
-import forpdateam.ru.forpda.api.qms.models.QmsChatModel;
-import forpdateam.ru.forpda.api.qms.models.QmsContact;
-import forpdateam.ru.forpda.api.qms.models.QmsMessage;
-import forpdateam.ru.forpda.api.qms.models.QmsThemes;
-import forpdateam.ru.forpda.api.theme.editpost.models.AttachmentItem;
+import forpdateam.ru.forpda.model.data.remote.api.Api;
+import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
+import forpdateam.ru.forpda.model.data.remote.api.RequestFile;
+import forpdateam.ru.forpda.entity.remote.others.user.ForumUser;
+import forpdateam.ru.forpda.entity.remote.qms.QmsChatModel;
+import forpdateam.ru.forpda.entity.remote.qms.QmsContact;
+import forpdateam.ru.forpda.entity.remote.qms.QmsMessage;
+import forpdateam.ru.forpda.entity.remote.qms.QmsThemes;
+import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem;
 import forpdateam.ru.forpda.apirx.ForumUsersCache;
 import io.reactivex.Observable;
 

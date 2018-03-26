@@ -1,7 +1,7 @@
 package forpdateam.ru.forpda.presentation.mentions
 
-import forpdateam.ru.forpda.api.mentions.models.MentionItem
-import forpdateam.ru.forpda.api.mentions.models.MentionsData
+import forpdateam.ru.forpda.entity.remote.mentions.MentionItem
+import forpdateam.ru.forpda.entity.remote.mentions.MentionsData
 import forpdateam.ru.forpda.common.mvp.IBaseView
 
 /**

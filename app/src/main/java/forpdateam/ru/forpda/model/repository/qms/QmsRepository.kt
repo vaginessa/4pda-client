@@ -2,23 +2,18 @@ package forpdateam.ru.forpda.model.repository.qms
 
 import biz.source_code.miniTemplator.MiniTemplator
 import forpdateam.ru.forpda.App
-import forpdateam.ru.forpda.api.Api
-import forpdateam.ru.forpda.api.ApiUtils
-import forpdateam.ru.forpda.api.RequestFile
-import forpdateam.ru.forpda.api.mentions.Mentions
-import forpdateam.ru.forpda.api.mentions.models.MentionsData
-import forpdateam.ru.forpda.api.others.user.ForumUser
-import forpdateam.ru.forpda.api.qms.Qms
-import forpdateam.ru.forpda.api.qms.models.QmsChatModel
-import forpdateam.ru.forpda.api.qms.models.QmsContact
-import forpdateam.ru.forpda.api.qms.models.QmsMessage
-import forpdateam.ru.forpda.api.qms.models.QmsThemes
-import forpdateam.ru.forpda.api.theme.editpost.models.AttachmentItem
+import forpdateam.ru.forpda.model.data.remote.api.ApiUtils
+import forpdateam.ru.forpda.model.data.remote.api.RequestFile
+import forpdateam.ru.forpda.entity.remote.others.user.ForumUser
+import forpdateam.ru.forpda.model.data.remote.api.qms.Qms
+import forpdateam.ru.forpda.entity.remote.qms.QmsChatModel
+import forpdateam.ru.forpda.entity.remote.qms.QmsContact
+import forpdateam.ru.forpda.entity.remote.qms.QmsMessage
+import forpdateam.ru.forpda.entity.remote.qms.QmsThemes
+import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem
 import forpdateam.ru.forpda.apirx.ForumUsersCache
 import forpdateam.ru.forpda.model.SchedulersProvider
 import io.reactivex.Observable
-import org.json.JSONException
-import org.json.JSONObject
 import java.util.ArrayList
 
 /**
