@@ -1,7 +1,5 @@
 package forpdateam.ru.forpda.apirx;
 
-import forpdateam.ru.forpda.apirx.apiclasses.QmsRx;
-
 /**
  * Created by radiationx on 25.03.17.
  */

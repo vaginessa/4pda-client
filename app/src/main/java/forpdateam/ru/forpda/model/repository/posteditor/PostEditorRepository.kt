@@ -6,6 +6,7 @@ import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem
 import forpdateam.ru.forpda.entity.remote.editpost.EditPostForm
 import forpdateam.ru.forpda.entity.remote.theme.ThemePage
 import forpdateam.ru.forpda.model.SchedulersProvider
+import forpdateam.ru.forpda.model.repository.temp.TempHelper
 import io.reactivex.Observable
 
 /**
@@ -34,7 +35,7 @@ class PostEditorRepository(
 
     fun sendPost(form: EditPostForm): Observable<ThemePage> = Observable
             .fromCallable { editPostApi.sendPost(form) }
-            .map { ThemeRx.transform(it, true) }
+            .map { TempHelper.transform(it, true) }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 

@@ -10,6 +10,7 @@ import forpdateam.ru.forpda.apirx.ForumUsersCache
 import forpdateam.ru.forpda.client.ClientHelper
 import forpdateam.ru.forpda.common.Preferences
 import forpdateam.ru.forpda.model.SchedulersProvider
+import forpdateam.ru.forpda.model.repository.temp.TempHelper
 import io.reactivex.Observable
 import java.util.ArrayList
 import java.util.regex.Matcher
@@ -61,11 +62,11 @@ class SearchRepository(
 
 
             t.setVariableOpt("body_type", "search")
-            t.setVariableOpt("navigation_disable", ThemeRx.getDisableStr(prevDisabled && nextDisabled))
-            t.setVariableOpt("first_disable", ThemeRx.getDisableStr(prevDisabled))
-            t.setVariableOpt("prev_disable", ThemeRx.getDisableStr(prevDisabled))
-            t.setVariableOpt("next_disable", ThemeRx.getDisableStr(nextDisabled))
-            t.setVariableOpt("last_disable", ThemeRx.getDisableStr(nextDisabled))
+            t.setVariableOpt("navigation_disable", TempHelper.getDisableStr(prevDisabled && nextDisabled))
+            t.setVariableOpt("first_disable", TempHelper.getDisableStr(prevDisabled))
+            t.setVariableOpt("prev_disable", TempHelper.getDisableStr(prevDisabled))
+            t.setVariableOpt("next_disable", TempHelper.getDisableStr(nextDisabled))
+            t.setVariableOpt("last_disable", TempHelper.getDisableStr(nextDisabled))
 
             val isEnableAvatars = Preferences.Theme.isShowAvatars(null)
             t.setVariableOpt("enable_avatars_bool", java.lang.Boolean.toString(isEnableAvatars))

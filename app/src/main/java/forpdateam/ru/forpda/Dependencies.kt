@@ -20,12 +20,16 @@ import forpdateam.ru.forpda.model.data.remote.api.news.NewsApi
 import forpdateam.ru.forpda.model.data.remote.api.qms.QmsApi
 import forpdateam.ru.forpda.model.data.remote.api.search.SearchApi
 import forpdateam.ru.forpda.model.repository.auth.AuthRepository
+import forpdateam.ru.forpda.model.repository.devdb.DevDbRepository
 import forpdateam.ru.forpda.model.repository.faviorites.FavoritesRepository
 import forpdateam.ru.forpda.model.repository.forum.ForumRepository
 import forpdateam.ru.forpda.model.repository.history.HistoryRepository
 import forpdateam.ru.forpda.model.repository.mentions.MentionsRepository
+import forpdateam.ru.forpda.model.repository.news.NewsRepository
 import forpdateam.ru.forpda.model.repository.profile.ProfileRepository
+import forpdateam.ru.forpda.model.repository.qms.QmsRepository
 import forpdateam.ru.forpda.model.repository.reputation.ReputationRepository
+import forpdateam.ru.forpda.model.repository.search.SearchRepository
 import forpdateam.ru.forpda.model.repository.theme.ThemeRepository
 import forpdateam.ru.forpda.model.repository.topics.TopicsRepository
 import forpdateam.ru.forpda.model.system.AppNetworkState
@@ -68,4 +72,8 @@ class Dependencies internal constructor(
     val forumRepository = ForumRepository(schedulers, forumApi)
     val topicsRepository = TopicsRepository(schedulers, topicsApi)
     val themeRepository = ThemeRepository(schedulers, themeApi, editPostApi)
+    val qmsRepository = QmsRepository(schedulers, qmsApi)
+    val searchRepository = SearchRepository(schedulers, searchApi)
+    val newsRepository = NewsRepository(schedulers, newsApi)
+    val devDbRepository = DevDbRepository(schedulers, devDbApi)
 }

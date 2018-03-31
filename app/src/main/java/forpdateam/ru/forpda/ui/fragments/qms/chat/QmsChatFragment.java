@@ -35,7 +35,6 @@ import forpdateam.ru.forpda.entity.remote.qms.QmsMessage;
 import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem;
 import forpdateam.ru.forpda.apirx.ForumUsersCache;
 import forpdateam.ru.forpda.apirx.RxApi;
-import forpdateam.ru.forpda.apirx.apiclasses.QmsRx;
 import forpdateam.ru.forpda.common.FilePickHelper;
 import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.common.Preferences;
