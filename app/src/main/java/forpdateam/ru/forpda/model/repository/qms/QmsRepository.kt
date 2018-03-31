@@ -1,5 +1,6 @@
 package forpdateam.ru.forpda.model.repository.qms
 
+import android.os.Bundle
 import biz.source_code.miniTemplator.MiniTemplator
 import forpdateam.ru.forpda.App
 import forpdateam.ru.forpda.R
@@ -7,17 +8,14 @@ import forpdateam.ru.forpda.model.data.remote.api.ApiUtils
 import forpdateam.ru.forpda.model.data.remote.api.RequestFile
 import forpdateam.ru.forpda.entity.remote.others.user.ForumUser
 import forpdateam.ru.forpda.model.data.remote.api.qms.QmsApi
-import forpdateam.ru.forpda.entity.remote.qms.QmsChatModel
-import forpdateam.ru.forpda.entity.remote.qms.QmsContact
-import forpdateam.ru.forpda.entity.remote.qms.QmsMessage
-import forpdateam.ru.forpda.entity.remote.qms.QmsThemes
 import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem
 import forpdateam.ru.forpda.apirx.ForumUsersCache
-import forpdateam.ru.forpda.client.ClientHelper
 import forpdateam.ru.forpda.entity.db.qms.QmsContactBd
+import forpdateam.ru.forpda.entity.db.qms.QmsThemesBd
+import forpdateam.ru.forpda.entity.remote.qms.*
 import forpdateam.ru.forpda.model.SchedulersProvider
-import forpdateam.ru.forpda.ui.views.ContentController
-import forpdateam.ru.forpda.ui.views.FunnyContent
+import forpdateam.ru.forpda.ui.TabManager
+import forpdateam.ru.forpda.ui.fragments.qms.chat.QmsChatFragment
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.realm.Realm
@@ -52,7 +50,7 @@ class QmsRepository(
     fun getContactList(): Observable<List<QmsContact>> = Observable
             .fromCallable { qmsApi.contactList }
             .map { interceptContacts(it) }
-            .flatMap { saveCache(it) }
+            .flatMap { saveContactsCache(it) }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 
@@ -70,6 +68,7 @@ class QmsRepository(
     //Themes
     fun getThemesList(id: Int): Observable<QmsThemes> = Observable
             .fromCallable { qmsApi.getThemesList(id) }
+            .flatMap { saveThemesCache(it) }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 
@@ -182,7 +181,7 @@ class QmsRepository(
     *
     * */
 
-    fun saveCache(items: List<QmsContact>): Observable<List<QmsContact>> = Completable
+    fun saveContactsCache(items: List<QmsContact>): Observable<List<QmsContact>> = Completable
             .fromCallable {
                 Realm.getDefaultInstance().use { realm ->
                     realm.executeTransaction { r ->
@@ -197,12 +196,11 @@ class QmsRepository(
                 }
             }
             .toObservable<List<QmsContact>>()
-            .flatMap { getCache() }
+            .flatMap { getContactsCache() }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 
-
-    fun getCache(): Observable<List<QmsContact>> = Observable
+    fun getContactsCache(): Observable<List<QmsContact>> = Observable
             .fromCallable {
                 val currentItems = mutableListOf<QmsContact>()
                 Realm.getDefaultInstance().use { realm ->
@@ -213,6 +211,41 @@ class QmsRepository(
                     }
                 }
                 currentItems as List<QmsContact>
+            }
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.ui())
+
+    fun saveThemesCache(data: QmsThemes): Observable<QmsThemes> = Completable
+            .fromCallable {
+                Realm.getDefaultInstance().use { realm ->
+                    realm.executeTransaction({ r ->
+                        r.where(QmsThemesBd::class.java)
+                                .equalTo("userId", data.getUserId())
+                                .findAll()
+                                .deleteAllFromRealm()
+                        val qmsThemesBd = QmsThemesBd(data)
+                        r.copyToRealmOrUpdate(qmsThemesBd)
+                        qmsThemesBd.themes.clear()
+                    })
+                }
+            }
+            .toObservable<QmsThemes>()
+            .flatMap { getThemesCache(data.userId) }
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.ui())
+
+    fun getThemesCache(userId: Int): Observable<QmsThemes> = Observable
+            .fromCallable {
+                Realm.getDefaultInstance().use { realm ->
+                    val results = realm
+                            .where(QmsThemesBd::class.java)
+                            .equalTo("userId", userId)
+                            .findAll()
+                            .last()
+                    QmsThemes(results).apply {
+                        themes.addAll(results.themes.map { QmsTheme(it) })
+                    }
+                }
             }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())

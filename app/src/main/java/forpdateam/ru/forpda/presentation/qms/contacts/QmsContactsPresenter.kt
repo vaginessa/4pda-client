@@ -2,14 +2,12 @@ package forpdateam.ru.forpda.presentation.qms.contacts
 
 import android.os.Bundle
 import com.arellomobile.mvp.InjectViewState
-import forpdateam.ru.forpda.R
 import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.remote.qms.QmsContact
 import forpdateam.ru.forpda.model.repository.qms.QmsRepository
 import forpdateam.ru.forpda.ui.TabManager
 import forpdateam.ru.forpda.ui.fragments.TabFragment
-import forpdateam.ru.forpda.ui.fragments.notes.NotesAddPopup
 import forpdateam.ru.forpda.ui.fragments.qms.QmsBlackListFragment
 import forpdateam.ru.forpda.ui.fragments.qms.QmsThemesFragment
 
@@ -43,7 +41,7 @@ class QmsContactsPresenter(
 
     fun loadCache() {
         qmsRepository
-                .getCache()
+                .getContactsCache()
                 .subscribe({
                     localItems.clear()
                     localItems.addAll(it)
@@ -100,6 +98,10 @@ class QmsContactsPresenter(
         args.putInt(QmsThemesFragment.USER_ID_ARG, item.id)
         args.putString(QmsThemesFragment.USER_AVATAR_ARG, item.avatar)
         TabManager.get().add(QmsThemesFragment::class.java, args)
+    }
+
+    fun onItemLongClick(item: QmsContact) {
+        viewState.showItemDialogMenu(item)
     }
 
     fun createNote(item: QmsContact) {

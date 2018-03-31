@@ -13,4 +13,5 @@ interface QmsContactsView : IBaseView {
     fun showContacts(items: List<QmsContact>)
     fun onBlockUser(res: Boolean)
     fun showCreateNote(nick: String, url: String)
+    fun showItemDialogMenu(item: QmsContact)
 }

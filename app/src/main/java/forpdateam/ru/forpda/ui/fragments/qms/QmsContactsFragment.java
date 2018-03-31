@@ -189,6 +189,13 @@ public class QmsContactsFragment extends RecyclerFragment implements QmsContacts
     }
 
     @Override
+    public void showItemDialogMenu(@NotNull QmsContact item) {
+        dialogMenu.disallowAll();
+        dialogMenu.allowAll();
+        dialogMenu.show(getContext(), QmsContactsFragment.this, item);
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         QmsHelper.get().unSubscribeQms(notification);
@@ -201,9 +208,7 @@ public class QmsContactsFragment extends RecyclerFragment implements QmsContacts
 
     @Override
     public boolean onItemLongClick(QmsContact item) {
-        dialogMenu.disallowAll();
-        dialogMenu.allowAll();
-        dialogMenu.show(getContext(), QmsContactsFragment.this, item);
+        presenter.onItemLongClick(item);
         return false;
     }
 }

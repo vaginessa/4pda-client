@@ -77,14 +77,9 @@ class QmsBlackListPresenter(
                 .addToDisposable()
     }
 
-    fun onItemClick(item: QmsContact) {
-        val args = Bundle()
-        args.putString(TabFragment.ARG_TITLE, item.nick)
-        args.putInt(QmsThemesFragment.USER_ID_ARG, item.id)
-        args.putString(QmsThemesFragment.USER_AVATAR_ARG, item.avatar)
-        TabManager.get().add(QmsThemesFragment::class.java, args)
+    fun onItemLongClick(item: QmsContact) {
+        viewState.showItemDialogMenu(item)
     }
-
 
     fun openProfile(item: QmsContact) {
         IntentHandler.handle("https://4pda.ru/forum/index.php?showuser=${item.id}")

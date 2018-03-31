@@ -140,20 +140,21 @@ public class QmsBlackListFragment extends RecyclerFragment implements QmsContact
         nickField.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_dropdown_item_1line, nicks));
     }
 
-    private void someClick(QmsContact contact) {
+    @Override
+    public void showItemDialogMenu(@NotNull QmsContact item) {
         dialogMenu.disallowAll();
         dialogMenu.allowAll();
-        dialogMenu.show(getContext(), QmsBlackListFragment.this, contact);
+        dialogMenu.show(getContext(), QmsBlackListFragment.this, item);
     }
 
     @Override
     public void onItemClick(QmsContact item) {
-        someClick(item);
+        presenter.onItemLongClick(item);
     }
 
     @Override
     public boolean onItemLongClick(QmsContact item) {
-        someClick(item);
+        presenter.onItemLongClick(item);
         return false;
     }
 }

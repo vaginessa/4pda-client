@@ -11,7 +11,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.arellomobile.mvp.presenter.InjectPresenter;
+import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.nostra13.universalimageloader.core.ImageLoader;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,7 +24,7 @@ import java.util.Observer;
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.entity.remote.events.NotificationEvent;
-import forpdateam.ru.forpda.entity.remote.qms.IQmsTheme;
+import forpdateam.ru.forpda.entity.remote.qms.QmsTheme;
 import forpdateam.ru.forpda.entity.remote.qms.QmsTheme;
 import forpdateam.ru.forpda.entity.remote.qms.QmsThemes;
 import forpdateam.ru.forpda.apirx.RxApi;
@@ -28,6 +32,8 @@ import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.entity.app.TabNotification;
 import forpdateam.ru.forpda.entity.db.qms.QmsThemeBd;
 import forpdateam.ru.forpda.entity.db.qms.QmsThemesBd;
+import forpdateam.ru.forpda.presentation.qms.themes.QmsThemesPresenter;
+import forpdateam.ru.forpda.presentation.qms.themes.QmsThemesView;
 import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.RecyclerFragment;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
@@ -41,22 +47,26 @@ import io.realm.RealmResults;
 /**
  * Created by radiationx on 25.08.16.
  */
-public class QmsThemesFragment extends RecyclerFragment implements QmsThemesAdapter.OnItemClickListener<IQmsTheme> {
+public class QmsThemesFragment extends RecyclerFragment implements QmsThemesAdapter.OnItemClickListener<QmsTheme>, QmsThemesView {
     public final static String USER_ID_ARG = "USER_ID_ARG";
     public final static String USER_AVATAR_ARG = "USER_AVATAR_ARG";
     private MenuItem blackListMenuItem;
     private MenuItem noteMenuItem;
-    private String avatarUrl;
-    private QmsThemes currentThemes = new QmsThemes();
     private QmsThemesAdapter adapter;
-    private Realm realm;
-    private DynamicDialogMenu<QmsThemesFragment, IQmsTheme> dialogMenu;
-
+    private DynamicDialogMenu<QmsThemesFragment, QmsTheme> dialogMenu = new DynamicDialogMenu<>();
     private Observer notification = (observable, o) -> {
         if (o == null) return;
         TabNotification event = (TabNotification) o;
-        runInUiThread(() -> handleEvent(event));
+        //runInUiThread(() -> handleEvent(event));
     };
+
+    @InjectPresenter
+    QmsThemesPresenter presenter;
+
+    @ProvidePresenter
+    QmsThemesPresenter providePresenter() {
+        return new QmsThemesPresenter(App.get().Di().getQmsRepository());
+    }
 
     public QmsThemesFragment() {
         //configuration.setUseCache(true);
@@ -66,10 +76,9 @@ public class QmsThemesFragment extends RecyclerFragment implements QmsThemesAdap
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        realm = Realm.getDefaultInstance();
         if (getArguments() != null) {
-            currentThemes.setUserId(getArguments().getInt(USER_ID_ARG));
-            avatarUrl = getArguments().getString(USER_AVATAR_ARG);
+            presenter.setThemesId(getArguments().getInt(USER_ID_ARG));
+            presenter.setAvatarUrl(getArguments().getString(USER_AVATAR_ARG));
         }
     }
 
@@ -85,183 +94,36 @@ public class QmsThemesFragment extends RecyclerFragment implements QmsThemesAdap
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initFabBehavior();
-        tryShowAvatar();
 
         refreshLayout.setOnRefreshListener(this::loadData);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         fab.setImageDrawable(App.getVecDrawable(getContext(), R.drawable.ic_fab_create));
-        fab.setOnClickListener(view1 -> {
-            Bundle args = new Bundle();
-            args.putInt(QmsChatFragment.USER_ID_ARG, currentThemes.getUserId());
-            args.putString(QmsChatFragment.USER_NICK_ARG, currentThemes.getNick());
-            args.putString(QmsChatFragment.USER_AVATAR_ARG, avatarUrl);
-            TabManager.get().add(QmsChatFragment.class, args);
-        });
+        fab.setOnClickListener(view1 -> presenter.openChat());
         fab.setVisibility(View.VISIBLE);
+
+        dialogMenu.addItem(getString(R.string.delete), (context, data) -> presenter.deleteTheme(data.getId()));
+        dialogMenu.addItem(getString(R.string.create_note), (context1, data) -> presenter.createThemeNote(data));
+
         adapter = new QmsThemesAdapter();
         adapter.setOnItemClickListener(this);
         recyclerView.setAdapter(adapter);
-        bindView();
         QmsHelper.get().subscribeQms(notification);
-    }
-
-    private void tryShowAvatar() {
-        if (avatarUrl != null) {
-            ImageLoader.getInstance().displayImage(avatarUrl, toolbarImageView);
-            toolbarImageView.setVisibility(View.VISIBLE);
-            toolbarImageView.setOnClickListener(view1 -> IntentHandler.handle("https://4pda.ru/forum/index.php?showuser=" + currentThemes.getUserId()));
-            toolbarImageView.setContentDescription(App.get().getString(R.string.user_avatar));
-        } else {
-            toolbarImageView.setVisibility(View.GONE);
-        }
-    }
-
-
-    @Override
-    public boolean loadData() {
-        if (!super.loadData()) {
-            return false;
-        }
-        setRefreshing(true);
-
-        refreshToolbarMenuItems(false);
-
-       subscribe(RxApi.Qms().getThemesList(currentThemes.getUserId()), this::onLoadThemes, currentThemes, v -> loadData());
-        return true;
-    }
-
-    private void onLoadThemes(QmsThemes themes) {
-        setRefreshing(false);
-
-        recyclerView.scrollToPosition(0);
-        currentThemes = themes;
-
-        setTabTitle(String.format(getString(R.string.dialogs_Nick), currentThemes.getNick()));
-        setTitle(currentThemes.getNick());
-        if (currentThemes.getThemes().isEmpty() && currentThemes.getNick() != null) {
-            Bundle args = new Bundle();
-            args.putInt(QmsChatFragment.USER_ID_ARG, currentThemes.getUserId());
-            args.putString(QmsChatFragment.USER_NICK_ARG, currentThemes.getNick());
-            args.putString(QmsChatFragment.USER_AVATAR_ARG, avatarUrl);
-            TabManager.get().add(QmsChatFragment.class, args);
-            //new Handler().postDelayed(() -> TabManager.get().remove(getTag()), 500);
-        }
-
-        if (realm.isClosed()) return;
-        realm.executeTransactionAsync(r -> {
-            r.where(QmsThemesBd.class).equalTo("userId", currentThemes.getUserId()).findAll().deleteAllFromRealm();
-            QmsThemesBd qmsThemesBd = new QmsThemesBd(currentThemes);
-            r.copyToRealmOrUpdate(qmsThemesBd);
-            qmsThemesBd.getThemes().clear();
-        }, this::bindView);
-    }
-
-    private void bindView() {
-        if (realm.isClosed()) return;
-        refreshToolbarMenuItems(true);
-        RealmResults<QmsThemesBd> results = realm
-                .where(QmsThemesBd.class)
-                .equalTo("userId", currentThemes.getUserId())
-                .findAll();
-
-        QmsThemesBd qmsThemesBd = results.last(null);
-        if (qmsThemesBd == null) {
-            return;
-        }
-        ArrayList<QmsTheme> currentItems = new ArrayList<>();
-        for (QmsThemeBd qmsThemeBd : qmsThemesBd.getThemes()) {
-            QmsTheme qmsTheme = new QmsTheme(qmsThemeBd);
-            currentItems.add(qmsTheme);
-        }
-        adapter.addAll(currentItems);
-        adapter.notifyDataSetChanged();
-    }
-
-    private void handleEvent(TabNotification event) {
-        if (realm.isClosed()) return;
-        bindView();
-        if(true) return;
-        RealmResults<QmsThemesBd> results = realm
-                .where(QmsThemesBd.class)
-                .equalTo("userId", currentThemes.getUserId())
-                .findAll();
-
-        QmsThemesBd qmsThemesBdLast = results.last(null);
-        if (qmsThemesBdLast == null) {
-            return;
-        }
-        ArrayList<QmsTheme> currentItems = new ArrayList<>();
-        for (QmsThemeBd qmsThemeBd : qmsThemesBdLast.getThemes()) {
-            QmsTheme qmsTheme = new QmsTheme(qmsThemeBd);
-            currentItems.add(qmsTheme);
-        }
-
-        if (event.getType() == NotificationEvent.Type.READ) {
-            for (QmsTheme item : currentItems) {
-                if (item.getId() == event.getEvent().getSourceId()) {
-                    item.setCountNew(0);
-                    break;
-                }
-            }
-        } else {
-            SparseIntArray sparseArray = new SparseIntArray();
-            for (NotificationEvent loadedEvent : event.getLoadedEvents()) {
-                int count = sparseArray.get(loadedEvent.getSourceId());
-                count += loadedEvent.getMsgCount();
-                sparseArray.put(loadedEvent.getSourceId(), count);
-            }
-            for (int i = sparseArray.size() - 1; i >= 0; i--) {
-                int id = sparseArray.keyAt(i);
-                int count = sparseArray.valueAt(i);
-                for (QmsTheme item : currentItems) {
-                    if (item.getId() == id) {
-                        item.setCountMessages(item.getCountMessages() + count);
-                        item.setCountNew(count);
-                        Collections.swap(currentItems, currentItems.indexOf(item), 0);
-                        break;
-                    }
-                }
-            }
-        }
-
-
-        QmsContactsFragment contactsFragment = (QmsContactsFragment) TabManager.get().getByClass(QmsContactsFragment.class);
-        if (contactsFragment != null) {
-            int count = 0;
-            for (QmsTheme qmsTheme : currentItems) {
-                count += qmsTheme.getCountNew();
-            }
-            contactsFragment.updateCount(currentThemes.getUserId(), count);
-        }
-        if (realm.isClosed()) return;
-        realm.executeTransactionAsync(r -> {
-            r.where(QmsThemesBd.class).equalTo("userId", currentThemes.getUserId()).findAll().deleteAllFromRealm();
-            currentThemes.getThemes().clear();
-            currentThemes.getThemes().addAll(currentItems);
-            QmsThemesBd qmsThemesBd = new QmsThemesBd(currentThemes);
-            r.copyToRealmOrUpdate(qmsThemesBd);
-            qmsThemesBd.getThemes().clear();
-        }, this::bindView);
     }
 
     @Override
     protected void addBaseToolbarMenu(Menu menu) {
         super.addBaseToolbarMenu(menu);
-        blackListMenuItem = menu.add(R.string.add_to_blacklist)
+        blackListMenuItem = menu
+                .add(R.string.add_to_blacklist)
                 .setOnMenuItemClickListener(item -> {
-                   subscribe(RxApi.Qms().blockUser(currentThemes.getNick()), qmsContacts -> {
-                        if (!qmsContacts.isEmpty()) {
-                            Toast.makeText(getContext(), R.string.user_added_to_blacklist, Toast.LENGTH_SHORT).show();
-                        }
-                    }, new ArrayList<>());
+                    presenter.blockUser();
                     return false;
                 });
-        noteMenuItem = menu.add(R.string.create_note)
+        noteMenuItem = menu
+                .add(R.string.create_note)
                 .setOnMenuItemClickListener(item -> {
-                    String title = String.format(getString(R.string.dialogs_Nick), currentThemes.getNick());
-                    String url = "https://4pda.ru/forum/index.php?act=qms&mid=" + currentThemes.getUserId();
-                    NotesAddPopup.showAddNoteDialog(getContext(), title, url);
+                    presenter.createNote();
                     return true;
                 });
         refreshToolbarMenuItems(false);
@@ -280,40 +142,71 @@ public class QmsThemesFragment extends RecyclerFragment implements QmsThemesAdap
     }
 
     @Override
+    public void setRefreshing(boolean isRefreshing) {
+        super.setRefreshing(isRefreshing);
+        refreshToolbarMenuItems(!isRefreshing);
+    }
+
+    @Override
+    public void showThemes(@NotNull QmsThemes data) {
+        recyclerView.scrollToPosition(0);
+
+        setTabTitle(String.format(getString(R.string.dialogs_Nick), data.getNick()));
+        setTitle(data.getNick());
+        if (data.getThemes().isEmpty() && data.getNick() != null) {
+            presenter.openChat();
+        }
+
+        adapter.addAll(data.getThemes());
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void showAvatar(@NotNull String avatarUrl) {
+        ImageLoader.getInstance().displayImage(avatarUrl, toolbarImageView);
+        toolbarImageView.setVisibility(View.VISIBLE);
+        toolbarImageView.setOnClickListener(view1 -> presenter.openProfile(presenter.getThemesId()));
+        toolbarImageView.setContentDescription(App.get().getString(R.string.user_avatar));
+    }
+
+    @Override
+    public void showCreateNote(@NotNull String nick, @NotNull String url) {
+        String title = String.format(getString(R.string.dialogs_Nick), nick);
+        NotesAddPopup.showAddNoteDialog(getContext(), title, url);
+    }
+
+    @Override
+    public void showCreateNote(@NotNull String name, @NotNull String nick, @NotNull String url) {
+        String title = String.format(getString(R.string.dialog_Title_Nick), name, nick);
+        NotesAddPopup.showAddNoteDialog(getContext(), title, url);
+    }
+
+    @Override
+    public void onBlockUser(boolean res) {
+        Toast.makeText(getContext(), R.string.user_added_to_blacklist, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showItemDialogMenu(@NotNull QmsTheme item) {
+        dialogMenu.disallowAll();
+        dialogMenu.allowAll();
+        dialogMenu.show(getContext(), QmsThemesFragment.this, item);
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
-        realm.close();
         QmsHelper.get().unSubscribeQms(notification);
     }
 
     @Override
-    public void onItemClick(IQmsTheme item) {
-        Bundle args = new Bundle();
-        args.putString(TabFragment.ARG_TITLE, item.getName());
-        args.putString(TabFragment.TAB_SUBTITLE, getTitle());
-        args.putInt(QmsChatFragment.USER_ID_ARG, currentThemes.getUserId());
-        args.putString(QmsChatFragment.USER_AVATAR_ARG, avatarUrl);
-        args.putInt(QmsChatFragment.THEME_ID_ARG, item.getId());
-        args.putString(QmsChatFragment.THEME_TITLE_ARG, item.getName());
-        TabManager.get().add(QmsChatFragment.class, args);
+    public void onItemClick(QmsTheme item) {
+        presenter.onItemClick(item);
     }
 
     @Override
-    public boolean onItemLongClick(IQmsTheme item) {
-        if (dialogMenu == null) {
-            dialogMenu = new DynamicDialogMenu<>();
-            dialogMenu.addItem(getString(R.string.delete), (context, data) -> {
-                subscribe(RxApi.Qms().deleteTheme(currentThemes.getUserId(), data.getId()), this::onLoadThemes, currentThemes, v -> loadData());
-            });
-            dialogMenu.addItem(getString(R.string.create_note), (context1, data) -> {
-                String title = String.format(getString(R.string.dialog_Title_Nick), data.getName(), currentThemes.getNick());
-                String url = "https://4pda.ru/forum/index.php?act=qms&mid=" + currentThemes.getUserId() + "&t=" + data.getId();
-                NotesAddPopup.showAddNoteDialog(context1.getContext(), title, url);
-            });
-        }
-        dialogMenu.disallowAll();
-        dialogMenu.allowAll();
-        dialogMenu.show(getContext(), QmsThemesFragment.this, item);
+    public boolean onItemLongClick(QmsTheme item) {
+        presenter.onItemLongClick(item);
         return false;
     }
 }

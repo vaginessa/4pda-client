@@ -14,4 +14,5 @@ interface QmsBlackListView : IBaseView {
     fun showContacts(items: List<QmsContact>)
     fun showFoundUsers(items: List<ForumUser>)
     fun clearNickField()
+    fun showItemDialogMenu(item: QmsContact)
 }

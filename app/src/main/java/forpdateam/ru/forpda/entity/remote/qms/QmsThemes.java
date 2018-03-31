@@ -15,6 +15,11 @@ public class QmsThemes implements IQmsThemes {
     public QmsThemes() {
     }
 
+    public QmsThemes(IQmsThemes qmsThemes) {
+        userId = qmsThemes.getUserId();
+        nick = qmsThemes.getNick();
+    }
+
     public List<QmsTheme> getThemes() {
         return themes;
     }
