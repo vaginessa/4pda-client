@@ -2,6 +2,7 @@ package forpdateam.ru.forpda.model.repository.qms
 
 import biz.source_code.miniTemplator.MiniTemplator
 import forpdateam.ru.forpda.App
+import forpdateam.ru.forpda.R
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils
 import forpdateam.ru.forpda.model.data.remote.api.RequestFile
 import forpdateam.ru.forpda.entity.remote.others.user.ForumUser
@@ -12,8 +13,14 @@ import forpdateam.ru.forpda.entity.remote.qms.QmsMessage
 import forpdateam.ru.forpda.entity.remote.qms.QmsThemes
 import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem
 import forpdateam.ru.forpda.apirx.ForumUsersCache
+import forpdateam.ru.forpda.client.ClientHelper
+import forpdateam.ru.forpda.entity.db.qms.QmsContactBd
 import forpdateam.ru.forpda.model.SchedulersProvider
+import forpdateam.ru.forpda.ui.views.ContentController
+import forpdateam.ru.forpda.ui.views.FunnyContent
+import io.reactivex.Completable
 import io.reactivex.Observable
+import io.realm.Realm
 import java.util.ArrayList
 
 /**
@@ -36,15 +43,16 @@ class QmsRepository(
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 
-    fun unBlockUsers(userIds: IntArray): Observable<ArrayList<QmsContact>> = Observable
-            .fromCallable { qmsApi.unBlockUsers(userIds) }
+    fun unBlockUsers(userId: Int): Observable<ArrayList<QmsContact>> = Observable
+            .fromCallable { qmsApi.unBlockUsers(userId) }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 
     //Contacts
-    fun getContactList(): Observable<ArrayList<QmsContact>> = Observable
+    fun getContactList(): Observable<List<QmsContact>> = Observable
             .fromCallable { qmsApi.contactList }
             .map { interceptContacts(it) }
+            .flatMap { saveCache(it) }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 
@@ -166,5 +174,48 @@ class QmsRepository(
 
         return t
     }
+
+
+    /*
+    *
+    * cache
+    *
+    * */
+
+    fun saveCache(items: List<QmsContact>): Observable<List<QmsContact>> = Completable
+            .fromCallable {
+                Realm.getDefaultInstance().use { realm ->
+                    realm.executeTransaction { r ->
+                        r.delete(QmsContactBd::class.java)
+                        val bdList = ArrayList<QmsContactBd>()
+                        for (contact in items) {
+                            bdList.add(QmsContactBd(contact))
+                        }
+                        r.copyToRealmOrUpdate(bdList)
+                        bdList.clear()
+                    }
+                }
+            }
+            .toObservable<List<QmsContact>>()
+            .flatMap { getCache() }
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.ui())
+
+
+    fun getCache(): Observable<List<QmsContact>> = Observable
+            .fromCallable {
+                val currentItems = mutableListOf<QmsContact>()
+                Realm.getDefaultInstance().use { realm ->
+                    val results = realm.where(QmsContactBd::class.java).findAll()
+                    for (qmsContactBd in results) {
+                        val contact = QmsContact(qmsContactBd)
+                        currentItems.add(contact)
+                    }
+                }
+                currentItems as List<QmsContact>
+            }
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.ui())
+
 
 }

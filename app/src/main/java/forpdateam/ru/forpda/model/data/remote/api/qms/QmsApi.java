@@ -38,7 +38,7 @@ public class QmsApi {
     private final static Pattern blackListMsgPattern = Pattern.compile("<div class=\"list-group-item msgbox ([^\"]*?)\"[^>]*?>[^<]*?<a[^>]*?>[^<]*?<\\/a>([\\s\\S]*?)<\\/div>");
 
     private final static Pattern findUserPattern = Pattern.compile("\\[(\\d+),\"([\\s\\S]*?)\",\\d+,\"<span[^>]*?background:url\\(([^\\)]*?)\\)");
-    
+
     private IWebClient webClient = null;
 
     public QmsApi(IWebClient webClient) {
@@ -66,15 +66,12 @@ public class QmsApi {
         return list;
     }
 
-    public ArrayList<QmsContact> unBlockUsers(int[] ids) throws Exception {
+    public ArrayList<QmsContact> unBlockUsers(int id) throws Exception {
         NetworkRequest.Builder builder = new NetworkRequest.Builder()
                 .url("https://4pda.ru/forum/index.php?act=qms&settings=blacklist&xhr=blacklist-form&do=1")
                 .formHeader("action", "delete-users");
-        String strId;
-        for (int id : ids) {
-            strId = Integer.toString(id);
-            builder.formHeader("user-id[".concat(strId).concat("]"), strId);
-        }
+        String strId = Integer.toString(id);
+        builder.formHeader("user-id[" + strId + "]", strId);
         NetworkResponse response = webClient.request(builder.build());
         checkOperation(response.getBody());
         return parseBlackList(response.getBody());

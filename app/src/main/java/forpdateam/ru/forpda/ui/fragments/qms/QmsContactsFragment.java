@@ -14,7 +14,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.arellomobile.mvp.presenter.InjectPresenter;
+import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.nostra13.universalimageloader.core.ImageLoader;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,13 +28,15 @@ import java.util.Observer;
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.entity.remote.events.NotificationEvent;
-import forpdateam.ru.forpda.entity.remote.qms.IQmsContact;
+import forpdateam.ru.forpda.entity.remote.qms.QmsContact;
 import forpdateam.ru.forpda.entity.remote.qms.QmsContact;
 import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.entity.app.TabNotification;
 import forpdateam.ru.forpda.entity.db.qms.QmsContactBd;
+import forpdateam.ru.forpda.presentation.qms.contacts.QmsContactsPresenter;
+import forpdateam.ru.forpda.presentation.qms.contacts.QmsContactsView;
 import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.RecyclerFragment;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
@@ -47,28 +53,28 @@ import io.realm.RealmResults;
 /**
  * Created by radiationx on 25.08.16.
  */
-public class QmsContactsFragment extends RecyclerFragment implements QmsContactsAdapter.OnItemClickListener<IQmsContact> {
+public class QmsContactsFragment extends RecyclerFragment implements QmsContactsAdapter.OnItemClickListener<QmsContact>, QmsContactsView {
     private QmsContactsAdapter adapter;
-    private Realm realm;
-    private RealmResults<QmsContactBd> results;
-    private DynamicDialogMenu<QmsContactsFragment, IQmsContact> dialogMenu;
+    private DynamicDialogMenu<QmsContactsFragment, QmsContact> dialogMenu = new DynamicDialogMenu<>();
 
     private Observer notification = (observable, o) -> {
         if (o == null) return;
         TabNotification event = (TabNotification) o;
-        runInUiThread(() -> handleEvent(event));
+        //runInUiThread(() -> handleEvent(event));
     };
+
+    @InjectPresenter
+    QmsContactsPresenter presenter;
+
+    @ProvidePresenter
+    QmsContactsPresenter providePresenter() {
+        return new QmsContactsPresenter(App.get().Di().getQmsRepository());
+    }
 
     public QmsContactsFragment() {
         configuration.setAlone(true);
         configuration.setMenu(true);
         configuration.setDefaultTitle(App.get().getString(R.string.fragment_title_contacts));
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        realm = Realm.getDefaultInstance();
     }
 
     @Nullable
@@ -94,11 +100,16 @@ public class QmsContactsFragment extends RecyclerFragment implements QmsContacts
         fab.setOnClickListener(view1 -> TabManager.get().add(QmsChatFragment.class));
         fab.setVisibility(View.VISIBLE);
 
+
+        dialogMenu.addItem(getString(R.string.profile), (context, data) -> presenter.openProfile(data));
+        dialogMenu.addItem(getString(R.string.add_to_blacklist), (context, data) -> presenter.blockUser(data.getNick()));
+        dialogMenu.addItem(getString(R.string.delete), (context, data) -> presenter.deleteDialog(data.getId()));
+        dialogMenu.addItem(getString(R.string.create_note), (context1, data) -> presenter.createNote(data));
+
         adapter = new QmsContactsAdapter();
         adapter.setOnItemClickListener(this);
         recyclerView.setAdapter(adapter);
 
-        bindView();
         QmsHelper.get().subscribeQms(notification);
     }
 
@@ -116,8 +127,6 @@ public class QmsContactsFragment extends RecyclerFragment implements QmsContacts
 
         searchView.setIconifiedByDefault(true);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            private ArrayList<QmsContactBd> searchContacts = new ArrayList<>();
-
             @Override
             public boolean onQueryTextSubmit(String query) {
                 return false;
@@ -125,27 +134,17 @@ public class QmsContactsFragment extends RecyclerFragment implements QmsContacts
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                searchContacts.clear();
-                if (!newText.isEmpty()) {
-                    for (QmsContactBd contact : results) {
-                        if (contact.getNick().toLowerCase().contains(newText.toLowerCase()))
-                            searchContacts.add(contact);
-                    }
-                    adapter.addAll(searchContacts);
-                } else {
-                    adapter.addAll(results);
-                }
+                presenter.searchLocal(newText);
                 return false;
             }
         });
         searchView.setQueryHint(getString(R.string.user));
         menu.add(R.string.blacklist)
                 .setOnMenuItemClickListener(item -> {
-                    TabManager.get().add(QmsBlackListFragment.class);
+                    presenter.openBlackList();
                     return false;
                 });
     }
-
 
     @Override
     public boolean onBackPressed() {
@@ -160,54 +159,11 @@ public class QmsContactsFragment extends RecyclerFragment implements QmsContacts
     }
 
     @Override
-    public boolean loadData() {
-        if (!super.loadData()) {
-            return false;
-        }
-        setRefreshing(true);
-        subscribe(RxApi.Qms().getContactList(), this::onLoadContacts, new ArrayList<>(), v -> loadData());
-        return true;
-    }
-
-    private void onLoadContacts(ArrayList<QmsContact> data) {
-        setRefreshing(false);
+    public void showContacts(@NotNull List<? extends QmsContact> items) {
         recyclerView.scrollToPosition(0);
 
-        if (realm.isClosed()) return;
-        realm.executeTransactionAsync(r -> {
-            r.delete(QmsContactBd.class);
-            List<QmsContactBd> bdList = new ArrayList<>();
-            for (QmsContact contact : data) {
-                bdList.add(new QmsContactBd(contact));
-            }
-            r.copyToRealmOrUpdate(bdList);
-            bdList.clear();
-        }, this::bindView);
-    }
-
-    private void bindView() {
-        if (realm.isClosed()) return;
-        results = realm.where(QmsContactBd.class).findAll();
-
-        if (results.isEmpty()) {
-            if (!contentController.contains(ContentController.TAG_NO_DATA)) {
-                FunnyContent funnyContent = new FunnyContent(getContext())
-                        .setImage(R.drawable.ic_contacts)
-                        .setTitle(R.string.funny_contacts_nodata_title);
-                contentController.addContent(funnyContent, ContentController.TAG_NO_DATA);
-            }
-            contentController.showContent(ContentController.TAG_NO_DATA);
-        } else {
-            contentController.hideContent(ContentController.TAG_NO_DATA);
-        }
-
-        ArrayList<QmsContact> currentItems = new ArrayList<>();
-        for (QmsContactBd qmsContactBd : results) {
-            QmsContact contact = new QmsContact(qmsContactBd);
-            currentItems.add(contact);
-        }
         int count = 0;
-        for (QmsContact contact : currentItems) {
+        for (QmsContact contact : items) {
             if (contact.getCount() > 0) {
                 count += contact.getCount();
             }
@@ -216,122 +172,35 @@ public class QmsContactsFragment extends RecyclerFragment implements QmsContacts
         ClientHelper.setQmsCount(count);
         ClientHelper.get().notifyCountsChanged();
 
-        adapter.addAll(currentItems);
+        adapter.addAll(items);
     }
 
-    private void handleEvent(TabNotification event) {
-        bindView();
-        if (true) return;
-        SparseIntArray sparseArray = new SparseIntArray();
-
-        if (realm.isClosed()) return;
-        results = realm.where(QmsContactBd.class).findAll();
-
-        ArrayList<QmsContact> currentItems = new ArrayList<>();
-        for (QmsContactBd qmsContactBd : results) {
-            QmsContact contact = new QmsContact(qmsContactBd);
-            currentItems.add(contact);
+    @Override
+    public void onBlockUser(boolean res) {
+        if (res) {
+            Toast.makeText(getContext(), R.string.user_added_to_blacklist, Toast.LENGTH_SHORT).show();
         }
-
-        for (NotificationEvent loadedEvent : event.getLoadedEvents()) {
-            int count = sparseArray.get(loadedEvent.getUserId());
-            count += loadedEvent.getMsgCount();
-            sparseArray.put(loadedEvent.getUserId(), count);
-        }
-        for (int i = sparseArray.size() - 1; i >= 0; i--) {
-            int id = sparseArray.keyAt(i);
-            int count = sparseArray.valueAt(i);
-            for (QmsContact item : currentItems) {
-                if (item.getId() == id) {
-                    item.setCount(count);
-                    Collections.swap(currentItems, currentItems.indexOf(item), 0);
-                    break;
-                }
-            }
-        }
-
-        if (realm.isClosed()) return;
-        realm.executeTransactionAsync(r -> {
-            r.delete(QmsContactBd.class);
-            List<QmsContactBd> bdList = new ArrayList<>();
-            for (QmsContact qmsContact : currentItems) {
-                bdList.add(new QmsContactBd(qmsContact));
-            }
-            r.copyToRealmOrUpdate(bdList);
-            bdList.clear();
-        }, this::bindView);
-
-        //adapter.notifyDataSetChanged();
-        /*ArrayList<IFavItem> newItems = new ArrayList<>();
-        newItems.addAll(currentItems);
-        refreshList(newItems);*/
     }
 
-    public void updateCount(int id, int count) {
-        /*for (QmsContact item : currentItems) {
-            if (item.getId() == id) {
-                item.setCount(count);
-                break;
-            }
-        }
-        if (realm.isClosed()) return;
-        realm.executeTransactionAsync(r -> {
-            r.delete(QmsContactBd.class);
-            List<QmsContactBd> bdList = new ArrayList<>();
-            for (QmsContact qmsContact : currentItems) {
-                bdList.add(new QmsContactBd(qmsContact));
-            }
-            r.copyToRealmOrUpdate(bdList);
-            bdList.clear();
-        }, this::bindView);*/
-    }
-
-    public void deleteDialog(int mid) {
-        setRefreshing(true);
-        subscribe(RxApi.Qms().deleteDialog(mid), this::onDeletedDialog, "");
-    }
-
-    private void onDeletedDialog(String res) {
-        loadData();
+    @Override
+    public void showCreateNote(@NotNull String nick, @NotNull String url) {
+        String title = String.format(getString(R.string.dialogs_Nick), nick);
+        NotesAddPopup.showAddNoteDialog(getContext(), title, url);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        realm.close();
         QmsHelper.get().unSubscribeQms(notification);
     }
 
     @Override
-    public void onItemClick(IQmsContact item) {
-        Bundle args = new Bundle();
-        args.putString(TabFragment.ARG_TITLE, item.getNick());
-        args.putInt(QmsThemesFragment.USER_ID_ARG, item.getId());
-        args.putString(QmsThemesFragment.USER_AVATAR_ARG, item.getAvatar());
-        TabManager.get().add(QmsThemesFragment.class, args);
+    public void onItemClick(QmsContact item) {
+        presenter.onItemClick(item);
     }
 
     @Override
-    public boolean onItemLongClick(IQmsContact item) {
-        if (dialogMenu == null) {
-            dialogMenu = new DynamicDialogMenu<>();
-            dialogMenu.addItem(getString(R.string.profile), (context, data) -> {
-                IntentHandler.handle("https://4pda.ru/forum/index.php?showuser=" + data.getId());
-            });
-            dialogMenu.addItem(getString(R.string.add_to_blacklist), (context, data) -> {
-                subscribe(RxApi.Qms().blockUser(data.getNick()), qmsContacts -> {
-                    if (!qmsContacts.isEmpty()) {
-                        Toast.makeText(getContext(), R.string.user_added_to_blacklist, Toast.LENGTH_SHORT).show();
-                    }
-                }, new ArrayList<>());
-            });
-            dialogMenu.addItem(getString(R.string.delete), (context, data) -> context.deleteDialog(data.getId()));
-            dialogMenu.addItem(getString(R.string.create_note), (context1, data) -> {
-                String title = String.format(getString(R.string.dialogs_Nick), data.getNick());
-                String url = "https://4pda.ru/forum/index.php?act=qms&mid=" + data.getId();
-                NotesAddPopup.showAddNoteDialog(context1.getContext(), title, url);
-            });
-        }
+    public boolean onItemLongClick(QmsContact item) {
         dialogMenu.disallowAll();
         dialogMenu.allowAll();
         dialogMenu.show(getContext(), QmsContactsFragment.this, item);

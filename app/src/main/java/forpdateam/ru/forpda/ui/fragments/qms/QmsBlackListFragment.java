@@ -12,17 +12,24 @@ import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.ArrayAdapter;
 
+import com.arellomobile.mvp.presenter.InjectPresenter;
+import com.arellomobile.mvp.presenter.ProvidePresenter;
+
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.entity.remote.others.user.ForumUser;
-import forpdateam.ru.forpda.entity.remote.qms.IQmsContact;
+import forpdateam.ru.forpda.entity.remote.qms.QmsContact;
 import forpdateam.ru.forpda.entity.remote.qms.QmsContact;
 import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.common.simple.SimpleTextWatcher;
+import forpdateam.ru.forpda.presentation.qms.blacklist.QmsBlackListPresenter;
+import forpdateam.ru.forpda.presentation.qms.blacklist.QmsBlackListView;
 import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.RecyclerFragment;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
@@ -35,11 +42,18 @@ import forpdateam.ru.forpda.ui.views.FunnyContent;
  * Created by radiationx on 22.03.17.
  */
 
-public class QmsBlackListFragment extends RecyclerFragment implements QmsContactsAdapter.OnItemClickListener<IQmsContact> {
+public class QmsBlackListFragment extends RecyclerFragment implements QmsContactsAdapter.OnItemClickListener<QmsContact>, QmsBlackListView {
     private AppCompatAutoCompleteTextView nickField;
     private QmsContactsAdapter adapter;
-    private DynamicDialogMenu<QmsBlackListFragment, IQmsContact> dialogMenu;
-    private ArrayList<QmsContact> currentData;
+    private DynamicDialogMenu<QmsBlackListFragment, QmsContact> dialogMenu = new DynamicDialogMenu<>();
+
+    @InjectPresenter
+    QmsBlackListPresenter presenter;
+
+    @ProvidePresenter
+    QmsBlackListPresenter providePresenter() {
+        return new QmsBlackListPresenter(App.get().Di().getQmsRepository());
+    }
 
     public QmsBlackListFragment() {
         configuration.setDefaultTitle(App.get().getString(R.string.fragment_title_blacklist));
@@ -62,12 +76,16 @@ public class QmsBlackListFragment extends RecyclerFragment implements QmsContact
         nickField.addTextChangedListener(new SimpleTextWatcher() {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                searchUser(s.toString());
+                presenter.searchUser(s.toString());
             }
         });
 
         refreshLayout.setOnRefreshListener(this::loadData);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        dialogMenu.addItem(getString(R.string.profile), (context, data) -> presenter.openProfile(data));
+        dialogMenu.addItem(getString(R.string.dialogs), (context, data) -> presenter.openDialogs(data));
+        dialogMenu.addItem(getString(R.string.delete), (context, data) -> presenter.unBlockUser(data.getId()));
 
         adapter = new QmsContactsAdapter();
         recyclerView.setAdapter(adapter);
@@ -83,44 +101,16 @@ public class QmsBlackListFragment extends RecyclerFragment implements QmsContact
                     String nick = "";
                     if (nickField.getText() != null)
                         nick = nickField.getText().toString();
-                    blockUser(nick);
+                    presenter.blockUser(nick);
                     return false;
                 })
                 .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
     }
 
-    private void someClick(IQmsContact contact) {
-        if (dialogMenu == null) {
-            dialogMenu = new DynamicDialogMenu<>();
-            dialogMenu.addItem(getString(R.string.profile), (context, data) -> IntentHandler.handle("https://4pda.ru/forum/index.php?showuser=" + data.getId()));
-            dialogMenu.addItem(getString(R.string.dialogs), (context, data) -> {
-                Bundle args = new Bundle();
-                args.putString(TabFragment.ARG_TITLE, data.getNick());
-                args.putInt(QmsThemesFragment.USER_ID_ARG, data.getId());
-                args.putString(QmsThemesFragment.USER_AVATAR_ARG, data.getAvatar());
-                TabManager.get().add(QmsThemesFragment.class, args);
-            });
-            dialogMenu.addItem(getString(R.string.delete), (context, data) -> context.unBlockUser(new int[]{data.getId()}));
-        }
-        dialogMenu.disallowAll();
-        dialogMenu.allowAll();
-        dialogMenu.show(getContext(), QmsBlackListFragment.this, contact);
-    }
-
-
     @Override
-    public boolean loadData() {
-        if (!super.loadData()) {
-            return false;
-        }
-        setRefreshing(true);
-        subscribe(RxApi.Qms().getBlackList(), this::onLoadContacts, new ArrayList<>(), v -> loadData());
-        return true;
-    }
-
-    private void onLoadContacts(ArrayList<QmsContact> data) {
+    public void showContacts(@NotNull List<? extends QmsContact> items) {
         setRefreshing(false);
-        if (data.isEmpty()) {
+        if (items.isEmpty()) {
             if (!contentController.contains(ContentController.TAG_NO_DATA)) {
                 FunnyContent funnyContent = new FunnyContent(getContext())
                         .setImage(R.drawable.ic_contacts)
@@ -133,47 +123,36 @@ public class QmsBlackListFragment extends RecyclerFragment implements QmsContact
             contentController.hideContent(ContentController.TAG_NO_DATA);
         }
         recyclerView.scrollToPosition(0);
-        currentData = data;
-        adapter.addAll(currentData);
+        adapter.addAll(items);
     }
 
-    private void blockUser(String nick) {
-        setRefreshing(true);
-        subscribe(RxApi.Qms().blockUser(nick), this::onEditedList, currentData, null);
-    }
-
-    private void unBlockUser(int[] userIds) {
-        setRefreshing(true);
-        subscribe(RxApi.Qms().unBlockUsers(userIds), this::onEditedList, currentData, null);
-    }
-
-    private void onEditedList(ArrayList<QmsContact> data) {
-        setRefreshing(false);
-        if (currentData == data) return;
-        currentData = data;
-        adapter.addAll(currentData);
+    @Override
+    public void clearNickField() {
         nickField.setText("");
     }
 
-    private void searchUser(String nick) {
-        subscribe(RxApi.Qms().findUser(nick), this::onShowSearchRes, new ArrayList<>());
-    }
-
-    private void onShowSearchRes(List<ForumUser> res) {
+    @Override
+    public void showFoundUsers(@NotNull List<? extends ForumUser> items) {
         List<String> nicks = new ArrayList<>();
-        for (ForumUser user : res) {
+        for (ForumUser user : items) {
             nicks.add(user.getNick());
         }
         nickField.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_dropdown_item_1line, nicks));
     }
 
+    private void someClick(QmsContact contact) {
+        dialogMenu.disallowAll();
+        dialogMenu.allowAll();
+        dialogMenu.show(getContext(), QmsBlackListFragment.this, contact);
+    }
+
     @Override
-    public void onItemClick(IQmsContact item) {
+    public void onItemClick(QmsContact item) {
         someClick(item);
     }
 
     @Override
-    public boolean onItemLongClick(IQmsContact item) {
+    public boolean onItemLongClick(QmsContact item) {
         someClick(item);
         return false;
     }
