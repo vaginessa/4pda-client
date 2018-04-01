@@ -217,7 +217,7 @@ public class AttachmentsPopup {
     }
 
 
-    public void onDeleteFiles(List<AttachmentItem> deletedItems) {
+    public void onDeleteFiles(List<? extends AttachmentItem> deletedItems) {
         //unblock ui
         Log.d(LOG_TAG, "onDeleteFiles " + deletedItems);
         for (AttachmentItem item : deletedItems) {

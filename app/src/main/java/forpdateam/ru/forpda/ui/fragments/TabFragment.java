@@ -106,8 +106,8 @@ public class TabFragment extends MvpAppCompatFragment {
 
     protected Consumer<Boolean> networkObserver = state -> {
         if ((!configuration.isUseCache() || noNetwork.getVisibility() == View.VISIBLE) && state) {
-            if (!alreadyCallLoad)
-                loadData();
+            /*if (!alreadyCallLoad)
+                loadData();*/
             noNetwork.setVisibility(View.GONE);
         }
     };
@@ -254,7 +254,7 @@ public class TabFragment extends MvpAppCompatFragment {
     }
 
     //Загрузка каких-то данных, выполняется только при наличии сети
-    @CallSuper
+    /*@CallSuper
     public boolean loadData() {
         Log.e("SUKA", "loadData " + networkState.getState() + " : " + this);
         if (!networkState.getState()) {
@@ -268,7 +268,7 @@ public class TabFragment extends MvpAppCompatFragment {
     @CallSuper
     public void loadCacheData() {
 
-    }
+    }*/
 
     public CoordinatorLayout getCoordinatorLayout() {
         return coordinatorLayout;
@@ -401,12 +401,12 @@ public class TabFragment extends MvpAppCompatFragment {
 
     private void viewsReady() {
         addBaseToolbarMenu(getMenu());
-        if (networkState.getState() && !configuration.isUseCache()) {
+        /*if (networkState.getState() && !configuration.isUseCache()) {
             if (!alreadyCallLoad)
                 loadData();
         } else {
             loadCacheData();
-        }
+        }*/
     }
 
 

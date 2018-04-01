@@ -149,7 +149,8 @@ public abstract class ThemeFragment extends TabFragment implements ThemeView {
     ThemePresenter provideThemePresenter() {
         return new ThemePresenter(
                 App.get().Di().getThemeRepository(),
-                App.get().Di().getReputationRepository()
+                App.get().Di().getReputationRepository(),
+                App.get().Di().getEditPostRepository()
         );
     }
 
@@ -678,10 +679,10 @@ public abstract class ThemeFragment extends TabFragment implements ThemeView {
 
 
     /*
-    *
-    * EDIT POST FUNCTIONS
-    *
-    * */
+     *
+     * EDIT POST FUNCTIONS
+     *
+     * */
 
     public MessagePanel getMessagePanel() {
         return messagePanel;
@@ -738,22 +739,30 @@ public abstract class ThemeFragment extends TabFragment implements ThemeView {
 
     public void uploadFiles(List<RequestFile> files) {
         List<AttachmentItem> pending = attachmentsPopup.preUploadFiles(files);
-        subscribe(RxApi.EditPost().uploadFiles(0, files, pending), items -> attachmentsPopup.onUploadFiles(items), new ArrayList<>(), null);
+        presenter.uploadFiles(files, pending);
     }
 
     public void removeFiles() {
         attachmentsPopup.preDeleteFiles();
         List<AttachmentItem> selectedFiles = attachmentsPopup.getSelected();
-        subscribe(RxApi.EditPost().deleteFiles(0, selectedFiles), item -> attachmentsPopup.onDeleteFiles(selectedFiles), selectedFiles, null);
+        presenter.deleteFiles(selectedFiles);
     }
 
+    @Override
+    public void onUploadFiles(@NotNull List<? extends AttachmentItem> items) {
+        attachmentsPopup.onUploadFiles(items);
+    }
 
+    @Override
+    public void onDeleteFiles(@NotNull List<? extends AttachmentItem> items) {
+        attachmentsPopup.onDeleteFiles(items);
+    }
 
     /*
-    *
-    * Post functions
-    *
-    * */
+     *
+     * Post functions
+     *
+     * */
 
     @Override
     public void showNoteCreate(@NotNull String title, @NotNull String url) {

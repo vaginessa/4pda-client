@@ -2,6 +2,7 @@ package forpdateam.ru.forpda.presentation.theme
 
 import forpdateam.ru.forpda.common.mvp.IBaseView
 import forpdateam.ru.forpda.entity.remote.IBaseForumPost
+import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem
 import forpdateam.ru.forpda.entity.remote.theme.ThemePage
 
 /**
@@ -9,6 +10,9 @@ import forpdateam.ru.forpda.entity.remote.theme.ThemePage
  */
 
 interface ThemeView : IBaseView {
+    fun onUploadFiles(items: List<AttachmentItem>)
+    fun onDeleteFiles(items: List<AttachmentItem>)
+
     fun findNext(next: Boolean)
     fun findText(text: String)
     fun updateShowAvatarState(isShow: Boolean)

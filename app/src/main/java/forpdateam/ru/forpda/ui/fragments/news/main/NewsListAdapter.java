@@ -1,4 +1,4 @@
-package forpdateam.ru.forpda.ui.fragments.news.main.timeline;
+package forpdateam.ru.forpda.ui.fragments.news.main;
 
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.CardView;
@@ -79,7 +79,7 @@ public class NewsListAdapter extends BaseAdapter<NewsItem, BaseViewHolder> {
         return FULL_LAYOUT;
     }
 
-    public void insertMore(List<NewsItem> list) {
+    public void insertMore(List<? extends NewsItem> list) {
         this.items.addAll(list);
         notifyItemRangeInserted(items.size(), list.size());
         showBtn = true;

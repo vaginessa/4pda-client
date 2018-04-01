@@ -13,7 +13,9 @@ import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem
 import forpdateam.ru.forpda.entity.remote.editpost.EditPostForm
 import forpdateam.ru.forpda.entity.remote.search.SearchSettings
 import forpdateam.ru.forpda.entity.remote.theme.ThemePage
+import forpdateam.ru.forpda.model.data.remote.api.RequestFile
 import forpdateam.ru.forpda.model.data.remote.api.theme.ThemeApi
+import forpdateam.ru.forpda.model.repository.posteditor.PostEditorRepository
 import forpdateam.ru.forpda.model.repository.reputation.ReputationRepository
 import forpdateam.ru.forpda.model.repository.theme.ThemeRepository
 import forpdateam.ru.forpda.ui.TabManager
@@ -32,7 +34,8 @@ import java.util.regex.Pattern
 @InjectViewState
 class ThemePresenter(
         private val themeRepository: ThemeRepository,
-        private val reputationRepository: ReputationRepository
+        private val reputationRepository: ReputationRepository,
+        private val editorRepository: PostEditorRepository
 ) : BasePresenter<ThemeView>(), IThemePresenter {
 
 
@@ -129,6 +132,28 @@ class ThemePresenter(
                     })
                     .addToDisposable()
         }
+    }
+
+    fun uploadFiles(files: List<RequestFile>, pending: List<AttachmentItem>) {
+        editorRepository
+                .uploadFiles(0, files, pending)
+                .subscribe({
+                    viewState.onUploadFiles(it)
+                }, {
+                    this.handleErrorRx(it)
+                })
+                .addToDisposable()
+    }
+
+    fun deleteFiles(items: List<AttachmentItem>) {
+        editorRepository
+                .deleteFiles(0, items)
+                .subscribe({
+                    viewState.onDeleteFiles(it)
+                }, {
+                    this.handleErrorRx(it)
+                })
+                .addToDisposable()
     }
 
     fun loadUrl(url: String) {

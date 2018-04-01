@@ -26,6 +26,7 @@ import forpdateam.ru.forpda.model.repository.forum.ForumRepository
 import forpdateam.ru.forpda.model.repository.history.HistoryRepository
 import forpdateam.ru.forpda.model.repository.mentions.MentionsRepository
 import forpdateam.ru.forpda.model.repository.news.NewsRepository
+import forpdateam.ru.forpda.model.repository.posteditor.PostEditorRepository
 import forpdateam.ru.forpda.model.repository.profile.ProfileRepository
 import forpdateam.ru.forpda.model.repository.qms.QmsRepository
 import forpdateam.ru.forpda.model.repository.reputation.ReputationRepository
@@ -76,4 +77,5 @@ class Dependencies internal constructor(
     val searchRepository = SearchRepository(schedulers, searchApi)
     val newsRepository = NewsRepository(schedulers, newsApi)
     val devDbRepository = DevDbRepository(schedulers, devDbApi)
+    val editPostRepository = PostEditorRepository(schedulers, editPostApi)
 }
