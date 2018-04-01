@@ -21,8 +21,12 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.arellomobile.mvp.presenter.InjectPresenter;
+import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
@@ -32,6 +36,9 @@ import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.common.Utils;
 import forpdateam.ru.forpda.entity.remote.news.DetailsPage;
+import forpdateam.ru.forpda.presentation.articles.detail.ArticleDetailPresenter;
+import forpdateam.ru.forpda.presentation.articles.detail.ArticleDetailView;
+import forpdateam.ru.forpda.presentation.mentions.MentionsPresenter;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import forpdateam.ru.forpda.ui.fragments.notes.NotesAddPopup;
 import forpdateam.ru.forpda.ui.views.ScrimHelper;
@@ -43,7 +50,7 @@ import static forpdateam.ru.forpda.common.Utils.log;
  * Created by isanechek on 8/19/17.
  */
 
-public class NewsDetailsFragment extends TabFragment {
+public class NewsDetailsFragment extends TabFragment implements ArticleDetailView {
 
     public static final String ARG_NEWS_URL = "ARG_NEWS_URL";
     public static final String ARG_NEWS_ID = "ARG_NEWS_ID";
@@ -67,17 +74,15 @@ public class NewsDetailsFragment extends TabFragment {
     private TextView detailsNick;
     private TextView detailsCount;
     private TextView detailsDate;
-    //private Realm realm;
-    //private News news;
-    private String newsUrl;
-    private int newsId;
-    private int commentId;
-    private String newsTitle;
-    private String newsNick;
-    private int newsCount = -1;
-    private String newsDate;
-    private String newsImageUrl;
-    private DetailsPage currentArticle;
+
+
+    @InjectPresenter
+    ArticleDetailPresenter presenter;
+
+    @ProvidePresenter
+    ArticleDetailPresenter provideMentionsPresenter() {
+        return new ArticleDetailPresenter(App.get().Di().getNewsRepository());
+    }
 
     public NewsDetailsFragment() {
         configuration.setDefaultTitle(App.get().getString(R.string.fragment_title_news));
@@ -90,21 +95,15 @@ public class NewsDetailsFragment extends TabFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            newsUrl = getArguments().getString(ARG_NEWS_URL);
-            newsId = getArguments().getInt(ARG_NEWS_ID, 0);
-            commentId = getArguments().getInt(ARG_NEWS_COMMENT_ID, 0);
-            newsTitle = getArguments().getString(ARG_NEWS_TITLE);
-            newsNick = getArguments().getString(ARG_NEWS_AUTHOR_NICK);
-            newsDate = getArguments().getString(ARG_NEWS_DATE);
-            newsImageUrl = getArguments().getString(ARG_NEWS_IMAGE);
-            newsCount = getArguments().getInt(ARG_NEWS_COMMENTS_COUNT, -1);
-
-            Log.d("SUKA", "" + newsId + " : " + newsTitle + " : " + newsNick + " : " + newsDate + " : " + newsImageUrl);
-            //realm = Realm.getDefaultInstance();
-            //news = realm.where(News.class).equalTo("url", newsId).findFirst();
-
-
-        } else log("Arguments null");
+            presenter.setNewsUrl(getArguments().getString(ARG_NEWS_URL));
+            presenter.setNewsId(getArguments().getInt(ARG_NEWS_ID, 0));
+            presenter.setCommentId(getArguments().getInt(ARG_NEWS_COMMENT_ID, 0));
+            /*presenter.setNewsTitle(getArguments().getString(ARG_NEWS_TITLE));
+            presenter.setNewsNick(getArguments().getString(ARG_NEWS_AUTHOR_NICK));
+            presenter.setNewsDate(getArguments().getString(ARG_NEWS_DATE));
+            presenter.setNewsImageUrl(getArguments().getString(ARG_NEWS_IMAGE));
+            presenter.setNewsCount(getArguments().getInt(ARG_NEWS_COMMENTS_COUNT, -1));*/
+        }
         if (getChildFragmentManager().getFragments() != null) {
             FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
             for (Fragment fragment : getChildFragmentManager().getFragments()) {
@@ -114,8 +113,6 @@ public class NewsDetailsFragment extends TabFragment {
             getChildFragmentManager().executePendingTransactions();
         }
     }
-
-    boolean scrim = false;
 
     @Nullable
     @Override
@@ -161,24 +158,36 @@ public class NewsDetailsFragment extends TabFragment {
             }
         });
 
-        //toolbarLayout.requestLayout();
-        if (newsTitle != null) {
-            setTitle(newsTitle);
-            setTabTitle(String.format(getString(R.string.fragment_tab_title_article), newsTitle));
-            detailsTitle.setText(newsTitle);
+
+        if (getArguments() != null) {
+            String newsTitle = getArguments().getString(ARG_NEWS_TITLE);
+            String newsNick = getArguments().getString(ARG_NEWS_AUTHOR_NICK);
+            String newsDate = getArguments().getString(ARG_NEWS_DATE);
+            String newsImageUrl = getArguments().getString(ARG_NEWS_IMAGE);
+            int newsCount = getArguments().getInt(ARG_NEWS_COMMENTS_COUNT, -1);
+            if (newsTitle != null) {
+                setTitle(newsTitle);
+                setTabTitle(String.format(getString(R.string.fragment_tab_title_article), newsTitle));
+                detailsTitle.setText(newsTitle);
+            }
+            if (newsNick != null) {
+                detailsNick.setText(newsNick);
+            }
+            if (newsCount != -1) {
+                detailsCount.setText(Integer.toString(newsCount));
+            }
+            if (newsDate != null) {
+                detailsDate.setText(newsDate);
+            }
+            if (newsImageUrl != null) {
+                showArticleImage(newsImageUrl);
+            }
         }
-        if (newsNick != null) {
-            detailsNick.setText(newsNick);
-        }
-        if (newsCount != -1) {
-            detailsCount.setText(Integer.toString(newsCount));
-        }
-        if (newsDate != null) {
-            detailsDate.setText(newsDate);
-        }
+
         toolbarTitleView.setVisibility(View.GONE);
         toolbar.getNavigationIcon().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
         toolbar.getOverflowIcon().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+        detailsNick.setOnClickListener(v -> presenter.openAuthorProfile());
     }
 
     @Override
@@ -186,19 +195,17 @@ public class NewsDetailsFragment extends TabFragment {
         super.addBaseToolbarMenu(menu);
         menu.add(R.string.copy_link)
                 .setOnMenuItemClickListener(menuItem -> {
-                    Utils.copyToClipBoard("https://4pda.ru/index.php?p=" + newsId);
+                    presenter.copyLink();
                     return false;
                 });
         menu.add(R.string.share)
                 .setOnMenuItemClickListener(menuItem -> {
-                    Utils.shareText("https://4pda.ru/index.php?p=" + newsId);
+                    presenter.shareLink();
                     return false;
                 });
         menu.add(R.string.create_note)
                 .setOnMenuItemClickListener(menuItem -> {
-                    String title = newsTitle;
-                    String url = "https://4pda.ru/index.php?p=" + newsId;
-                    NotesAddPopup.showAddNoteDialog(getContext(), title, url);
+                    presenter.createNote();
                     return false;
                 });
     }
@@ -213,89 +220,53 @@ public class NewsDetailsFragment extends TabFragment {
     }
 
     @Override
-    public boolean loadData() {
-        if (!super.loadData()) {
-            return false;
-        }
-        //webViewContainer.setRefreshing(true);
-        progressBar.setVisibility(View.VISIBLE);
-        loadCoverImage();
-        Observable<DetailsPage> observable = null;
-        if (newsUrl != null) {
-            observable = RxApi.NewsList().getDetails(newsUrl);
-        } else {
-            observable = RxApi.NewsList().getDetails(newsId);
-        }
-        subscribe(observable, this::onLoadArticle, new DetailsPage(), v -> loadData());
-        return true;
+    public void setRefreshing(boolean isRefreshing) {
+        progressBar.setVisibility(isRefreshing ? View.VISIBLE : View.GONE);
     }
 
-    private void onLoadArticle(DetailsPage article) {
-        currentArticle = article;
-        article.setCommentId(commentId);
-        progressBar.setVisibility(View.GONE);
-        newsTitle = article.getTitle();
-        newsNick = article.getAuthor();
-        newsDate = article.getDate();
-        newsId = article.getId();
-        newsCount = article.getCommentsCount();
-        if (newsImageUrl == null) {
-            newsImageUrl = article.getImgUrl();
-            loadCoverImage();
+    @Override
+    public void showArticle(@NotNull DetailsPage data) {
+        setTitle(data.getTitle());
+        setTabTitle(String.format(getString(R.string.fragment_tab_title_article), data.getTitle()));
+        detailsTitle.setText(data.getTitle());
+        detailsNick.setText(data.getAuthor());
+        detailsDate.setText(data.getDate());
+        detailsCount.setText(Integer.toString(data.getCommentsCount()));
+
+        if (data.getImgUrl() != null) {
+            showArticleImage(data.getImgUrl());
         }
 
-        setTitle(newsTitle);
-        setTabTitle(String.format(getString(R.string.fragment_tab_title_article), newsTitle));
-        detailsTitle.setText(newsTitle);
-        detailsNick.setText(newsNick);
-        detailsDate.setText(newsDate);
-        detailsCount.setText(Integer.toString(newsCount));
-
-
-        FragmentPagerAdapter pagerAdapter = new FragmentPagerAdapter(getChildFragmentManager(), article);
+        FragmentPagerAdapter pagerAdapter = new FragmentPagerAdapter(getChildFragmentManager(), data);
         fragmentsPager.setAdapter(pagerAdapter);
-        if (article.getCommentId() != 0) {
+        if (data.getCommentId() != 0) {
             appBarLayout.setExpanded(false, true);
-            /*if (!isTalkBackEnabled()) {
-                appBarLayout.setExpanded(false, true);
-            }*/
             fragmentsPager.setCurrentItem(1, true);
         }
-
-        detailsNick.setOnClickListener(v -> {
-            IntentHandler.handle("https://4pda.ru/forum/index.php?showuser=" + currentArticle.getAuthorId());
-        });
-
     }
 
+    @Override
+    public void showCreateNote(@NotNull String title, @NotNull String url) {
+        NotesAddPopup.showAddNoteDialog(getContext(), title, url);
+    }
 
     public ViewPager getFragmentsPager() {
         return fragmentsPager;
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void showArticleImage(@NotNull String imageUrl) {
+        ImageLoader.getInstance().displayImage(imageUrl, detailsImage, new SimpleImageLoadingListener() {
+            @Override
+            public void onLoadingStarted(String imageUri, View view) {
+                imageProgressBar.setVisibility(View.VISIBLE);
+            }
 
-        /*if (!disposables.isDisposed())
-            disposables.dispose();*/
-        //if (realm != null) realm.close();
-    }
-
-    private void loadCoverImage() {
-        if (newsImageUrl != null) {
-            ImageLoader.getInstance().displayImage(newsImageUrl, detailsImage, new SimpleImageLoadingListener() {
-                @Override
-                public void onLoadingStarted(String imageUri, View view) {
-                    imageProgressBar.setVisibility(View.VISIBLE);
-                }
-
-                @Override
-                public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-                    imageProgressBar.setVisibility(View.GONE);
-                }
-            });
-        }
+            @Override
+            public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                imageProgressBar.setVisibility(View.GONE);
+            }
+        });
     }
 
     private class FragmentPagerAdapter extends android.support.v4.app.FragmentPagerAdapter {
