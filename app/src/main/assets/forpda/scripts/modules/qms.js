@@ -17,7 +17,7 @@ window.addEventListener("scroll", function (e) {
     var date = new Date();
     if (window.pageYOffset == 0 /*|| window.pageYOffset <= 48*/ && (date.getTime() - lastMessRequestTS >= 500)) {
         lastMessRequestTS = date.getTime();
-        IChat.showMoreMess();
+        IChat.loadMoreMessages();
     }
 });
 

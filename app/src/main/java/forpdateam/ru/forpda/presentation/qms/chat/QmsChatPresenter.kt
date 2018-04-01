@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.View
 import com.arellomobile.mvp.InjectViewState
 import com.nostra13.universalimageloader.core.ImageLoader
+import forpdateam.ru.forpda.App
 import forpdateam.ru.forpda.apirx.ForumUsersCache
 import forpdateam.ru.forpda.apirx.RxApi
 import forpdateam.ru.forpda.common.IntentHandler
@@ -19,6 +20,7 @@ import forpdateam.ru.forpda.entity.remote.qms.QmsMessage
 import forpdateam.ru.forpda.entity.remote.qms.QmsTheme
 import forpdateam.ru.forpda.model.data.remote.api.RequestFile
 import forpdateam.ru.forpda.model.repository.qms.QmsRepository
+import forpdateam.ru.forpda.model.repository.temp.TempHelper
 import forpdateam.ru.forpda.ui.TabManager
 import forpdateam.ru.forpda.ui.fragments.TabFragment
 import forpdateam.ru.forpda.ui.fragments.qms.QmsThemesFragment
@@ -35,7 +37,7 @@ import java.util.function.Consumer
 @InjectViewState
 class QmsChatPresenter(
         private val qmsRepository: QmsRepository
-) : BasePresenter<QmsChatView>() {
+) : BasePresenter<QmsChatView>(), IQmsChatPresenter {
 
     var themeId = 0
     var userId = 0
@@ -47,9 +49,8 @@ class QmsChatPresenter(
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
-        avatarUrl?.let {
-            viewState.showAvatar(it)
-        }
+        nick?.let { nick -> title?.let { title -> viewState.setTitles(title, nick) } }
+        tryShowAvatar()
         loadChat()
     }
 
@@ -61,9 +62,7 @@ class QmsChatPresenter(
                 .subscribe({
                     currentData = it
                     viewState.showChat(it)
-                    it.avatarUrl?.let {
-                        viewState.showAvatar(it)
-                    }
+                    tryShowAvatar()
                 }, {
                     it.printStackTrace()
                 })
@@ -79,9 +78,7 @@ class QmsChatPresenter(
                     currentData = it
                     viewState.onNewThemeCreate(it)
                     viewState.showChat(it)
-                    it.avatarUrl?.let {
-                        viewState.showAvatar(it)
-                    }
+                    tryShowAvatar()
                 }, {
                     it.printStackTrace()
                 })
@@ -115,13 +112,23 @@ class QmsChatPresenter(
         }
     }
 
-    fun findAvatar() {
+    private fun tryShowAvatar() {
         Observable
-                .fromCallable { ForumUsersCache.loadUserByNick(nick) }
+                .fromCallable {
+                    var result: String? = null
+                    result = avatarUrl?.let { it } ?: result
+                    result = currentData?.avatarUrl?.let { it } ?: result
+                    if (result == null) {
+                        currentData?.nick?.let {
+                            result = ForumUsersCache.loadUserByNick(it).avatar
+                        }
+                    }
+                    result
+                }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    it.avatar?.let { viewState.showAvatar(it) }
+                    it?.let { viewState.showAvatar(it) }
                 }, { })
                 .addToDisposable()
     }
@@ -141,18 +148,25 @@ class QmsChatPresenter(
     fun handleEvent(event: TabNotification) {
         val themeId = event.event.sourceId
         val messageId = event.event.messageId
-        if (themeId == currentData.getThemeId()) {
-            when (event.type) {
-                NotificationEvent.Type.NEW -> {
-                    Log.d(LOG_TAG, "NEW QMS MESSAGE $themeId : $messageId")
-                    onNewWsMessage(themeId, messageId)
-                }
-                NotificationEvent.Type.READ -> {
-                    Log.d(LOG_TAG, "THREAD READED")
-                    webView.evalJs("makeAllRead();")
+        currentData?.let {
+            if (themeId == it.themeId) {
+                when (event.type) {
+                    NotificationEvent.Type.NEW -> {
+                        onNewWsMessage(themeId, messageId)
+                    }
+                    NotificationEvent.Type.READ -> {
+                        viewState.makeAllRead()
+                    }
+                    NotificationEvent.Type.MENTION -> {
+                    }
+                    NotificationEvent.Type.HAT_EDITED -> {
+                    }
+                    null -> {
+                    }
                 }
             }
         }
+
     }
 
     private fun onNewWsMessage(themeId: Int, messageId: Int) {
@@ -213,6 +227,23 @@ class QmsChatPresenter(
             args.putInt(QmsThemesFragment.USER_ID_ARG, it.userId)
             args.putString(QmsThemesFragment.USER_AVATAR_ARG, it.avatarUrl)
             TabManager.get().add(QmsThemesFragment::class.java, args)
+        }
+    }
+
+    fun onSendClick() {
+        if (themeId == QmsChatModel.NOT_CREATED) {
+            viewState.temp_sendNewTheme()
+        } else {
+            viewState.temp_sendMessage()
+        }
+    }
+
+    override fun loadMoreMessages() {
+        currentData?.let {
+            val endIndex = it.showedMessIndex
+            val startIndex = Math.max(endIndex - 30, 0)
+            it.showedMessIndex = startIndex
+            viewState.showMoreMessages(it.messages, startIndex, endIndex)
         }
     }
 }

@@ -81,7 +81,7 @@ public class QmsChatFragment extends TabFragment implements ChatThemeCreator.The
     private ProgressBar progressBar;
     private MessagePanel messagePanel;
     private AttachmentsPopup attachmentsPopup;
-
+    private QmsChatJsInterface jsInterface;
 
     private Observer chatPreferenceObserver = (observable, o) -> {
         if (o == null) return;
@@ -148,13 +148,13 @@ public class QmsChatFragment extends TabFragment implements ChatThemeCreator.The
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        jsInterface = new QmsChatJsInterface(presenter);
         webView.setJsLifeCycleListener(this);
-        webView.addJavascriptInterface(this, JS_INTERFACE);
+        webView.addJavascriptInterface(jsInterface, JS_INTERFACE);
         registerForContextMenu(webView);
         webView.setWebViewClient(new CustomWebViewClient());
         webView.setWebChromeClient(new CustomWebChromeClient());
         loadBaseWebContainer();
-
 
         attachmentsPopup.setAddOnClickListener(v -> tryPickFile());
         attachmentsPopup.setDeleteOnClickListener(v -> {
@@ -175,11 +175,7 @@ public class QmsChatFragment extends TabFragment implements ChatThemeCreator.The
                 item.getImageUrl()));
 
         messagePanel.addSendOnClickListener(v -> {
-            if (presenter.getThemeId() == QmsChatModel.NOT_CREATED) {
-                themeCreator.sendNewTheme();
-            } else {
-                sendMessage();
-            }
+            presenter.onSendClick();
         });
 
 
@@ -188,13 +184,6 @@ public class QmsChatFragment extends TabFragment implements ChatThemeCreator.The
         });
         App.get().addPreferenceChangeObserver(chatPreferenceObserver);
 
-        if (presenter.getNick() != null) {
-            setSubtitle(presenter.getNick());
-        }
-        if (presenter.getTitle() != null) {
-            setTitle(presenter.getTitle());
-            setTabTitle(String.format(getString(R.string.fragment_tab_title_chat), presenter.getTitle(), presenter.getNick()));
-        }
         if (presenter.getThemeId() == QmsChatModel.NOT_CREATED) {
             themeCreator = new ChatThemeCreator(this);
         }
@@ -271,6 +260,16 @@ public class QmsChatFragment extends TabFragment implements ChatThemeCreator.The
     }
 
     @Override
+    public void temp_sendMessage() {
+        sendMessage();
+    }
+
+    @Override
+    public void temp_sendNewTheme() {
+        themeCreator.sendNewTheme();
+    }
+
+    @Override
     public void showChat(@NotNull QmsChatModel data) {
         App.get().subscribeQms(notification);
         progressBar.setVisibility(View.GONE);
@@ -290,13 +289,14 @@ public class QmsChatFragment extends TabFragment implements ChatThemeCreator.The
         webView.evalJs("showNewMess('".concat(messagesSrc).concat("', true)"));
 
         refreshToolbarMenuItems(true);
-        if (data.getNick() != null) {
-            setSubtitle(data.getNick());
-        }
-        if (data.getTitle() != null) {
-            setTitle(data.getTitle());
-            setTabTitle(String.format(getString(R.string.fragment_tab_title_chat), data.getTitle(), data.getNick()));
-        }
+        setTitles(data.getTitle(), data.getNick());
+    }
+
+    @Override
+    public void setTitles(@NotNull String title, @NotNull String nick) {
+        setSubtitle(nick);
+        setTitle(title);
+        setTabTitle(String.format(getString(R.string.fragment_tab_title_chat), title, nick));
     }
 
     @Override
@@ -376,20 +376,20 @@ public class QmsChatFragment extends TabFragment implements ChatThemeCreator.The
         NotesAddPopup.showAddNoteDialog(getContext(), title, url);
     }
 
-    @JavascriptInterface
-    public void showMoreMess() {
-        if (getContext() == null)
-            return;
+    @Override
+    public void showMoreMessages(@NotNull List<? extends QmsMessage> items, int startIndex, int endIndex) {
         MiniTemplator t = App.get().getTemplate(App.TEMPLATE_QMS_CHAT_MESS);
         App.setTemplateResStrings(t);
-        int endIndex = currentChat.getShowedMessIndex();
-        int startIndex = Math.max(endIndex - 30, 0);
-        currentChat.setShowedMessIndex(startIndex);
-        TempHelper.INSTANCE.generateMess(t, currentChat.getMessages(), startIndex, endIndex);
+        TempHelper.INSTANCE.generateMess(t, items, startIndex, endIndex);
         String messagesSrc = t.generateOutput();
         t.reset();
         messagesSrc = TempHelper.INSTANCE.transformMessageSrc(messagesSrc);
         webView.evalJs("showMoreMess('" + messagesSrc + "')");
+    }
+
+    @Override
+    public void makeAllRead() {
+        webView.evalJs("makeAllRead();");
     }
 
     @Override

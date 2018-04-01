@@ -23,4 +23,9 @@ interface QmsChatView : IBaseView {
     fun showCreateNote(name: String, nick: String, url: String)
     fun onUploadFiles(items: List<AttachmentItem>)
     fun showAvatar(avatarUrl: String)
+    fun showMoreMessages(items: List<QmsMessage>, startIndex: Int, endIndex: Int)
+    fun makeAllRead()
+    fun setTitles(title: String, nick: String)
+    fun temp_sendNewTheme()
+    fun temp_sendMessage()
 }

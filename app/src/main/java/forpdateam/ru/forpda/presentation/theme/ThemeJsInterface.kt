@@ -3,17 +3,14 @@ package forpdateam.ru.forpda.presentation.theme
 import android.os.Handler
 import android.os.Looper
 import android.webkit.JavascriptInterface
+import forpdateam.ru.forpda.ui.fragments.BaseJsInterface
 
 /**
  * Created by radiationx on 17.03.18.
  */
 class ThemeJsInterface(
         private val presenter: IThemePresenter
-) {
-
-    private val handler = Handler(Looper.getMainLooper())
-
-    private fun runInUiThread(runnable: Runnable) = handler.post(runnable)
+) : BaseJsInterface() {
 
     @JavascriptInterface
     fun firstPage() = runInUiThread(Runnable { presenter.onFirstPageClick() })
