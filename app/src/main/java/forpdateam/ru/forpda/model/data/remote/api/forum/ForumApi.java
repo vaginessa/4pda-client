@@ -6,15 +6,15 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import forpdateam.ru.forpda.model.data.remote.IWebClient;
-import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
-import forpdateam.ru.forpda.model.data.remote.api.NetworkRequest;
-import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
-import forpdateam.ru.forpda.entity.remote.forum.IForumItemFlat;
 import forpdateam.ru.forpda.entity.remote.forum.Announce;
 import forpdateam.ru.forpda.entity.remote.forum.ForumItemFlat;
 import forpdateam.ru.forpda.entity.remote.forum.ForumItemTree;
 import forpdateam.ru.forpda.entity.remote.forum.ForumRules;
+import forpdateam.ru.forpda.entity.remote.forum.IForumItemFlat;
+import forpdateam.ru.forpda.model.data.remote.IWebClient;
+import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
+import forpdateam.ru.forpda.model.data.remote.api.NetworkRequest;
+import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
 
 /**
  * Created by radiationx on 15.02.17.

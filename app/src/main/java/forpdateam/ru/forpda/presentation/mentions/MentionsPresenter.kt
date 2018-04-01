@@ -2,10 +2,10 @@ package forpdateam.ru.forpda.presentation.mentions
 
 import android.os.Bundle
 import com.arellomobile.mvp.InjectViewState
-import forpdateam.ru.forpda.entity.remote.mentions.MentionItem
 import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.Utils
 import forpdateam.ru.forpda.common.mvp.BasePresenter
+import forpdateam.ru.forpda.entity.remote.mentions.MentionItem
 import forpdateam.ru.forpda.model.repository.mentions.MentionsRepository
 import forpdateam.ru.forpda.ui.fragments.TabFragment
 import java.util.regex.Pattern

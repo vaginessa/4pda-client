@@ -1,8 +1,8 @@
 package forpdateam.ru.forpda.presentation.reputation
 
+import forpdateam.ru.forpda.common.mvp.IBaseView
 import forpdateam.ru.forpda.entity.remote.reputation.RepData
 import forpdateam.ru.forpda.entity.remote.reputation.RepItem
-import forpdateam.ru.forpda.common.mvp.IBaseView
 
 /**
  * Created by radiationx on 03.01.18.

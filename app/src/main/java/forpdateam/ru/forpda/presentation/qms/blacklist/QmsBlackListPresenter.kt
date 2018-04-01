@@ -2,15 +2,12 @@ package forpdateam.ru.forpda.presentation.qms.blacklist
 
 import android.os.Bundle
 import com.arellomobile.mvp.InjectViewState
-import forpdateam.ru.forpda.R
 import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.remote.qms.QmsContact
 import forpdateam.ru.forpda.model.repository.qms.QmsRepository
 import forpdateam.ru.forpda.ui.TabManager
 import forpdateam.ru.forpda.ui.fragments.TabFragment
-import forpdateam.ru.forpda.ui.fragments.notes.NotesAddPopup
-import forpdateam.ru.forpda.ui.fragments.qms.QmsBlackListFragment
 import forpdateam.ru.forpda.ui.fragments.qms.QmsThemesFragment
 
 /**

@@ -3,13 +3,13 @@ package forpdateam.ru.forpda.ui.fragments.qms;
 import java.util.Observer;
 
 import forpdateam.ru.forpda.App;
-import forpdateam.ru.forpda.entity.remote.events.NotificationEvent;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.simple.SimpleObservable;
 import forpdateam.ru.forpda.entity.app.TabNotification;
 import forpdateam.ru.forpda.entity.db.qms.QmsContactBd;
 import forpdateam.ru.forpda.entity.db.qms.QmsThemeBd;
 import forpdateam.ru.forpda.entity.db.qms.QmsThemesBd;
+import forpdateam.ru.forpda.entity.remote.events.NotificationEvent;
 import io.realm.Realm;
 import io.realm.RealmResults;
 

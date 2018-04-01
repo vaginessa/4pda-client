@@ -4,17 +4,17 @@ import java.net.URLEncoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import forpdateam.ru.forpda.model.data.remote.IWebClient;
-import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
-import forpdateam.ru.forpda.model.data.remote.api.NetworkRequest;
-import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
+import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.entity.remote.others.pagination.Pagination;
 import forpdateam.ru.forpda.entity.remote.theme.Poll;
 import forpdateam.ru.forpda.entity.remote.theme.PollQuestion;
 import forpdateam.ru.forpda.entity.remote.theme.PollQuestionItem;
 import forpdateam.ru.forpda.entity.remote.theme.ThemePage;
 import forpdateam.ru.forpda.entity.remote.theme.ThemePost;
-import forpdateam.ru.forpda.client.ClientHelper;
+import forpdateam.ru.forpda.model.data.remote.IWebClient;
+import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
+import forpdateam.ru.forpda.model.data.remote.api.NetworkRequest;
+import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
 
 /**
  * Created by radiationx on 04.08.16.

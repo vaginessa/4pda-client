@@ -1,11 +1,11 @@
 package forpdateam.ru.forpda.presentation.reputation
 
 import com.arellomobile.mvp.InjectViewState
-import forpdateam.ru.forpda.model.data.remote.api.reputation.ReputationApi
-import forpdateam.ru.forpda.entity.remote.reputation.RepData
-import forpdateam.ru.forpda.entity.remote.reputation.RepItem
 import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.mvp.BasePresenter
+import forpdateam.ru.forpda.entity.remote.reputation.RepData
+import forpdateam.ru.forpda.entity.remote.reputation.RepItem
+import forpdateam.ru.forpda.model.data.remote.api.reputation.ReputationApi
 import forpdateam.ru.forpda.model.repository.reputation.ReputationRepository
 
 /**

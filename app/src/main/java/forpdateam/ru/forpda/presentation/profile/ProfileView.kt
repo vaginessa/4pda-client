@@ -1,7 +1,7 @@
 package forpdateam.ru.forpda.presentation.profile
 
-import forpdateam.ru.forpda.entity.remote.profile.ProfileModel
 import forpdateam.ru.forpda.common.mvp.IBaseView
+import forpdateam.ru.forpda.entity.remote.profile.ProfileModel
 
 /**
  * Created by radiationx on 02.01.18.

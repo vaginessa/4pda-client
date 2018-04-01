@@ -1,8 +1,8 @@
 package forpdateam.ru.forpda.model.repository.mentions
 
-import forpdateam.ru.forpda.model.data.remote.api.mentions.MentionsApi
 import forpdateam.ru.forpda.entity.remote.mentions.MentionsData
 import forpdateam.ru.forpda.model.SchedulersProvider
+import forpdateam.ru.forpda.model.data.remote.api.mentions.MentionsApi
 import io.reactivex.Observable
 
 /**

@@ -1,26 +1,18 @@
 package forpdateam.ru.forpda.model.repository.qms
 
-import android.os.Bundle
-import biz.source_code.miniTemplator.MiniTemplator
-import forpdateam.ru.forpda.App
-import forpdateam.ru.forpda.R
-import forpdateam.ru.forpda.model.data.remote.api.ApiUtils
-import forpdateam.ru.forpda.model.data.remote.api.RequestFile
-import forpdateam.ru.forpda.entity.remote.others.user.ForumUser
-import forpdateam.ru.forpda.model.data.remote.api.qms.QmsApi
-import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem
-import forpdateam.ru.forpda.apirx.ForumUsersCache
 import forpdateam.ru.forpda.entity.db.qms.QmsContactBd
 import forpdateam.ru.forpda.entity.db.qms.QmsThemesBd
+import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem
+import forpdateam.ru.forpda.entity.remote.others.user.ForumUser
 import forpdateam.ru.forpda.entity.remote.qms.*
 import forpdateam.ru.forpda.model.SchedulersProvider
+import forpdateam.ru.forpda.model.data.remote.api.RequestFile
+import forpdateam.ru.forpda.model.data.remote.api.qms.QmsApi
 import forpdateam.ru.forpda.model.repository.temp.TempHelper
-import forpdateam.ru.forpda.ui.TabManager
-import forpdateam.ru.forpda.ui.fragments.qms.chat.QmsChatFragment
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.realm.Realm
-import java.util.ArrayList
+import java.util.*
 
 /**
  * Created by radiationx on 01.01.18.

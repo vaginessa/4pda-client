@@ -1,11 +1,11 @@
 package forpdateam.ru.forpda.model.repository.devdb
 
-import forpdateam.ru.forpda.model.data.remote.api.devdb.DevDbApi
 import forpdateam.ru.forpda.entity.remote.devdb.Brand
 import forpdateam.ru.forpda.entity.remote.devdb.Brands
 import forpdateam.ru.forpda.entity.remote.devdb.Device
 import forpdateam.ru.forpda.entity.remote.devdb.DeviceSearch
 import forpdateam.ru.forpda.model.SchedulersProvider
+import forpdateam.ru.forpda.model.data.remote.api.devdb.DevDbApi
 import io.reactivex.Observable
 
 /**

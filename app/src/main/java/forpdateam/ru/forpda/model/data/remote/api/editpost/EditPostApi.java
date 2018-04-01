@@ -15,15 +15,15 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem;
+import forpdateam.ru.forpda.entity.remote.editpost.EditPoll;
+import forpdateam.ru.forpda.entity.remote.editpost.EditPostForm;
+import forpdateam.ru.forpda.entity.remote.theme.ThemePage;
 import forpdateam.ru.forpda.model.data.remote.IWebClient;
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkRequest;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
 import forpdateam.ru.forpda.model.data.remote.api.RequestFile;
-import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem;
-import forpdateam.ru.forpda.entity.remote.editpost.EditPoll;
-import forpdateam.ru.forpda.entity.remote.editpost.EditPostForm;
-import forpdateam.ru.forpda.entity.remote.theme.ThemePage;
 
 /**
  * Created by radiationx on 10.01.17.

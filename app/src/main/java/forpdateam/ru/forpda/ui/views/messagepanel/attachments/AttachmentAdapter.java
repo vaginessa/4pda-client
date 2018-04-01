@@ -26,8 +26,8 @@ import java.util.List;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.model.data.remote.IWebClient;
 import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem;
+import forpdateam.ru.forpda.model.data.remote.IWebClient;
 
 /**
  * Created by radiationx on 09.01.17.

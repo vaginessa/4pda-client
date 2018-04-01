@@ -1,8 +1,8 @@
 package forpdateam.ru.forpda.presentation.topics
 
+import forpdateam.ru.forpda.common.mvp.IBaseView
 import forpdateam.ru.forpda.entity.remote.topics.TopicItem
 import forpdateam.ru.forpda.entity.remote.topics.TopicsData
-import forpdateam.ru.forpda.common.mvp.IBaseView
 
 /**
  * Created by radiationx on 03.01.18.

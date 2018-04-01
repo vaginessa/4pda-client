@@ -1,13 +1,13 @@
 package forpdateam.ru.forpda.model.repository.forum
 
 import forpdateam.ru.forpda.App
-import forpdateam.ru.forpda.model.data.remote.api.forum.ForumApi
+import forpdateam.ru.forpda.entity.db.forum.ForumItemFlatBd
+import forpdateam.ru.forpda.entity.remote.forum.Announce
 import forpdateam.ru.forpda.entity.remote.forum.ForumItemFlat
 import forpdateam.ru.forpda.entity.remote.forum.ForumItemTree
-import forpdateam.ru.forpda.entity.db.forum.ForumItemFlatBd
-import forpdateam.ru.forpda.model.SchedulersProvider
-import forpdateam.ru.forpda.entity.remote.forum.Announce
 import forpdateam.ru.forpda.entity.remote.forum.ForumRules
+import forpdateam.ru.forpda.model.SchedulersProvider
+import forpdateam.ru.forpda.model.data.remote.api.forum.ForumApi
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.realm.Realm

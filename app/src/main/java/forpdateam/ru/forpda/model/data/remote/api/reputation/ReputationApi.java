@@ -3,13 +3,13 @@ package forpdateam.ru.forpda.model.data.remote.api.reputation;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import forpdateam.ru.forpda.entity.remote.others.pagination.Pagination;
+import forpdateam.ru.forpda.entity.remote.reputation.RepData;
+import forpdateam.ru.forpda.entity.remote.reputation.RepItem;
 import forpdateam.ru.forpda.model.data.remote.IWebClient;
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkRequest;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
-import forpdateam.ru.forpda.entity.remote.others.pagination.Pagination;
-import forpdateam.ru.forpda.entity.remote.reputation.RepData;
-import forpdateam.ru.forpda.entity.remote.reputation.RepItem;
 
 /**
  * Created by radiationx on 20.03.17.

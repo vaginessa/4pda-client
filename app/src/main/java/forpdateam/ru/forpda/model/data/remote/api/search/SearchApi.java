@@ -3,13 +3,13 @@ package forpdateam.ru.forpda.model.data.remote.api.search;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import forpdateam.ru.forpda.model.data.remote.IWebClient;
-import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
-import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
 import forpdateam.ru.forpda.entity.remote.others.pagination.Pagination;
 import forpdateam.ru.forpda.entity.remote.search.SearchItem;
 import forpdateam.ru.forpda.entity.remote.search.SearchResult;
 import forpdateam.ru.forpda.entity.remote.search.SearchSettings;
+import forpdateam.ru.forpda.model.data.remote.IWebClient;
+import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
+import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
 
 /**
  * Created by radiationx on 01.02.17.

@@ -1,8 +1,8 @@
 package forpdateam.ru.forpda.presentation.auth
 
 import com.arellomobile.mvp.InjectViewState
-import forpdateam.ru.forpda.entity.remote.auth.AuthForm
 import forpdateam.ru.forpda.common.mvp.BasePresenter
+import forpdateam.ru.forpda.entity.remote.auth.AuthForm
 import forpdateam.ru.forpda.model.repository.auth.AuthRepository
 import forpdateam.ru.forpda.model.repository.profile.ProfileRepository
 

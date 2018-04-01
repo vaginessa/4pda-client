@@ -1,7 +1,5 @@
 package forpdateam.ru.forpda.entity.remote.qms;
 
-import forpdateam.ru.forpda.entity.remote.qms.IQmsChatItem;
-
 /**
  * Created by radiationx on 03.08.16.
  */

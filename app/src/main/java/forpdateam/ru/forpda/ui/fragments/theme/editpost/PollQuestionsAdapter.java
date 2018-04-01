@@ -20,8 +20,8 @@ import java.util.List;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.entity.remote.editpost.EditPoll;
 import forpdateam.ru.forpda.common.simple.SimpleTextWatcher;
+import forpdateam.ru.forpda.entity.remote.editpost.EditPoll;
 
 /**
  * Created by radiationx on 28.07.17.

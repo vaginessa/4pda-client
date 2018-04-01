@@ -14,9 +14,9 @@ import java.util.List;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.entity.remote.others.user.ForumUser;
 import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.common.simple.SimpleTextWatcher;
+import forpdateam.ru.forpda.entity.remote.others.user.ForumUser;
 
 /**
  * Created by radiationx on 11.06.17.

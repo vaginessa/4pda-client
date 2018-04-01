@@ -1,8 +1,8 @@
 package forpdateam.ru.forpda.model.repository.reputation
 
-import forpdateam.ru.forpda.model.data.remote.api.reputation.ReputationApi
 import forpdateam.ru.forpda.entity.remote.reputation.RepData
 import forpdateam.ru.forpda.model.SchedulersProvider
+import forpdateam.ru.forpda.model.data.remote.api.reputation.ReputationApi
 import io.reactivex.Observable
 
 /**

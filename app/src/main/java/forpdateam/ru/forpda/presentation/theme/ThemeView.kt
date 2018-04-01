@@ -1,8 +1,8 @@
 package forpdateam.ru.forpda.presentation.theme
 
+import forpdateam.ru.forpda.common.mvp.IBaseView
 import forpdateam.ru.forpda.entity.remote.IBaseForumPost
 import forpdateam.ru.forpda.entity.remote.theme.ThemePage
-import forpdateam.ru.forpda.common.mvp.IBaseView
 
 /**
  * Created by radiationx on 15.03.18.

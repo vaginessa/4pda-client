@@ -24,12 +24,12 @@ import java.util.Observer;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.entity.remote.news.Comment;
-import forpdateam.ru.forpda.entity.remote.news.DetailsPage;
 import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.common.simple.SimpleTextWatcher;
+import forpdateam.ru.forpda.entity.remote.news.Comment;
+import forpdateam.ru.forpda.entity.remote.news.DetailsPage;
 import forpdateam.ru.forpda.ui.fragments.devdb.BrandFragment;
 import forpdateam.ru.forpda.ui.views.ContentController;
 import forpdateam.ru.forpda.ui.views.FunnyContent;

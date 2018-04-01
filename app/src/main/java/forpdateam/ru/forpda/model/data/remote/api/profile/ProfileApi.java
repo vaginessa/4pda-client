@@ -3,11 +3,11 @@ package forpdateam.ru.forpda.model.data.remote.api.profile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import forpdateam.ru.forpda.entity.remote.profile.ProfileModel;
 import forpdateam.ru.forpda.model.data.remote.IWebClient;
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkRequest;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
-import forpdateam.ru.forpda.entity.remote.profile.ProfileModel;
 
 /**
  * Created by radiationx on 03.08.16.

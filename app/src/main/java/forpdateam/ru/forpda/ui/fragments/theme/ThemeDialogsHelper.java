@@ -11,12 +11,12 @@ import android.widget.Toast;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.entity.remote.IBaseForumPost;
-import forpdateam.ru.forpda.entity.remote.search.SearchItem;
-import forpdateam.ru.forpda.entity.remote.search.SearchSettings;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.common.Utils;
+import forpdateam.ru.forpda.entity.remote.IBaseForumPost;
+import forpdateam.ru.forpda.entity.remote.search.SearchItem;
+import forpdateam.ru.forpda.entity.remote.search.SearchSettings;
 import forpdateam.ru.forpda.presentation.theme.ThemeView;
 import forpdateam.ru.forpda.ui.fragments.notes.NotesAddPopup;
 import forpdateam.ru.forpda.ui.fragments.search.SearchFragment;

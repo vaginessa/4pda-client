@@ -7,13 +7,13 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import forpdateam.ru.forpda.model.data.remote.IWebClient;
-import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
-import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
 import forpdateam.ru.forpda.entity.remote.devdb.Brand;
 import forpdateam.ru.forpda.entity.remote.devdb.Brands;
 import forpdateam.ru.forpda.entity.remote.devdb.Device;
 import forpdateam.ru.forpda.entity.remote.devdb.DeviceSearch;
+import forpdateam.ru.forpda.model.data.remote.IWebClient;
+import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
+import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
 
 /**
  * Created by radiationx on 06.08.17.

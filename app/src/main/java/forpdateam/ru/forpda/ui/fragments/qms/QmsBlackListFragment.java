@@ -22,17 +22,12 @@ import java.util.List;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
+import forpdateam.ru.forpda.common.simple.SimpleTextWatcher;
 import forpdateam.ru.forpda.entity.remote.others.user.ForumUser;
 import forpdateam.ru.forpda.entity.remote.qms.QmsContact;
-import forpdateam.ru.forpda.entity.remote.qms.QmsContact;
-import forpdateam.ru.forpda.apirx.RxApi;
-import forpdateam.ru.forpda.common.IntentHandler;
-import forpdateam.ru.forpda.common.simple.SimpleTextWatcher;
 import forpdateam.ru.forpda.presentation.qms.blacklist.QmsBlackListPresenter;
 import forpdateam.ru.forpda.presentation.qms.blacklist.QmsBlackListView;
-import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.RecyclerFragment;
-import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import forpdateam.ru.forpda.ui.fragments.qms.adapters.QmsContactsAdapter;
 import forpdateam.ru.forpda.ui.views.ContentController;
 import forpdateam.ru.forpda.ui.views.DynamicDialogMenu;

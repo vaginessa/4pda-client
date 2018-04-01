@@ -12,8 +12,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.entity.remote.editpost.EditPoll;
 import forpdateam.ru.forpda.common.simple.SimpleTextWatcher;
+import forpdateam.ru.forpda.entity.remote.editpost.EditPoll;
 
 /**
  * Created by radiationx on 28.07.17.

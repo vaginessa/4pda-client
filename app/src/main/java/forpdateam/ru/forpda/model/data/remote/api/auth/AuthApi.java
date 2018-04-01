@@ -5,12 +5,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import forpdateam.ru.forpda.App;
-import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
+import forpdateam.ru.forpda.client.ClientHelper;
+import forpdateam.ru.forpda.entity.remote.auth.AuthForm;
 import forpdateam.ru.forpda.model.data.remote.IWebClient;
+import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkRequest;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
-import forpdateam.ru.forpda.entity.remote.auth.AuthForm;
-import forpdateam.ru.forpda.client.ClientHelper;
 
 /**
  * Created by radiationx on 25.03.17.

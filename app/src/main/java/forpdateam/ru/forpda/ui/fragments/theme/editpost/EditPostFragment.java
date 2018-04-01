@@ -17,12 +17,12 @@ import java.util.List;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.model.data.remote.api.RequestFile;
+import forpdateam.ru.forpda.apirx.RxApi;
+import forpdateam.ru.forpda.common.FilePickHelper;
 import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem;
 import forpdateam.ru.forpda.entity.remote.editpost.EditPostForm;
 import forpdateam.ru.forpda.entity.remote.theme.ThemePage;
-import forpdateam.ru.forpda.apirx.RxApi;
-import forpdateam.ru.forpda.common.FilePickHelper;
+import forpdateam.ru.forpda.model.data.remote.api.RequestFile;
 import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import forpdateam.ru.forpda.ui.fragments.theme.ThemeFragment;

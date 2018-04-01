@@ -1,8 +1,8 @@
 package forpdateam.ru.forpda.model.repository.topics
 
-import forpdateam.ru.forpda.model.data.remote.api.topcis.TopicsApi
 import forpdateam.ru.forpda.entity.remote.topics.TopicsData
 import forpdateam.ru.forpda.model.SchedulersProvider
+import forpdateam.ru.forpda.model.data.remote.api.topcis.TopicsApi
 import io.reactivex.Observable
 
 /**

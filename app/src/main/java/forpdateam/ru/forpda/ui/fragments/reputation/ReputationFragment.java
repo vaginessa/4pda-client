@@ -22,12 +22,12 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.entity.remote.others.user.ForumUser;
-import forpdateam.ru.forpda.model.data.remote.api.reputation.ReputationApi;
-import forpdateam.ru.forpda.entity.remote.reputation.RepData;
-import forpdateam.ru.forpda.entity.remote.reputation.RepItem;
 import forpdateam.ru.forpda.apirx.ForumUsersCache;
 import forpdateam.ru.forpda.client.ClientHelper;
+import forpdateam.ru.forpda.entity.remote.others.user.ForumUser;
+import forpdateam.ru.forpda.entity.remote.reputation.RepData;
+import forpdateam.ru.forpda.entity.remote.reputation.RepItem;
+import forpdateam.ru.forpda.model.data.remote.api.reputation.ReputationApi;
 import forpdateam.ru.forpda.presentation.reputation.ReputationPresenter;
 import forpdateam.ru.forpda.presentation.reputation.ReputationView;
 import forpdateam.ru.forpda.ui.fragments.RecyclerFragment;

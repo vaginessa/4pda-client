@@ -3,12 +3,12 @@ package forpdateam.ru.forpda.model.data.remote.api.mentions;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import forpdateam.ru.forpda.model.data.remote.IWebClient;
-import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
-import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
 import forpdateam.ru.forpda.entity.remote.mentions.MentionItem;
 import forpdateam.ru.forpda.entity.remote.mentions.MentionsData;
 import forpdateam.ru.forpda.entity.remote.others.pagination.Pagination;
+import forpdateam.ru.forpda.model.data.remote.IWebClient;
+import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
+import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
 
 /**
  * Created by radiationx on 21.01.17.

@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.SearchView;
-import android.util.SparseIntArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,35 +19,23 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Observer;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.entity.remote.events.NotificationEvent;
-import forpdateam.ru.forpda.entity.remote.qms.QmsContact;
-import forpdateam.ru.forpda.entity.remote.qms.QmsContact;
-import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.client.ClientHelper;
-import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.entity.app.TabNotification;
-import forpdateam.ru.forpda.entity.db.qms.QmsContactBd;
+import forpdateam.ru.forpda.entity.remote.qms.QmsContact;
 import forpdateam.ru.forpda.presentation.qms.contacts.QmsContactsPresenter;
 import forpdateam.ru.forpda.presentation.qms.contacts.QmsContactsView;
 import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.RecyclerFragment;
-import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import forpdateam.ru.forpda.ui.fragments.notes.NotesAddPopup;
 import forpdateam.ru.forpda.ui.fragments.qms.adapters.QmsContactsAdapter;
 import forpdateam.ru.forpda.ui.fragments.qms.chat.QmsChatFragment;
-import forpdateam.ru.forpda.ui.views.ContentController;
 import forpdateam.ru.forpda.ui.views.DynamicDialogMenu;
-import forpdateam.ru.forpda.ui.views.FunnyContent;
 import forpdateam.ru.forpda.ui.views.PauseOnScrollListener;
-import io.realm.Realm;
-import io.realm.RealmResults;
 
 /**
  * Created by radiationx on 25.08.16.

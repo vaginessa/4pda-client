@@ -9,18 +9,18 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import forpdateam.ru.forpda.model.data.remote.IWebClient;
-import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
-import forpdateam.ru.forpda.model.data.remote.api.NetworkRequest;
-import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
-import forpdateam.ru.forpda.model.data.remote.api.RequestFile;
+import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem;
 import forpdateam.ru.forpda.entity.remote.others.user.ForumUser;
 import forpdateam.ru.forpda.entity.remote.qms.QmsChatModel;
 import forpdateam.ru.forpda.entity.remote.qms.QmsContact;
 import forpdateam.ru.forpda.entity.remote.qms.QmsMessage;
 import forpdateam.ru.forpda.entity.remote.qms.QmsTheme;
 import forpdateam.ru.forpda.entity.remote.qms.QmsThemes;
-import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem;
+import forpdateam.ru.forpda.model.data.remote.IWebClient;
+import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
+import forpdateam.ru.forpda.model.data.remote.api.NetworkRequest;
+import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
+import forpdateam.ru.forpda.model.data.remote.api.RequestFile;
 
 
 /**

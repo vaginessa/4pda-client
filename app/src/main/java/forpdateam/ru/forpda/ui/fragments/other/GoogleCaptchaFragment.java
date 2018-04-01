@@ -14,10 +14,10 @@ import android.widget.Toast;
 import java.util.regex.Pattern;
 
 import forpdateam.ru.forpda.App;
-import forpdateam.ru.forpda.model.data.remote.api.NetworkRequest;
-import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
 import forpdateam.ru.forpda.client.Client;
 import forpdateam.ru.forpda.common.webview.CustomWebViewClient;
+import forpdateam.ru.forpda.model.data.remote.api.NetworkRequest;
+import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
 import forpdateam.ru.forpda.ui.activities.MainActivity;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import forpdateam.ru.forpda.ui.views.ExtendedWebView;

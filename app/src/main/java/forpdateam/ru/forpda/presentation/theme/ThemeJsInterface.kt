@@ -1,7 +1,5 @@
 package forpdateam.ru.forpda.presentation.theme
 
-import android.os.Handler
-import android.os.Looper
 import android.webkit.JavascriptInterface
 import forpdateam.ru.forpda.ui.fragments.BaseJsInterface
 

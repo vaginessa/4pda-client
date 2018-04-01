@@ -17,9 +17,9 @@ import com.unnamed.b.atv.view.AndroidTreeView;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.entity.remote.forum.ForumItemTree;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.entity.db.forum.ForumItemFlatBd;
+import forpdateam.ru.forpda.entity.remote.forum.ForumItemTree;
 import forpdateam.ru.forpda.presentation.forum.ForumPresenter;
 import forpdateam.ru.forpda.presentation.forum.ForumView;
 import forpdateam.ru.forpda.ui.TabManager;

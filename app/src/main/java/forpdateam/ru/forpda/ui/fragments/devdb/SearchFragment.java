@@ -18,10 +18,10 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.entity.remote.devdb.Brand;
-import forpdateam.ru.forpda.entity.remote.devdb.DeviceSearch;
 import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.common.Utils;
+import forpdateam.ru.forpda.entity.remote.devdb.Brand;
+import forpdateam.ru.forpda.entity.remote.devdb.DeviceSearch;
 import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import forpdateam.ru.forpda.ui.fragments.devdb.adapters.BrandAdapter;

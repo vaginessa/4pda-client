@@ -7,13 +7,13 @@ import java.util.Comparator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import forpdateam.ru.forpda.entity.remote.favorites.FavData;
+import forpdateam.ru.forpda.entity.remote.favorites.FavItem;
+import forpdateam.ru.forpda.entity.remote.others.pagination.Pagination;
 import forpdateam.ru.forpda.model.data.remote.IWebClient;
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkRequest;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
-import forpdateam.ru.forpda.entity.remote.favorites.FavData;
-import forpdateam.ru.forpda.entity.remote.favorites.FavItem;
-import forpdateam.ru.forpda.entity.remote.others.pagination.Pagination;
 
 /**
  * Created by radiationx on 22.09.16.
