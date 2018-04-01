@@ -188,7 +188,7 @@ public class AttachmentsPopup {
         return loadingItems;
     }
 
-    public void onUploadFiles(List<AttachmentItem> items) {
+    public void onUploadFiles(List<? extends AttachmentItem> items) {
         Log.d(LOG_TAG, "onUploadFiles " + items);
         for (AttachmentItem item : items) {
             Log.d(LOG_TAG, "Loading item " + item);

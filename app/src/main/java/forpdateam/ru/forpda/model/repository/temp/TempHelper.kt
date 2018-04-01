@@ -1,13 +1,19 @@
 package forpdateam.ru.forpda.model.repository.temp
 
+import biz.source_code.miniTemplator.MiniTemplator
 import forpdateam.ru.forpda.App
 import forpdateam.ru.forpda.R
 import forpdateam.ru.forpda.apirx.ForumUsersCache
 import forpdateam.ru.forpda.client.ClientHelper
 import forpdateam.ru.forpda.common.Preferences
 import forpdateam.ru.forpda.entity.remote.others.user.ForumUser
+import forpdateam.ru.forpda.entity.remote.qms.QmsChatModel
+import forpdateam.ru.forpda.entity.remote.qms.QmsContact
+import forpdateam.ru.forpda.entity.remote.qms.QmsMessage
 import forpdateam.ru.forpda.entity.remote.theme.ThemePage
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils
+import org.json.JSONException
+import org.json.JSONObject
 import java.util.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -190,5 +196,84 @@ object TempHelper {
 
     fun getDisableStr(b: Boolean): String {
         return if (b) "disabled" else ""
+    }
+
+
+    /* QMS */
+    fun interceptContacts(contacts: ArrayList<QmsContact>): ArrayList<QmsContact> {
+        val forumUsers = ArrayList<ForumUser>()
+        for (post in contacts) {
+            val forumUser = ForumUser()
+            forumUser.id = post.id
+            forumUser.nick = post.nick
+            forumUser.avatar = post.avatar
+        }
+        ForumUsersCache.saveUsers(forumUsers)
+        return contacts
+    }
+
+    fun transform(chatModel: QmsChatModel, withHtml: Boolean): QmsChatModel {
+        if (withHtml) {
+            val t = App.get().getTemplate(App.TEMPLATE_QMS_CHAT)
+            App.setTemplateResStrings(t)
+            t!!.setVariableOpt("style_type", App.get().cssStyleType)
+            t.setVariableOpt("chat_title", ApiUtils.htmlEncode(chatModel.title))
+            t.setVariableOpt("chatId", chatModel.themeId)
+            t.setVariableOpt("userId", chatModel.userId)
+            t.setVariableOpt("nick", chatModel.nick)
+            t.setVariableOpt("avatarUrl", chatModel.avatarUrl)
+
+            val endIndex = chatModel.messages.size
+            val startIndex = Math.max(endIndex - 30, 0)
+            chatModel.showedMessIndex = startIndex
+            val messTemp = App.get().getTemplate(App.TEMPLATE_QMS_CHAT_MESS)
+            App.setTemplateResStrings(t)
+            generateMess(messTemp, chatModel.messages, startIndex, endIndex)
+            t.setVariableOpt("messages", messTemp!!.generateOutput())
+            messTemp.reset()
+            chatModel.html = t.generateOutput()
+            t.reset()
+        }
+        return chatModel
+    }
+
+    fun generateMess(t: MiniTemplator?, messages: List<QmsMessage>, start: Int, end: Int): MiniTemplator? {
+        for (i in start until end) {
+            val mess = messages[i]
+            generateMess(t, mess)
+        }
+        return t
+    }
+
+     fun generateMess(t: MiniTemplator?, mess: QmsMessage): MiniTemplator {
+        if (mess.isDate) {
+            t!!.setVariableOpt("date", mess.date)
+            t.addBlockOpt("date")
+        } else {
+            t!!.setVariableOpt("from_class", if (mess.isMyMessage) "our" else "his")
+            t.setVariableOpt("unread_class", if (mess.readStatus) "" else "unread")
+            t.setVariableOpt("mess_id", mess.id)
+            t.setVariableOpt("content", mess.content)
+            t.setVariableOpt("time", mess.time)
+            t.addBlockOpt("mess")
+        }
+        t.addBlockOpt("item")
+
+        return t
+    }
+
+    fun transformMessageSrc(messagesSrcIn: String): String {
+        var messagesSrc = messagesSrcIn
+        messagesSrc = messagesSrc.replace("\n".toRegex(), "").replace("'".toRegex(), "&apos;")
+        messagesSrc = JSONObject.quote(messagesSrc)
+        messagesSrc = messagesSrc.substring(1, messagesSrc.length - 1)
+        val jsonObject = JSONObject()
+        try {
+            jsonObject.put("src", messagesSrc)
+        } catch (e: JSONException) {
+            e.printStackTrace()
+        }
+
+        return messagesSrc
     }
 }
