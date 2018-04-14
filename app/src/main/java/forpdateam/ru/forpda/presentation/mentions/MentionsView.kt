@@ -12,4 +12,5 @@ interface MentionsView : IBaseView {
     fun showMentions(data: MentionsData)
     fun showItemDialogMenu(item: MentionItem)
     fun showAddFavoritesDialog(id: Int)
+    fun onAddToFavorite(result: Boolean)
 }

@@ -15,16 +15,19 @@ import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.unnamed.b.atv.model.TreeNode;
 import com.unnamed.b.atv.view.AndroidTreeView;
 
+import org.jetbrains.annotations.NotNull;
+
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.entity.db.forum.ForumItemFlatBd;
 import forpdateam.ru.forpda.entity.remote.forum.ForumItemTree;
+import forpdateam.ru.forpda.model.data.remote.api.favorites.FavoritesApi;
 import forpdateam.ru.forpda.presentation.forum.ForumPresenter;
 import forpdateam.ru.forpda.presentation.forum.ForumView;
 import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
-import forpdateam.ru.forpda.ui.fragments.favorites.FavoritesHelper;
+import forpdateam.ru.forpda.ui.fragments.favorites.FavoritesFragment;
 import forpdateam.ru.forpda.ui.fragments.topics.TopicsFragment;
 import forpdateam.ru.forpda.ui.views.DynamicDialogMenu;
 import io.realm.RealmResults;
@@ -41,7 +44,10 @@ public class ForumFragment extends TabFragment implements ForumView {
 
     @ProvidePresenter
     ForumPresenter provideForumPresenter() {
-        return new ForumPresenter(App.get().Di().getForumRepository());
+        return new ForumPresenter(
+                App.get().Di().getForumRepository(),
+                App.get().Di().getFavoritesRepository()
+        );
     }
 
     private NestedScrollView treeContainer;
@@ -105,18 +111,8 @@ public class ForumFragment extends TabFragment implements ForumView {
         dialogMenu = new DynamicDialogMenu<>();
         dialogMenu.addItem(getString(R.string.open_forum), (context, data) -> presenter.navigateToForum(data));
         dialogMenu.addItem(getString(R.string.copy_link), (context, data) -> presenter.copyLink(data));
-        dialogMenu.addItem(getString(R.string.mark_read), (context, data) -> {
-            new AlertDialog.Builder(getContext())
-                    .setMessage(getString(R.string.mark_read) + "?")
-                    .setPositiveButton(R.string.ok, (dialog, which) -> ForumHelper.markRead(o -> Toast.makeText(getContext(), R.string.action_complete, Toast.LENGTH_SHORT).show(), data.getId()))
-                    .setNegativeButton(R.string.cancel, null)
-                    .show();
-        });
-        dialogMenu.addItem(getString(R.string.add_to_favorites), (context, data) -> {
-            FavoritesHelper.addForumWithDialog(getContext(), aBoolean -> {
-                Toast.makeText(getContext(), aBoolean ? getString(R.string.favorites_added) : getString(R.string.error_occurred), Toast.LENGTH_SHORT).show();
-            }, data.getId());
-        });
+        dialogMenu.addItem(getString(R.string.mark_read), (context, data) -> openMarkReadDialog(data));
+        dialogMenu.addItem(getString(R.string.add_to_favorites), (context, data) -> openAddToFavoriteDialog(data.getId()));
         dialogMenu.addItem(getString(R.string.fragment_title_search), (context, data) -> presenter.navigateToSearch(data));
     }
 
@@ -125,41 +121,18 @@ public class ForumFragment extends TabFragment implements ForumView {
         super.addBaseToolbarMenu(menu);
         menu.add(R.string.forum_refresh)
                 .setOnMenuItemClickListener(item -> {
-                    loadData();
+                    presenter.loadForums();
                     return false;
                 });
         menu.add(R.string.mark_all_read)
                 .setOnMenuItemClickListener(item -> {
-                    new AlertDialog.Builder(getContext())
-                            .setMessage(getString(R.string.mark_all_read) + "?")
-                            .setPositiveButton(R.string.ok, (dialog, which) -> {
-                                ForumHelper.markAllRead(o -> {
-                                    loadData();
-                                });
-                            })
-                            .setNegativeButton(R.string.no, null)
-                            .show();
+                    openMarkAllReadDialog();
                     return false;
                 });
     }
 
     @Override
-    public boolean loadData() {
-        if (!super.loadData()) {
-            return false;
-        }
-        presenter.loadForums();
-        return true;
-    }
-
-    @Override
-    public void loadCacheData() {
-        super.loadCacheData();
-        presenter.getCacheForums();
-    }
-
-    @Override
-    public void showForums(ForumItemTree forumRoot) {
+    public void showForums(@NotNull ForumItemTree forumRoot) {
         tView = new AndroidTreeView(getContext());
         root = TreeNode.root();
         recourse(forumRoot, root);
@@ -176,6 +149,46 @@ public class ForumFragment extends TabFragment implements ForumView {
             scrollToForum(forumId);
             forumId = -1;
         }
+    }
+
+    public void openAddToFavoriteDialog(int forumId) {
+        new AlertDialog.Builder(getContext())
+                .setTitle(R.string.favorites_subscribe_email)
+                .setItems(FavoritesFragment.SUB_NAMES, (dialog1, which1) -> {
+                    presenter.addToFavorite(forumId, FavoritesApi.SUB_TYPES[which1]);
+                })
+                .show();
+    }
+
+    public void openMarkReadDialog(ForumItemTree item) {
+        new AlertDialog.Builder(getContext())
+                .setMessage(getString(R.string.mark_read) + "?")
+                .setPositiveButton(R.string.ok, (dialog, which) -> presenter.markRead(item.getId()))
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    public void openMarkAllReadDialog() {
+        new AlertDialog.Builder(getContext())
+                .setMessage(getString(R.string.mark_all_read) + "?")
+                .setPositiveButton(R.string.ok, (dialog, which) -> presenter.markAllRead())
+                .setNegativeButton(R.string.no, null)
+                .show();
+    }
+
+    @Override
+    public void onMarkRead() {
+        Toast.makeText(getContext(), R.string.action_complete, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onMarkAllRead() {
+        Toast.makeText(getContext(), R.string.action_complete, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onAddToFavorite(boolean result) {
+        Toast.makeText(getContext(), result ? getString(R.string.favorites_added) : getString(R.string.error_occurred), Toast.LENGTH_SHORT).show();
     }
 
     private void scrollToForum(int id) {

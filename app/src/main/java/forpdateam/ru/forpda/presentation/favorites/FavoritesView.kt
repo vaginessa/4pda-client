@@ -17,4 +17,5 @@ interface FavoritesView : IBaseView {
     fun showItemDialogMenu(item: FavItem)
     fun onChangeFav(result: Boolean)
     fun showSubscribeDialog(item: FavItem)
+    fun onMarkAllRead()
 }

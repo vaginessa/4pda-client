@@ -10,6 +10,10 @@ import forpdateam.ru.forpda.entity.remote.theme.ThemePage
  */
 
 interface ThemeView : IBaseView {
+
+    fun onAddToFavorite(result: Boolean)
+    fun onDeleteFromFavorite(result: Boolean)
+
     fun onUploadFiles(items: List<AttachmentItem>)
     fun onDeleteFiles(items: List<AttachmentItem>)
 

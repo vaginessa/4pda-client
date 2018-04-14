@@ -3,6 +3,7 @@ package forpdateam.ru.forpda.ui.fragments.mentions;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,10 +18,11 @@ import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.entity.remote.mentions.MentionItem;
 import forpdateam.ru.forpda.entity.remote.mentions.MentionsData;
+import forpdateam.ru.forpda.model.data.remote.api.favorites.FavoritesApi;
 import forpdateam.ru.forpda.presentation.mentions.MentionsPresenter;
 import forpdateam.ru.forpda.presentation.mentions.MentionsView;
 import forpdateam.ru.forpda.ui.fragments.RecyclerFragment;
-import forpdateam.ru.forpda.ui.fragments.favorites.FavoritesHelper;
+import forpdateam.ru.forpda.ui.fragments.favorites.FavoritesFragment;
 import forpdateam.ru.forpda.ui.views.ContentController;
 import forpdateam.ru.forpda.ui.views.DynamicDialogMenu;
 import forpdateam.ru.forpda.ui.views.FunnyContent;
@@ -38,7 +40,10 @@ public class MentionsFragment extends RecyclerFragment implements MentionsView {
 
     @ProvidePresenter
     MentionsPresenter provideMentionsPresenter() {
-        return new MentionsPresenter(App.get().Di().getMentionsRepository());
+        return new MentionsPresenter(
+                App.get().Di().getMentionsRepository(),
+                App.get().Di().getFavoritesRepository()
+        );
     }
 
     private DynamicDialogMenu<MentionsFragment, MentionItem> dialogMenu;
@@ -73,18 +78,8 @@ public class MentionsFragment extends RecyclerFragment implements MentionsView {
         recyclerView.setAdapter(adapter);
 
         adapter.setOnItemClickListener(adapterListener);
-        refreshLayout.setOnRefreshListener(this::loadData);
+        refreshLayout.setOnRefreshListener(() -> presenter.getMentions());
         paginationHelper.setListener(paginationListener);
-
-    }
-
-    @Override
-    public boolean loadData() {
-        if (!super.loadData()) {
-            return false;
-        }
-        presenter.getMentions(paginationHelper.getCurrentPage());
-        return true;
     }
 
     @Override
@@ -127,9 +122,17 @@ public class MentionsFragment extends RecyclerFragment implements MentionsView {
 
     @Override
     public void showAddFavoritesDialog(int id) {
-        FavoritesHelper.addWithDialog(getContext(), aBoolean -> {
-            Toast.makeText(getContext(), aBoolean ? getString(R.string.favorites_added) : getString(R.string.error_occurred), Toast.LENGTH_SHORT).show();
-        }, id);
+        new AlertDialog.Builder(getContext())
+                .setTitle(R.string.favorites_subscribe_email)
+                .setItems(FavoritesFragment.SUB_NAMES, (dialog1, which1) -> {
+                    presenter.addTopicToFavorite(id, FavoritesApi.SUB_TYPES[which1]);
+                })
+                .show();
+    }
+
+    @Override
+    public void onAddToFavorite(boolean result) {
+        Toast.makeText(getContext(), result ? getString(R.string.favorites_added) : getString(R.string.error_occurred), Toast.LENGTH_SHORT).show();
     }
 
     private PaginationHelper.PaginationListener paginationListener = new PaginationHelper.PaginationListener() {
@@ -140,7 +143,8 @@ public class MentionsFragment extends RecyclerFragment implements MentionsView {
 
         @Override
         public void onSelectedPage(int pageNumber) {
-            loadData();
+            presenter.setCurrentSt(pageNumber);
+            presenter.getMentions();
         }
     };
 

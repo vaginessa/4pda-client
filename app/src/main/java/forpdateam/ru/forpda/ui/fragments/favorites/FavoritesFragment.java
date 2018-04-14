@@ -38,7 +38,6 @@ import forpdateam.ru.forpda.model.data.remote.api.favorites.Sorting;
 import forpdateam.ru.forpda.presentation.favorites.FavoritesPresenter;
 import forpdateam.ru.forpda.presentation.favorites.FavoritesView;
 import forpdateam.ru.forpda.ui.fragments.RecyclerFragment;
-import forpdateam.ru.forpda.ui.fragments.forum.ForumHelper;
 import forpdateam.ru.forpda.ui.views.ContentController;
 import forpdateam.ru.forpda.ui.views.DynamicDialogMenu;
 import forpdateam.ru.forpda.ui.views.FunnyContent;
@@ -64,7 +63,10 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
 
     @ProvidePresenter
     FavoritesPresenter provideFavoritesPresenter() {
-        return new FavoritesPresenter(App.get().Di().getFavoritesRepository());
+        return new FavoritesPresenter(
+                App.get().Di().getFavoritesRepository(),
+                App.get().Di().getForumRepository()
+        );
     }
 
     private DynamicDialogMenu<FavoritesFragment, FavItem> dialogMenu;
@@ -206,15 +208,7 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
         super.addBaseToolbarMenu(menu);
         menu.add(R.string.mark_all_read)
                 .setOnMenuItemClickListener(item -> {
-                    new AlertDialog.Builder(getContext())
-                            .setMessage(App.get().getString(R.string.mark_all_read) + "?")
-                            .setPositiveButton(R.string.ok, (dialog, which) -> {
-                                ForumHelper.markAllRead(o -> {
-                                    presenter.loadFavorites();
-                                });
-                            })
-                            .setNegativeButton(R.string.no, null)
-                            .show();
+                    openMarkAllReadDialog();
                     return false;
                 });
 
@@ -231,6 +225,19 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
                     }
                     return false;
                 });
+    }
+
+    public void openMarkAllReadDialog() {
+        new AlertDialog.Builder(getContext())
+                .setMessage(getString(R.string.mark_all_read) + "?")
+                .setPositiveButton(R.string.ok, (dialog, which) -> presenter.markAllRead())
+                .setNegativeButton(R.string.no, null)
+                .show();
+    }
+
+    @Override
+    public void onMarkAllRead() {
+        Toast.makeText(getContext(), R.string.action_complete, Toast.LENGTH_SHORT).show();
     }
 
     @Override

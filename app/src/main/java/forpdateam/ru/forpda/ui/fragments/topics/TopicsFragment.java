@@ -23,11 +23,11 @@ import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.common.Utils;
 import forpdateam.ru.forpda.entity.remote.topics.TopicItem;
 import forpdateam.ru.forpda.entity.remote.topics.TopicsData;
+import forpdateam.ru.forpda.model.data.remote.api.favorites.FavoritesApi;
 import forpdateam.ru.forpda.presentation.topics.TopicsPresenter;
 import forpdateam.ru.forpda.presentation.topics.TopicsView;
 import forpdateam.ru.forpda.ui.fragments.RecyclerFragment;
-import forpdateam.ru.forpda.ui.fragments.favorites.FavoritesHelper;
-import forpdateam.ru.forpda.ui.fragments.forum.ForumHelper;
+import forpdateam.ru.forpda.ui.fragments.favorites.FavoritesFragment;
 import forpdateam.ru.forpda.ui.views.DynamicDialogMenu;
 import forpdateam.ru.forpda.ui.views.pagination.PaginationHelper;
 
@@ -47,7 +47,11 @@ public class TopicsFragment extends RecyclerFragment implements TopicsView {
 
     @ProvidePresenter
     TopicsPresenter provideReputationPresenter() {
-        return new TopicsPresenter(App.get().Di().getTopicsRepository());
+        return new TopicsPresenter(
+                App.get().Di().getTopicsRepository(),
+                App.get().Di().getForumRepository(),
+                App.get().Di().getFavoritesRepository()
+        );
     }
 
     public TopicsFragment() {
@@ -90,32 +94,19 @@ public class TopicsFragment extends RecyclerFragment implements TopicsView {
         });
         dialogMenu.addItem(getString(R.string.add_to_favorites), ((context, data1) -> {
             if (data1.isForum()) {
-                FavoritesHelper.addForumWithDialog(getContext(), aBoolean -> {
-                    Toast.makeText(getContext(), aBoolean ? getString(R.string.favorites_added) : getString(R.string.error_occurred), Toast.LENGTH_SHORT).show();
-                }, data1.getId());
+                openAddForumToFavoriteDialog(data1.getId());
             } else {
-                FavoritesHelper.addWithDialog(getContext(), aBoolean -> {
-                    Toast.makeText(getContext(), aBoolean ? getString(R.string.favorites_added) : getString(R.string.error_occurred), Toast.LENGTH_SHORT).show();
-                }, data1.getId());
+                openAddTopicToFavoriteDialog(data1.getId());
             }
         }));
 
-        refreshLayout.setOnRefreshListener(this::loadData);
+        refreshLayout.setOnRefreshListener(() -> presenter.loadTopics());
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         adapter = new TopicsAdapter();
         recyclerView.setAdapter(adapter);
         adapter.setOnItemClickListener(adapterListener);
         paginationHelper.setListener(paginationListener);
-    }
-
-    @Override
-    public boolean loadData() {
-        if (!super.loadData()) {
-            return false;
-        }
-        presenter.loadTopics();
-        return true;
     }
 
     @Override
@@ -162,11 +153,7 @@ public class TopicsFragment extends RecyclerFragment implements TopicsView {
             menu
                     .add(R.string.mark_read)
                     .setOnMenuItemClickListener(item -> {
-                        new AlertDialog.Builder(getContext())
-                                .setMessage(getString(R.string.mark_read) + "?")
-                                .setPositiveButton(R.string.ok, (dialog, which) -> ForumHelper.markRead(o -> Toast.makeText(getContext(), R.string.action_complete, Toast.LENGTH_SHORT).show(), presenter.getId()))
-                                .setNegativeButton(R.string.cancel, null)
-                                .show();
+                        openMarkReadDialog();
                         return true;
                     });
         }
@@ -178,6 +165,42 @@ public class TopicsFragment extends RecyclerFragment implements TopicsView {
                     return true;
                 })
                 .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+    }
+
+    public void openAddForumToFavoriteDialog(int forumId) {
+        new AlertDialog.Builder(getContext())
+                .setTitle(R.string.favorites_subscribe_email)
+                .setItems(FavoritesFragment.SUB_NAMES, (dialog1, which1) -> {
+                    presenter.addForumToFavorite(forumId, FavoritesApi.SUB_TYPES[which1]);
+                })
+                .show();
+    }
+
+    public void openAddTopicToFavoriteDialog(int topicId) {
+        new AlertDialog.Builder(getContext())
+                .setTitle(R.string.favorites_subscribe_email)
+                .setItems(FavoritesFragment.SUB_NAMES, (dialog1, which1) -> {
+                    presenter.addTopicToFavorite(topicId, FavoritesApi.SUB_TYPES[which1]);
+                })
+                .show();
+    }
+
+    public void openMarkReadDialog() {
+        new AlertDialog.Builder(getContext())
+                .setMessage(getString(R.string.mark_read) + "?")
+                .setPositiveButton(R.string.ok, (dialog, which) -> presenter.markRead())
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    @Override
+    public void onMarkRead() {
+        Toast.makeText(getContext(), R.string.action_complete, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onAddToFavorite(boolean result) {
+        Toast.makeText(getContext(), result ? getString(R.string.favorites_added) : getString(R.string.error_occurred), Toast.LENGTH_SHORT).show();
     }
 
     @Override

@@ -9,4 +9,7 @@ import forpdateam.ru.forpda.entity.remote.forum.ForumItemTree
 
 interface ForumView : IBaseView {
     fun showForums(forumRoot: ForumItemTree)
+    fun onMarkRead()
+    fun onMarkAllRead()
+    fun onAddToFavorite(result: Boolean)
 }

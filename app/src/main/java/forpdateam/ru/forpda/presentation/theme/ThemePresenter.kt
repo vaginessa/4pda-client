@@ -14,7 +14,9 @@ import forpdateam.ru.forpda.entity.remote.editpost.EditPostForm
 import forpdateam.ru.forpda.entity.remote.search.SearchSettings
 import forpdateam.ru.forpda.entity.remote.theme.ThemePage
 import forpdateam.ru.forpda.model.data.remote.api.RequestFile
+import forpdateam.ru.forpda.model.data.remote.api.favorites.FavoritesApi
 import forpdateam.ru.forpda.model.data.remote.api.theme.ThemeApi
+import forpdateam.ru.forpda.model.repository.faviorites.FavoritesRepository
 import forpdateam.ru.forpda.model.repository.posteditor.PostEditorRepository
 import forpdateam.ru.forpda.model.repository.reputation.ReputationRepository
 import forpdateam.ru.forpda.model.repository.theme.ThemeRepository
@@ -35,7 +37,8 @@ import java.util.regex.Pattern
 class ThemePresenter(
         private val themeRepository: ThemeRepository,
         private val reputationRepository: ReputationRepository,
-        private val editorRepository: PostEditorRepository
+        private val editorRepository: PostEditorRepository,
+        private val favoritesRepository: FavoritesRepository
 ) : BasePresenter<ThemeView>(), IThemePresenter {
 
 
@@ -90,6 +93,32 @@ class ThemePresenter(
         if (loadAction === ActionState.REFRESH) {
             updateHistoryLast(page)
         }
+    }
+
+    fun addTopicToFavorite(topicId: Int, subType: String) {
+        favoritesRepository
+                .editFavorites(FavoritesApi.ACTION_ADD, -1, topicId, subType)
+                .subscribe({
+                    if(it){
+                        currentPage?.isInFavorite = true
+                    }
+                    viewState.onAddToFavorite(it)
+                }, {
+                    it.printStackTrace()
+                })
+    }
+
+    fun deleteTopicFromFavorite(favId: Int) {
+        favoritesRepository
+                .editFavorites(FavoritesApi.ACTION_DELETE, favId, -1, null)
+                .subscribe({
+                    if (it) {
+                        currentPage?.isInFavorite = false
+                    }
+                    viewState.onDeleteFromFavorite(it)
+                }, {
+                    it.printStackTrace()
+                })
     }
 
     private fun createEditPostForm(message: String, attachments: MutableList<AttachmentItem>): EditPostForm? = currentPage?.let {

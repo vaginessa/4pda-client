@@ -40,13 +40,11 @@ import com.arellomobile.mvp.presenter.ProvidePresenter;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Observer;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.FilePickHelper;
 import forpdateam.ru.forpda.common.Preferences;
@@ -57,12 +55,12 @@ import forpdateam.ru.forpda.entity.remote.events.NotificationEvent;
 import forpdateam.ru.forpda.entity.remote.others.pagination.Pagination;
 import forpdateam.ru.forpda.entity.remote.theme.ThemePage;
 import forpdateam.ru.forpda.model.data.remote.api.RequestFile;
+import forpdateam.ru.forpda.model.data.remote.api.favorites.FavoritesApi;
 import forpdateam.ru.forpda.presentation.theme.ThemePresenter;
 import forpdateam.ru.forpda.presentation.theme.ThemeView;
 import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import forpdateam.ru.forpda.ui.fragments.favorites.FavoritesFragment;
-import forpdateam.ru.forpda.ui.fragments.favorites.FavoritesHelper;
 import forpdateam.ru.forpda.ui.fragments.history.HistoryFragment;
 import forpdateam.ru.forpda.ui.fragments.notes.NotesAddPopup;
 import forpdateam.ru.forpda.ui.fragments.topics.TopicsFragment;
@@ -150,7 +148,8 @@ public abstract class ThemeFragment extends TabFragment implements ThemeView {
         return new ThemePresenter(
                 App.get().Di().getThemeRepository(),
                 App.get().Di().getReputationRepository(),
-                App.get().Di().getEditPostRepository()
+                App.get().Di().getEditPostRepository(),
+                App.get().Di().getFavoritesRepository()
         );
     }
 
@@ -658,11 +657,12 @@ public abstract class ThemeFragment extends TabFragment implements ThemeView {
 
     @Override
     public void showAddInFavDialog(@NotNull ThemePage page) {
-        FavoritesHelper.addWithDialog(getContext(), aBoolean -> {
-            Toast.makeText(App.getContext(), aBoolean ? getString(R.string.favorites_added) : getString(R.string.error), Toast.LENGTH_SHORT).show();
-            page.setInFavorite(aBoolean);
-            refreshToolbarMenuItems(true);
-        }, page.getId());
+        new AlertDialog.Builder(getContext())
+                .setTitle(R.string.favorites_subscribe_email)
+                .setItems(FavoritesFragment.SUB_NAMES, (dialog1, which1) -> {
+                    presenter.addTopicToFavorite(page.getId(), FavoritesApi.SUB_TYPES[which1]);
+                })
+                .show();
     }
 
     @Override
@@ -670,11 +670,23 @@ public abstract class ThemeFragment extends TabFragment implements ThemeView {
         if (page.getFavId() == 0) {
             Toast.makeText(App.getContext(), R.string.fav_delete_error_id_not_found, Toast.LENGTH_SHORT).show();
         }
-        FavoritesHelper.deleteWithDialog(getContext(), aBoolean -> {
-            Toast.makeText(App.getContext(), getString(aBoolean ? R.string.favorite_theme_deleted : R.string.error), Toast.LENGTH_SHORT).show();
-            page.setInFavorite(!aBoolean);
-            refreshToolbarMenuItems(true);
-        }, page.getFavId());
+        new AlertDialog.Builder(getContext())
+                .setMessage(R.string.fav_ask_delete)
+                .setPositiveButton(R.string.ok, (dialog, which) -> presenter.deleteTopicFromFavorite(page.getFavId()))
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    @Override
+    public void onAddToFavorite(boolean result) {
+        Toast.makeText(getContext(), result ? getString(R.string.favorites_added) : getString(R.string.error_occurred), Toast.LENGTH_SHORT).show();
+        refreshToolbarMenuItems(true);
+    }
+
+    @Override
+    public void onDeleteFromFavorite(boolean result) {
+        Toast.makeText(App.getContext(), getString(result ? R.string.favorite_theme_deleted : R.string.error), Toast.LENGTH_SHORT).show();
+        refreshToolbarMenuItems(true);
     }
 
 

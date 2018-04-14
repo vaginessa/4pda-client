@@ -6,6 +6,9 @@ import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.remote.topics.TopicItem
 import forpdateam.ru.forpda.entity.remote.topics.TopicsData
+import forpdateam.ru.forpda.model.data.remote.api.favorites.FavoritesApi
+import forpdateam.ru.forpda.model.repository.faviorites.FavoritesRepository
+import forpdateam.ru.forpda.model.repository.forum.ForumRepository
 import forpdateam.ru.forpda.model.repository.topics.TopicsRepository
 import forpdateam.ru.forpda.ui.TabManager
 import forpdateam.ru.forpda.ui.fragments.TabFragment
@@ -18,12 +21,19 @@ import forpdateam.ru.forpda.ui.fragments.search.SearchFragment
 
 @InjectViewState
 class TopicsPresenter(
-        private val topicsRepository: TopicsRepository
+        private val topicsRepository: TopicsRepository,
+        private val forumRepository: ForumRepository,
+        private val favoritesRepository: FavoritesRepository
 ) : BasePresenter<TopicsView>() {
 
     var id = 0
     private var currentSt = 0
     var currentData: TopicsData? = null
+
+    override fun onFirstViewAttach() {
+        super.onFirstViewAttach()
+        loadTopics()
+    }
 
     fun loadTopics() {
         topicsRepository
@@ -41,6 +51,36 @@ class TopicsPresenter(
     fun loadPage(st: Int) {
         currentSt = st
         loadTopics()
+    }
+
+    fun addForumToFavorite(forumId: Int, subType: String) {
+        favoritesRepository
+                .editFavorites(FavoritesApi.ACTION_ADD_FORUM, -1, forumId, subType)
+                .subscribe({
+                    viewState.onAddToFavorite(it)
+                }, {
+                    it.printStackTrace()
+                })
+    }
+
+    fun addTopicToFavorite(topicId: Int, subType: String) {
+        favoritesRepository
+                .editFavorites(FavoritesApi.ACTION_ADD, -1, topicId, subType)
+                .subscribe({
+                    viewState.onAddToFavorite(it)
+                }, {
+                    it.printStackTrace()
+                })
+    }
+
+    fun markRead() {
+        forumRepository
+                .markRead(id)
+                .subscribe({
+                    viewState.onMarkRead()
+                }, {
+                    it.printStackTrace()
+                })
     }
 
     fun openForum() {

@@ -11,4 +11,6 @@ import forpdateam.ru.forpda.entity.remote.topics.TopicsData
 interface TopicsView : IBaseView {
     fun showTopics(data: TopicsData)
     fun showItemDialogMenu(item: TopicItem)
+    fun onMarkRead()
+    fun onAddToFavorite(result: Boolean)
 }

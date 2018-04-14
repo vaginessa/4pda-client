@@ -9,6 +9,7 @@ import forpdateam.ru.forpda.entity.app.TabNotification
 import forpdateam.ru.forpda.entity.remote.favorites.FavItem
 import forpdateam.ru.forpda.model.data.remote.api.favorites.Sorting
 import forpdateam.ru.forpda.model.repository.faviorites.FavoritesRepository
+import forpdateam.ru.forpda.model.repository.forum.ForumRepository
 import forpdateam.ru.forpda.ui.fragments.TabFragment
 
 /**
@@ -17,7 +18,8 @@ import forpdateam.ru.forpda.ui.fragments.TabFragment
 
 @InjectViewState
 class FavoritesPresenter(
-        private val favoritesRepository: FavoritesRepository
+        private val favoritesRepository: FavoritesRepository,
+        private val forumRepository: ForumRepository
 ) : BasePresenter<FavoritesView>() {
 
 
@@ -93,6 +95,15 @@ class FavoritesPresenter(
                 .addToDisposable()
     }
 
+    fun markAllRead() {
+        forumRepository
+                .markAllRead()
+                .subscribe({
+                    viewState.onMarkAllRead()
+                }, {
+                    it.printStackTrace()
+                })
+    }
 
     fun onItemClick(item: FavItem) {
         val args = Bundle()

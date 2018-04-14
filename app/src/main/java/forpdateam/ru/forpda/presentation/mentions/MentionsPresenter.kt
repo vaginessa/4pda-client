@@ -6,6 +6,8 @@ import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.Utils
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.remote.mentions.MentionItem
+import forpdateam.ru.forpda.model.data.remote.api.favorites.FavoritesApi
+import forpdateam.ru.forpda.model.repository.faviorites.FavoritesRepository
 import forpdateam.ru.forpda.model.repository.mentions.MentionsRepository
 import forpdateam.ru.forpda.ui.fragments.TabFragment
 import java.util.regex.Pattern
@@ -16,12 +18,20 @@ import java.util.regex.Pattern
 
 @InjectViewState
 class MentionsPresenter(
-        private val mentionsRepository: MentionsRepository
+        private val mentionsRepository: MentionsRepository,
+        private val favoritesRepository: FavoritesRepository
 ) : BasePresenter<MentionsView>() {
 
-    fun getMentions(st: Int) {
+    var currentSt: Int = 0
+
+    override fun onFirstViewAttach() {
+        super.onFirstViewAttach()
+        getMentions()
+    }
+
+    fun getMentions() {
         mentionsRepository
-                .getMentions(st)
+                .getMentions(currentSt)
                 .doOnTerminate { viewState.setRefreshing(true) }
                 .doAfterTerminate { viewState.setRefreshing(false) }
                 .subscribe({
@@ -30,6 +40,16 @@ class MentionsPresenter(
                     this.handleErrorRx(it)
                 })
                 .addToDisposable()
+    }
+
+    fun addTopicToFavorite(topicId: Int, subType: String) {
+        favoritesRepository
+                .editFavorites(FavoritesApi.ACTION_ADD, -1, topicId, subType)
+                .subscribe({
+                    viewState.onAddToFavorite(it)
+                }, {
+                    it.printStackTrace()
+                })
     }
 
     fun onItemClick(item: MentionItem) {

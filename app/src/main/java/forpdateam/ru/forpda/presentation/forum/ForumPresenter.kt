@@ -5,6 +5,8 @@ import com.arellomobile.mvp.InjectViewState
 import forpdateam.ru.forpda.common.Utils
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.remote.forum.ForumItemTree
+import forpdateam.ru.forpda.model.data.remote.api.favorites.FavoritesApi
+import forpdateam.ru.forpda.model.repository.faviorites.FavoritesRepository
 import forpdateam.ru.forpda.model.repository.forum.ForumRepository
 import forpdateam.ru.forpda.ui.TabManager
 import forpdateam.ru.forpda.ui.fragments.TabFragment
@@ -17,8 +19,15 @@ import forpdateam.ru.forpda.ui.fragments.topics.TopicsFragment
 
 @InjectViewState
 class ForumPresenter(
-        private val forumRepository: ForumRepository
+        private val forumRepository: ForumRepository,
+        private val favoritesRepository: FavoritesRepository
 ) : BasePresenter<ForumView>() {
+
+    override fun onFirstViewAttach() {
+        super.onFirstViewAttach()
+        getCacheForums()
+        loadForums()
+    }
 
     fun loadForums() {
         forumRepository
@@ -62,6 +71,36 @@ class ForumPresenter(
                     this.handleErrorRx(it)
                 })
                 .addToDisposable()
+    }
+
+    fun markRead(id: Int) {
+        forumRepository
+                .markRead(id)
+                .subscribe({
+                    viewState.onMarkRead()
+                }, {
+                    it.printStackTrace()
+                })
+    }
+
+    fun markAllRead() {
+        forumRepository
+                .markAllRead()
+                .subscribe({
+                    viewState.onMarkAllRead()
+                }, {
+                    it.printStackTrace()
+                })
+    }
+
+    fun addToFavorite(forumId: Int, subType: String) {
+        favoritesRepository
+                .editFavorites(FavoritesApi.ACTION_ADD_FORUM, -1, forumId, subType)
+                .subscribe({
+                    viewState.onAddToFavorite(it)
+                }, {
+                    it.printStackTrace()
+                })
     }
 
     fun copyLink(item: ForumItemTree) {

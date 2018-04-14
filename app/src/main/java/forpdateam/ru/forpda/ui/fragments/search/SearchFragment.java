@@ -58,7 +58,6 @@ import forpdateam.ru.forpda.entity.remote.search.SearchSettings;
 import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import forpdateam.ru.forpda.ui.fragments.devdb.brand.DevicesFragment;
-import forpdateam.ru.forpda.ui.fragments.favorites.FavoritesHelper;
 import forpdateam.ru.forpda.ui.fragments.theme.ThemeDialogsHelper;
 import forpdateam.ru.forpda.ui.fragments.theme.ThemeFragmentWeb;
 import forpdateam.ru.forpda.ui.fragments.theme.ThemeHelper;
