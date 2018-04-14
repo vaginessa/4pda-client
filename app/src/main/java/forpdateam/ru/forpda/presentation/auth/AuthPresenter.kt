@@ -16,6 +16,11 @@ class AuthPresenter(
         private val profileRepository: ProfileRepository
 ) : BasePresenter<AuthView>() {
 
+    override fun onFirstViewAttach() {
+        super.onFirstViewAttach()
+        loadForm()
+    }
+
     fun loadForm() {
         authRepository
                 .loadForm()

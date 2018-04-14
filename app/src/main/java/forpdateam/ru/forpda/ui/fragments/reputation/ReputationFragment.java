@@ -195,13 +195,9 @@ public class ReputationFragment extends RecyclerFragment implements ReputationVi
     }
 
     @Override
-    public boolean loadData() {
-        if (!super.loadData()) {
-            return false;
-        }
-        refreshToolbarMenuItems(false);
-        presenter.loadReputation();
-        return true;
+    public void setRefreshing(boolean isRefreshing) {
+        super.setRefreshing(isRefreshing);
+        refreshToolbarMenuItems(!isRefreshing);
     }
 
     private void tryShowAvatar(RepData repData) {

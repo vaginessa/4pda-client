@@ -51,7 +51,10 @@ public class AuthFragment extends TabFragment implements AuthView {
 
     @ProvidePresenter
     AuthPresenter provideAuthPresenter() {
-        return new AuthPresenter(App.get().Di().getAuthRepository(), App.get().Di().getProfileRepository());
+        return new AuthPresenter(
+                App.get().Di().getAuthRepository(),
+                App.get().Di().getProfileRepository()
+        );
     }
 
     private EditText nick, password, captcha;
@@ -126,15 +129,6 @@ public class AuthFragment extends TabFragment implements AuthView {
     }
 
     @Override
-    public boolean loadData() {
-        if (!super.loadData()) {
-            return false;
-        }
-        presenter.loadForm();
-        return true;
-    }
-
-    @Override
     public void showForm(AuthForm authForm) {
         if (authForm.getBody() == null) return;
         this.authForm = authForm;
@@ -167,7 +161,7 @@ public class AuthFragment extends TabFragment implements AuthView {
         if (success) {
             loadProfile();
         } else {
-            loadData();
+            presenter.loadForm();
             captcha.setText("");
             password.setText("");
         }

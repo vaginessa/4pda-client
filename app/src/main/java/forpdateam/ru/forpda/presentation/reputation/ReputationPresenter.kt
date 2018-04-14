@@ -19,6 +19,11 @@ class ReputationPresenter(
 
     var currentData = RepData()
 
+    override fun onFirstViewAttach() {
+        super.onFirstViewAttach()
+        loadReputation()
+    }
+
     fun loadReputation() {
         reputationRepository
                 .loadReputation(currentData)
