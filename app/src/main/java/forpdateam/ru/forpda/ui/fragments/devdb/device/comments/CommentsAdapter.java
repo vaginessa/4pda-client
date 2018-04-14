@@ -12,6 +12,7 @@ import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.entity.remote.devdb.Device;
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
+import forpdateam.ru.forpda.ui.fragments.devdb.DevDbHelper;
 import forpdateam.ru.forpda.ui.views.adapters.BaseAdapter;
 import forpdateam.ru.forpda.ui.views.adapters.BaseViewHolder;
 
@@ -62,7 +63,7 @@ public class CommentsAdapter extends BaseAdapter<Device.Comment, CommentsAdapter
             rating.setText(Integer.toString(item.getRating()));
             like.setText(Integer.toString(item.getLikes()));
             dislike.setText(Integer.toString(item.getDislikes()));
-            rating.getBackground().setColorFilter(RxApi.DevDb().getColorFilter(item.getRating()));
+            rating.getBackground().setColorFilter(DevDbHelper.INSTANCE.getColorFilter(item.getRating()));
         }
 
         private void onTitleClick(View v) {

@@ -18,16 +18,11 @@ import forpdateam.ru.forpda.ui.fragments.devdb.device.SubDeviceFragment;
  */
 
 public class SpecsFragment extends SubDeviceFragment {
-    private RecyclerView recyclerView;
-
-    public SpecsFragment() {
-    }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.device_fragment_specs, container, false);
-        recyclerView = (RecyclerView) view.findViewById(R.id.base_list);
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.base_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         SpecsAdapter adapter = new SpecsAdapter();
         adapter.addAll(device.getSpecs());

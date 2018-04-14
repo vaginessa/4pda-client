@@ -26,10 +26,14 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.arellomobile.mvp.presenter.InjectPresenter;
+import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.robohorse.pagerbullet.PagerBullet;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -40,9 +44,14 @@ import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.common.Utils;
+import forpdateam.ru.forpda.entity.remote.devdb.Brand;
 import forpdateam.ru.forpda.entity.remote.devdb.Device;
+import forpdateam.ru.forpda.presentation.devdb.device.DevicePresenter;
+import forpdateam.ru.forpda.presentation.devdb.device.DeviceView;
+import forpdateam.ru.forpda.presentation.devdb.devices.DevicesView;
 import forpdateam.ru.forpda.ui.activities.imageviewer.ImageViewerActivity;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
+import forpdateam.ru.forpda.ui.fragments.devdb.DevDbHelper;
 import forpdateam.ru.forpda.ui.fragments.devdb.device.comments.CommentsFragment;
 import forpdateam.ru.forpda.ui.fragments.devdb.device.posts.PostsFragment;
 import forpdateam.ru.forpda.ui.fragments.devdb.device.specs.SpecsFragment;
@@ -52,15 +61,13 @@ import forpdateam.ru.forpda.ui.fragments.notes.NotesAddPopup;
  * Created by radiationx on 08.08.17.
  */
 
-public class DeviceFragment extends TabFragment {
+public class DeviceFragment extends TabFragment implements DeviceView {
     public final static String ARG_DEVICE_ID = "DEVICE_ID";
-    private String deviceId = "";
     private PagerBullet imagesPager;
     private TabLayout tabLayout;
     private TextView rating;
     private ViewPager fragmentsPager;
     private ProgressBar progressBar;
-    private Device currentData;
     private RelativeLayout toolbarContent;
     private Observer statusBarSizeObserver = (observable1, o) -> {
         if (toolbarContent != null) {
@@ -72,6 +79,14 @@ public class DeviceFragment extends TabFragment {
 
     private MenuItem copyLinkMenuItem, shareMenuItem, noteMenuItem, toBrandMenuItem, toBrandsMenuItem;
 
+    @InjectPresenter
+    DevicePresenter presenter;
+
+    @ProvidePresenter
+    DevicePresenter providePresenter() {
+        return new DevicePresenter(App.get().Di().getDevDbRepository());
+    }
+
     public DeviceFragment() {
         configuration.setDefaultTitle(App.get().getString(R.string.fragment_title_device));
     }
@@ -80,7 +95,7 @@ public class DeviceFragment extends TabFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            deviceId = getArguments().getString(ARG_DEVICE_ID, deviceId);
+            presenter.setDeviceId(getArguments().getString(ARG_DEVICE_ID, null));
         }
 
         if (getChildFragmentManager().getFragments() != null) {
@@ -93,12 +108,6 @@ public class DeviceFragment extends TabFragment {
         }
 
     }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-    }
-
 
     @Nullable
     @Override
@@ -158,33 +167,31 @@ public class DeviceFragment extends TabFragment {
         super.addBaseToolbarMenu(menu);
         copyLinkMenuItem = menu.add(R.string.copy_link)
                 .setOnMenuItemClickListener(item -> {
-                    Utils.copyToClipBoard("https://4pda.ru/devdb/" + currentData.getId());
+                    presenter.copyLink();
                     return true;
                 });
 
         shareMenuItem = menu.add(R.string.share)
                 .setOnMenuItemClickListener(item -> {
-                    Utils.shareText("https://4pda.ru/devdb/" + currentData.getId());
+                    presenter.shareLink();
                     return true;
                 });
 
         noteMenuItem = menu.add(R.string.create_note)
                 .setOnMenuItemClickListener(item -> {
-                    String title = "DevDb: " + currentData.getBrandTitle() + " " + currentData.getTitle();
-                    String url = "https://4pda.ru/devdb/" + currentData.getId();
-                    NotesAddPopup.showAddNoteDialog(getContext(), title, url);
+                    presenter.createNote();
                     return true;
                 });
 
         toBrandMenuItem = menu.add(R.string.devices)
                 .setOnMenuItemClickListener(item -> {
-                    IntentHandler.handle("https://4pda.ru/devdb/" + currentData.getCatId() + "/" + currentData.getBrandId());
+                    presenter.openDevices();
                     return true;
                 });
 
         toBrandsMenuItem = menu.add(R.string.devices)
                 .setOnMenuItemClickListener(item -> {
-                    IntentHandler.handle("https://4pda.ru/devdb/" + currentData.getCatId());
+                    presenter.openBrands();
                     return true;
                 });
 
@@ -210,45 +217,34 @@ public class DeviceFragment extends TabFragment {
     }
 
     @Override
-    public boolean loadData() {
-        if (!super.loadData()) {
-            return false;
-        }
-        refreshToolbarMenuItems(false);
-        progressBar.setVisibility(View.VISIBLE);
-        subscribe(RxApi.DevDb().getDevice(deviceId), this::onLoad, new Device());
-        return true;
-    }
-
-    private void onLoad(Device device) {
-        currentData = device;
+    public void showData(@NotNull Device data) {
         progressBar.setVisibility(View.GONE);
-        toBrandMenuItem.setTitle(currentData.getCatTitle() + " " + currentData.getBrandTitle());
-        toBrandsMenuItem.setTitle(currentData.getCatTitle());
+        toBrandMenuItem.setTitle(data.getCatTitle() + " " + data.getBrandTitle());
+        toBrandsMenuItem.setTitle(data.getCatTitle());
         refreshToolbarMenuItems(true);
-        setTitle(currentData.getTitle());
-        setTabTitle(currentData.getCatTitle() + " " + currentData.getBrandTitle() + ": " + currentData.getTitle());
-        setSubtitle(currentData.getCatTitle() + " " + currentData.getBrandTitle());
+        setTitle(data.getTitle());
+        setTabTitle(data.getCatTitle() + " " + data.getBrandTitle() + ": " + data.getTitle());
+        setSubtitle(data.getCatTitle() + " " + data.getBrandTitle());
 
 
         ArrayList<String> urls = new ArrayList<>();
         ArrayList<String> fullUrls = new ArrayList<>();
-        for (Pair<String, String> pair : currentData.getImages()) {
+        for (Pair<String, String> pair : data.getImages()) {
             urls.add(pair.first);
             fullUrls.add(pair.second);
         }
         ImagesAdapter imagesAdapter = new ImagesAdapter(getContext(), urls, fullUrls);
         imagesPager.setAdapter(imagesAdapter);
 
-        FragmentPagerAdapter pagerAdapter = new FragmentPagerAdapter(getChildFragmentManager(), currentData);
+        FragmentPagerAdapter pagerAdapter = new FragmentPagerAdapter(getChildFragmentManager(), data);
         fragmentsPager.setAdapter(pagerAdapter);
 
-        if (device.getRating() > 0) {
-            rating.setText(Integer.toString(device.getRating()));
+        if (data.getRating() > 0) {
+            rating.setText(Integer.toString(data.getRating()));
             rating.setBackground(App.getDrawableAttr(rating.getContext(), R.attr.count_background));
-            rating.getBackground().setColorFilter(RxApi.DevDb().getColorFilter(device.getRating()));
+            rating.getBackground().setColorFilter(DevDbHelper.INSTANCE.getColorFilter(data.getRating()));
             rating.setVisibility(View.VISIBLE);
-            if (!device.getComments().isEmpty()) {
+            if (!data.getComments().isEmpty()) {
                 rating.setClickable(true);
                 rating.setOnClickListener(v -> fragmentsPager.setCurrentItem(1, true));
             }
@@ -256,6 +252,11 @@ public class DeviceFragment extends TabFragment {
         } else {
             rating.setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public void showCreateNote(@NotNull String title, @NotNull String url) {
+        NotesAddPopup.showAddNoteDialog(getContext(), title, url);
     }
 
     @Override

@@ -31,10 +31,6 @@ public class DevDbApi {
         this.webClient = webClient;
     }
 
-    public int getRatingCode(int rating) {
-        return Math.max(Math.round(rating / 2.0f), 1);
-    }
-
     public Brands getBrands(String catId) throws Exception {
         Brands data = new Brands();
         NetworkResponse response = webClient.get("https://4pda.ru/devdb/" + catId + "/all");

@@ -26,7 +26,6 @@ public class PostsFragment extends SubDeviceFragment {
     public final static int SRC_NEWS = 3;
 
     private int source = 0;
-    private RecyclerView recyclerView;
 
     public SubDeviceFragment setSource(int source) {
         this.source = source;
@@ -38,7 +37,7 @@ public class PostsFragment extends SubDeviceFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.device_fragment_specs, container, false);
         //view.setBackgroundColor(App.getColorFromAttr(getContext(), R.attr.background_for_lists));
-        recyclerView = (RecyclerView) view.findViewById(R.id.base_list);
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.base_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         PostsAdapter adapter = new PostsAdapter();
         adapter.setSource(source);

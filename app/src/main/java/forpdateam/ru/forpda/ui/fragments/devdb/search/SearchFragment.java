@@ -1,4 +1,4 @@
-package forpdateam.ru.forpda.ui.fragments.devdb;
+package forpdateam.ru.forpda.ui.fragments.devdb.search;
 
 import android.app.SearchManager;
 import android.content.Context;
@@ -14,7 +14,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import com.arellomobile.mvp.presenter.InjectPresenter;
+import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.nostra13.universalimageloader.core.ImageLoader;
+
+import org.jetbrains.annotations.NotNull;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
@@ -22,6 +26,9 @@ import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.common.Utils;
 import forpdateam.ru.forpda.entity.remote.devdb.Brand;
 import forpdateam.ru.forpda.entity.remote.devdb.DeviceSearch;
+import forpdateam.ru.forpda.presentation.devdb.devices.DevicesPresenter;
+import forpdateam.ru.forpda.presentation.devdb.search.SearchDevicesPresenter;
+import forpdateam.ru.forpda.presentation.devdb.search.SearchDevicesView;
 import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import forpdateam.ru.forpda.ui.fragments.devdb.brand.DevicesAdapter;
@@ -36,14 +43,21 @@ import forpdateam.ru.forpda.ui.views.messagepanel.AutoFitRecyclerView;
  * Created by radiationx on 09.11.17.
  */
 
-public class SearchFragment extends TabFragment implements DevicesAdapter.OnItemClickListener<DeviceSearch.DeviceItem> {
+public class SearchFragment extends TabFragment implements SearchDevicesView, DevicesAdapter.OnItemClickListener<DeviceSearch.DeviceItem> {
     private DevicesAdapter adapter;
     private SwipeRefreshLayout refreshLayout;
     private AutoFitRecyclerView recyclerView;
     private SearchView searchView;
     private MenuItem searchMenuItem;
-    private String currentQuery = "";
-    private DynamicDialogMenu<SearchFragment, DeviceSearch.DeviceItem> dialogMenu;
+    private DynamicDialogMenu<SearchFragment, DeviceSearch.DeviceItem> dialogMenu = new DynamicDialogMenu<>();
+
+    @InjectPresenter
+    SearchDevicesPresenter presenter;
+
+    @ProvidePresenter
+    SearchDevicesPresenter providePresenter() {
+        return new SearchDevicesPresenter(App.get().Di().getDevDbRepository());
+    }
 
     public SearchFragment() {
         configuration.setDefaultTitle("Поиск устройств");
@@ -65,7 +79,7 @@ public class SearchFragment extends TabFragment implements DevicesAdapter.OnItem
         super.onViewCreated(view, savedInstanceState);
         setCardsBackground();
         refreshLayoutStyle(refreshLayout);
-        refreshLayout.setOnRefreshListener(this::loadData);
+        refreshLayout.setOnRefreshListener(() -> presenter.refresh());
 
         PauseOnScrollListener pauseOnScrollListener = new PauseOnScrollListener(ImageLoader.getInstance(), true, true);
         recyclerView.addOnScrollListener(pauseOnScrollListener);
@@ -89,7 +103,7 @@ public class SearchFragment extends TabFragment implements DevicesAdapter.OnItem
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                startSearch(query);
+                presenter.search(query);
                 return false;
             }
 
@@ -109,6 +123,10 @@ public class SearchFragment extends TabFragment implements DevicesAdapter.OnItem
         searchSrcText.setPadding(0, searchSrcText.getPaddingTop(), 0, searchSrcText.getPaddingBottom());
 
         searchMenuItem.expandActionView();
+
+        dialogMenu.addItem(getString(R.string.copy_link), (context, data) -> presenter.copyLink(data));
+        dialogMenu.addItem(getString(R.string.share), (context, data) -> presenter.shareLink(data));
+        dialogMenu.addItem(getString(R.string.create_note), (context1, data) -> presenter.createNote(data));
     }
 
 
@@ -121,56 +139,28 @@ public class SearchFragment extends TabFragment implements DevicesAdapter.OnItem
         searchView.setIconifiedByDefault(true);
     }
 
-    private void startSearch(String query) {
-        this.currentQuery = query;
-        loadData();
+    @Override
+    public void showData(@NotNull Brand data, @NotNull String query) {
+        setTitle("Поиск " + query);
+        adapter.addAll(data.getDevices());
     }
 
     @Override
-    public boolean loadData() {
-        if (currentQuery != null && currentQuery.isEmpty()) {
-            return false;
-        }
-        if (!super.loadData()) {
-            return false;
-        }
-        setRefreshing(true);
-        subscribe(RxApi.DevDb().search(currentQuery), this::onLoad, new Brand());
-        return true;
-    }
-
-    private void onLoad(Brand brand) {
-        setRefreshing(false);
-        adapter.addAll(brand.getDevices());
-        setTitle("Поиск " + currentQuery);
+    public void showCreateNote(@NotNull String title, @NotNull String url) {
+        NotesAddPopup.showAddNoteDialog(getContext(), title, url);
     }
 
     @Override
     public void onItemClick(DeviceSearch.DeviceItem item) {
-        Bundle args = new Bundle();
-        args.putString(DeviceFragment.ARG_DEVICE_ID, item.getId());
-        TabManager.get().add(DeviceFragment.class, args);
+        presenter.openDevice(item);
     }
 
     @Override
     public boolean onItemLongClick(DeviceSearch.DeviceItem item) {
-        if (dialogMenu == null) {
-            dialogMenu = new DynamicDialogMenu<>();
-            dialogMenu.addItem(getString(R.string.copy_link), (context, data) -> {
-                Utils.copyToClipBoard("https://4pda.ru/devdb/" + data.getId());
-            });
-            dialogMenu.addItem(getString(R.string.share), (context, data) -> {
-                Utils.shareText("https://4pda.ru/devdb/" + data.getId());
-            });
-            dialogMenu.addItem(getString(R.string.create_note), (context1, data) -> {
-                String title = "DevDb: " + currentQuery;
-                String url = "https://4pda.ru/devdb/" + data.getId();
-                NotesAddPopup.showAddNoteDialog(context1.getContext(), title, url);
-            });
-        }
         dialogMenu.disallowAll();
         dialogMenu.allowAll();
         dialogMenu.show(getContext(), SearchFragment.this, item);
         return false;
     }
+
 }

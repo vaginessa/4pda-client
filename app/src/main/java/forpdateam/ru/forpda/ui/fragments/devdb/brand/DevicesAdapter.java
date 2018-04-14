@@ -15,6 +15,7 @@ import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.entity.remote.devdb.Brand;
+import forpdateam.ru.forpda.ui.fragments.devdb.DevDbHelper;
 import forpdateam.ru.forpda.ui.views.adapters.BaseAdapter;
 import forpdateam.ru.forpda.ui.views.adapters.BaseViewHolder;
 
@@ -63,7 +64,7 @@ public class DevicesAdapter extends BaseAdapter<Brand.DeviceItem, DevicesAdapter
             title.setText(item.getTitle());
             if (item.getRating() > 0) {
                 rating.setText(Integer.toString(item.getRating()));
-                rating.getBackground().setColorFilter(RxApi.DevDb().getColorFilter(item.getRating()));
+                rating.getBackground().setColorFilter(DevDbHelper.INSTANCE.getColorFilter(item.getRating()));
                 rating.setVisibility(View.VISIBLE);
             } else {
                 rating.setVisibility(View.GONE);
