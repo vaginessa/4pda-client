@@ -12,17 +12,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.arellomobile.mvp.presenter.InjectPresenter;
+import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.nostra13.universalimageloader.core.ImageLoader;
+
+import org.jetbrains.annotations.NotNull;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.apirx.RxApi;
-import forpdateam.ru.forpda.common.Utils;
 import forpdateam.ru.forpda.entity.remote.devdb.Brand;
-import forpdateam.ru.forpda.ui.TabManager;
+import forpdateam.ru.forpda.presentation.devdb.device.DevicesPresenter;
+import forpdateam.ru.forpda.presentation.devdb.device.DevicesView;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
-import forpdateam.ru.forpda.ui.fragments.devdb.SearchFragment;
-import forpdateam.ru.forpda.ui.fragments.devdb.device.DeviceFragment;
 import forpdateam.ru.forpda.ui.fragments.notes.NotesAddPopup;
 import forpdateam.ru.forpda.ui.views.DynamicDialogMenu;
 import forpdateam.ru.forpda.ui.views.PauseOnScrollListener;
@@ -32,17 +33,23 @@ import forpdateam.ru.forpda.ui.views.messagepanel.AutoFitRecyclerView;
  * Created by radiationx on 08.08.17.
  */
 
-public class BrandFragment extends TabFragment implements BrandAdapter.OnItemClickListener<Brand.DeviceItem> {
+public class DevicesFragment extends TabFragment implements DevicesView, DevicesAdapter.OnItemClickListener<Brand.DeviceItem> {
     public final static String ARG_CATEGORY_ID = "CATEGORY_ID";
     public final static String ARG_BRAND_ID = "BRAND_ID";
     private SwipeRefreshLayout refreshLayout;
     private AutoFitRecyclerView recyclerView;
-    private BrandAdapter adapter;
-    private String catId, brandId;
-    private Brand currentData;
-    private DynamicDialogMenu<BrandFragment, Brand.DeviceItem> dialogMenu;
+    private DevicesAdapter adapter;
+    private DynamicDialogMenu<DevicesFragment, Brand.DeviceItem> dialogMenu = new DynamicDialogMenu<>();
 
-    public BrandFragment() {
+    @InjectPresenter
+    DevicesPresenter presenter;
+
+    @ProvidePresenter
+    DevicesPresenter providePresenter() {
+        return new DevicesPresenter(App.get().Di().getDevDbRepository());
+    }
+
+    public DevicesFragment() {
         configuration.setDefaultTitle(App.get().getString(R.string.fragment_title_brand));
     }
 
@@ -50,8 +57,8 @@ public class BrandFragment extends TabFragment implements BrandAdapter.OnItemCli
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            catId = getArguments().getString(ARG_CATEGORY_ID, null);
-            brandId = getArguments().getString(ARG_BRAND_ID, null);
+            presenter.setCategoryId(getArguments().getString(ARG_CATEGORY_ID, null));
+            presenter.setBrandId(getArguments().getString(ARG_BRAND_ID, null));
         }
     }
 
@@ -71,12 +78,13 @@ public class BrandFragment extends TabFragment implements BrandAdapter.OnItemCli
         super.onViewCreated(view, savedInstanceState);
         setCardsBackground();
         refreshLayoutStyle(refreshLayout);
-        refreshLayout.setOnRefreshListener(this::loadData);
+        refreshLayout.setOnRefreshListener(() -> presenter.loadBrand());
 
         PauseOnScrollListener pauseOnScrollListener = new PauseOnScrollListener(ImageLoader.getInstance(), true, true);
         recyclerView.addOnScrollListener(pauseOnScrollListener);
 
-        adapter = new BrandAdapter();
+        adapter = new DevicesAdapter();
+        adapter.setItemClickListener(this);
         recyclerView.setColumnWidth(App.get().dpToPx(144));
         recyclerView.setAdapter(adapter);
         try {
@@ -86,7 +94,9 @@ public class BrandFragment extends TabFragment implements BrandAdapter.OnItemCli
             ex.printStackTrace();
         }
 
-        adapter.setItemClickListener(this);
+        dialogMenu.addItem(getString(R.string.copy_link), (context, data) -> presenter.copyLink(data));
+        dialogMenu.addItem(getString(R.string.share), (context, data) -> presenter.shareLink(data));
+        dialogMenu.addItem(getString(R.string.create_note), (context1, data) -> presenter.createNote(data));
     }
 
     @Override
@@ -95,57 +105,35 @@ public class BrandFragment extends TabFragment implements BrandAdapter.OnItemCli
         menu.add(R.string.fragment_title_device_search)
                 .setIcon(R.drawable.ic_toolbar_search)
                 .setOnMenuItemClickListener(item -> {
-                    TabManager.get().add(SearchFragment.class);
+                    presenter.openSearch();
                     return false;
                 })
                 .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
     }
 
     @Override
-    public boolean loadData() {
-        if (!super.loadData()) {
-            return false;
-        }
-        setRefreshing(true);
-        subscribe(RxApi.DevDb().getBrand(catId, brandId), this::onLoad, new Brand());
-        return true;
+    public void showData(@NotNull Brand data) {
+        setTitle(data.getTitle());
+        setTabTitle(data.getCatTitle() + " " + data.getTitle());
+        setSubtitle(data.getCatTitle());
+        adapter.addAll(data.getDevices());
     }
 
-    private void onLoad(Brand brand) {
-        setRefreshing(false);
-        currentData = brand;
-        adapter.addAll(brand.getDevices());
-        setTitle(brand.getTitle());
-        setTabTitle(brand.getCatTitle() + " " + brand.getTitle());
-        setSubtitle(brand.getCatTitle());
+    @Override
+    public void showCreateNote(@NotNull String title, @NotNull String url) {
+        NotesAddPopup.showAddNoteDialog(getContext(), title, url);
     }
 
     @Override
     public void onItemClick(Brand.DeviceItem item) {
-        Bundle args = new Bundle();
-        args.putString(DeviceFragment.ARG_DEVICE_ID, item.getId());
-        TabManager.get().add(DeviceFragment.class, args);
+        presenter.openDevice(item);
     }
 
     @Override
     public boolean onItemLongClick(Brand.DeviceItem item) {
-        if (dialogMenu == null) {
-            dialogMenu = new DynamicDialogMenu<>();
-            dialogMenu.addItem(getString(R.string.copy_link), (context, data) -> {
-                Utils.copyToClipBoard("https://4pda.ru/devdb/" + data.getId());
-            });
-            dialogMenu.addItem(getString(R.string.share), (context, data) -> {
-                Utils.shareText("https://4pda.ru/devdb/" + data.getId());
-            });
-            dialogMenu.addItem(getString(R.string.create_note), (context1, data) -> {
-                String title = "DevDb: " + currentData.getTitle() + " " + data.getTitle();
-                String url = "https://4pda.ru/devdb/" + data.getId();
-                NotesAddPopup.showAddNoteDialog(context1.getContext(), title, url);
-            });
-        }
         dialogMenu.disallowAll();
         dialogMenu.allowAll();
-        dialogMenu.show(getContext(), BrandFragment.this, item);
+        dialogMenu.show(getContext(), DevicesFragment.this, item);
         return false;
     }
 

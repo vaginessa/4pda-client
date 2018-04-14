@@ -22,7 +22,7 @@ import forpdateam.ru.forpda.ui.views.adapters.BaseViewHolder;
  * Created by radiationx on 08.08.17.
  */
 
-public class BrandAdapter extends BaseAdapter<Brand.DeviceItem, BrandAdapter.DeviceItemHolder> {
+public class DevicesAdapter extends BaseAdapter<Brand.DeviceItem, DevicesAdapter.DeviceItemHolder> {
     private BaseAdapter.OnItemClickListener<Brand.DeviceItem> itemClickListener;
 
     public void setItemClickListener(OnItemClickListener<Brand.DeviceItem> itemClickListener) {
@@ -30,13 +30,13 @@ public class BrandAdapter extends BaseAdapter<Brand.DeviceItem, BrandAdapter.Dev
     }
 
     @Override
-    public BrandAdapter.DeviceItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public DevicesAdapter.DeviceItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = inflateLayout(parent, R.layout.brand_item);
-        return new BrandAdapter.DeviceItemHolder(v);
+        return new DevicesAdapter.DeviceItemHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(BrandAdapter.DeviceItemHolder holder, int position) {
+    public void onBindViewHolder(DevicesAdapter.DeviceItemHolder holder, int position) {
         holder.bind(getItem(position), position);
     }
 

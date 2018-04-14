@@ -57,7 +57,7 @@ import forpdateam.ru.forpda.entity.remote.search.SearchResult;
 import forpdateam.ru.forpda.entity.remote.search.SearchSettings;
 import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
-import forpdateam.ru.forpda.ui.fragments.devdb.brand.BrandFragment;
+import forpdateam.ru.forpda.ui.fragments.devdb.brand.DevicesFragment;
 import forpdateam.ru.forpda.ui.fragments.favorites.FavoritesHelper;
 import forpdateam.ru.forpda.ui.fragments.theme.ThemeDialogsHelper;
 import forpdateam.ru.forpda.ui.fragments.theme.ThemeFragmentWeb;
@@ -314,7 +314,7 @@ public class SearchFragment extends TabFragment implements IPostFunctions, Exten
         saveSettingsButton.setOnClickListener(v -> saveSettings());
         //recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.addItemDecoration(new BrandFragment.SpacingItemDecoration(App.px8, true));
+        recyclerView.addItemDecoration(new DevicesFragment.SpacingItemDecoration(App.px8, true));
         PauseOnScrollListener pauseOnScrollListener = new PauseOnScrollListener(ImageLoader.getInstance(), true, true);
         recyclerView.addOnScrollListener(pauseOnScrollListener);
         recyclerView.setAdapter(adapter);

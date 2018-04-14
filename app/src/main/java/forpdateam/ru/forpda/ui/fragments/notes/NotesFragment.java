@@ -37,7 +37,7 @@ import forpdateam.ru.forpda.entity.db.notes.NoteItemBd;
 import forpdateam.ru.forpda.model.data.remote.api.RequestFile;
 import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.RecyclerFragment;
-import forpdateam.ru.forpda.ui.fragments.devdb.brand.BrandFragment;
+import forpdateam.ru.forpda.ui.fragments.devdb.brand.DevicesFragment;
 import forpdateam.ru.forpda.ui.fragments.notes.adapters.NotesAdapter;
 import forpdateam.ru.forpda.ui.views.ContentController;
 import forpdateam.ru.forpda.ui.views.DynamicDialogMenu;
@@ -75,7 +75,7 @@ public class NotesFragment extends RecyclerFragment implements NotesAdapter.OnIt
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         refreshLayout.setOnRefreshListener(this::loadCacheData);
-        recyclerView.addItemDecoration(new BrandFragment.SpacingItemDecoration(App.px8, false));
+        recyclerView.addItemDecoration(new DevicesFragment.SpacingItemDecoration(App.px8, false));
     }
 
     @Override

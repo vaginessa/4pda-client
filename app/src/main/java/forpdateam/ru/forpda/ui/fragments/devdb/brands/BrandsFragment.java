@@ -19,14 +19,10 @@ import java.util.Map;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.entity.remote.devdb.Brands;
 import forpdateam.ru.forpda.presentation.devdb.brands.BrandsPresenter;
 import forpdateam.ru.forpda.presentation.devdb.brands.BrandsView;
-import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.RecyclerFragment;
-import forpdateam.ru.forpda.ui.fragments.devdb.SearchFragment;
-import forpdateam.ru.forpda.ui.fragments.devdb.brand.BrandFragment;
 
 /**
  * Created by radiationx on 08.08.17.

@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.ui.fragments.devdb.brand.BrandFragment;
+import forpdateam.ru.forpda.ui.fragments.devdb.brand.DevicesFragment;
 import forpdateam.ru.forpda.ui.fragments.devdb.device.SubDeviceFragment;
 
 /**
@@ -30,7 +30,7 @@ public class CommentsFragment extends SubDeviceFragment {
         CommentsAdapter adapter = new CommentsAdapter();
         adapter.addAll(device.getComments());
         recyclerView.setAdapter(adapter);
-        recyclerView.addItemDecoration(new BrandFragment.SpacingItemDecoration(App.px8, true));
+        recyclerView.addItemDecoration(new DevicesFragment.SpacingItemDecoration(App.px8, true));
         return view;
     }
 }

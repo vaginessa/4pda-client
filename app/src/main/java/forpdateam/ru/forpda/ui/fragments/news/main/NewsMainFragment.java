@@ -21,7 +21,7 @@ import forpdateam.ru.forpda.entity.remote.news.NewsItem;
 import forpdateam.ru.forpda.presentation.articles.list.ArticlesListPresenter;
 import forpdateam.ru.forpda.presentation.articles.list.ArticlesListView;
 import forpdateam.ru.forpda.ui.fragments.RecyclerFragment;
-import forpdateam.ru.forpda.ui.fragments.devdb.brand.BrandFragment;
+import forpdateam.ru.forpda.ui.fragments.devdb.brand.DevicesFragment;
 import forpdateam.ru.forpda.ui.fragments.notes.NotesAddPopup;
 import forpdateam.ru.forpda.ui.views.DynamicDialogMenu;
 import forpdateam.ru.forpda.ui.views.PauseOnScrollListener;
@@ -53,7 +53,7 @@ public class NewsMainFragment extends RecyclerFragment implements NewsListAdapte
         setCardsBackground();
         refreshLayout.setOnRefreshListener(() -> presenter.refreshArticles());
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.addItemDecoration(new BrandFragment.SpacingItemDecoration(App.px8, true));
+        recyclerView.addItemDecoration(new DevicesFragment.SpacingItemDecoration(App.px8, true));
         PauseOnScrollListener pauseOnScrollListener = new PauseOnScrollListener(ImageLoader.getInstance(), true, true);
         recyclerView.addOnScrollListener(pauseOnScrollListener);
         adapter = new NewsListAdapter();

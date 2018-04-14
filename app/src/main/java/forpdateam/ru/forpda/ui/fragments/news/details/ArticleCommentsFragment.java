@@ -36,7 +36,7 @@ import forpdateam.ru.forpda.entity.remote.news.Comment;
 import forpdateam.ru.forpda.model.interactors.news.ArticleInteractor;
 import forpdateam.ru.forpda.presentation.articles.detail.comments.ArticleCommentPresenter;
 import forpdateam.ru.forpda.presentation.articles.detail.comments.ArticleCommentView;
-import forpdateam.ru.forpda.ui.fragments.devdb.brand.BrandFragment;
+import forpdateam.ru.forpda.ui.fragments.devdb.brand.DevicesFragment;
 import forpdateam.ru.forpda.ui.views.ContentController;
 import forpdateam.ru.forpda.ui.views.FunnyContent;
 
@@ -103,7 +103,7 @@ public class ArticleCommentsFragment extends Fragment implements ArticleCommentV
         recyclerView.setBackgroundColor(App.getColorFromAttr(getContext(), R.attr.background_for_lists));
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setHasFixedSize(true);
-        recyclerView.addItemDecoration(new BrandFragment.SpacingItemDecoration(App.px12, false));
+        recyclerView.addItemDecoration(new DevicesFragment.SpacingItemDecoration(App.px12, false));
         adapter = new ArticleCommentsAdapter();
         adapter.setClickListener(this);
         recyclerView.setAdapter(adapter);

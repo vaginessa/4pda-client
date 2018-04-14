@@ -24,8 +24,8 @@ import forpdateam.ru.forpda.entity.remote.devdb.Brand;
 import forpdateam.ru.forpda.entity.remote.devdb.DeviceSearch;
 import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
-import forpdateam.ru.forpda.ui.fragments.devdb.brand.BrandAdapter;
-import forpdateam.ru.forpda.ui.fragments.devdb.brand.BrandFragment;
+import forpdateam.ru.forpda.ui.fragments.devdb.brand.DevicesAdapter;
+import forpdateam.ru.forpda.ui.fragments.devdb.brand.DevicesFragment;
 import forpdateam.ru.forpda.ui.fragments.devdb.device.DeviceFragment;
 import forpdateam.ru.forpda.ui.fragments.notes.NotesAddPopup;
 import forpdateam.ru.forpda.ui.views.DynamicDialogMenu;
@@ -36,8 +36,8 @@ import forpdateam.ru.forpda.ui.views.messagepanel.AutoFitRecyclerView;
  * Created by radiationx on 09.11.17.
  */
 
-public class SearchFragment extends TabFragment implements BrandAdapter.OnItemClickListener<DeviceSearch.DeviceItem> {
-    private BrandAdapter adapter;
+public class SearchFragment extends TabFragment implements DevicesAdapter.OnItemClickListener<DeviceSearch.DeviceItem> {
+    private DevicesAdapter adapter;
     private SwipeRefreshLayout refreshLayout;
     private AutoFitRecyclerView recyclerView;
     private SearchView searchView;
@@ -70,12 +70,12 @@ public class SearchFragment extends TabFragment implements BrandAdapter.OnItemCl
         PauseOnScrollListener pauseOnScrollListener = new PauseOnScrollListener(ImageLoader.getInstance(), true, true);
         recyclerView.addOnScrollListener(pauseOnScrollListener);
 
-        adapter = new BrandAdapter();
+        adapter = new DevicesAdapter();
         recyclerView.setColumnWidth(App.get().dpToPx(144));
         recyclerView.setAdapter(adapter);
         try {
             GridLayoutManager gridLayoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
-            recyclerView.addItemDecoration(new BrandFragment.SpacingItemDecoration(gridLayoutManager, App.px8));
+            recyclerView.addItemDecoration(new DevicesFragment.SpacingItemDecoration(gridLayoutManager, App.px8));
         } catch (Exception ex) {
             ex.printStackTrace();
         }

@@ -17,7 +17,7 @@ import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.common.LinkMovementMethod;
 import forpdateam.ru.forpda.entity.remote.profile.ProfileModel;
-import forpdateam.ru.forpda.ui.fragments.devdb.brand.BrandFragment;
+import forpdateam.ru.forpda.ui.fragments.devdb.brand.DevicesFragment;
 import forpdateam.ru.forpda.ui.views.DividerItemDecoration;
 import forpdateam.ru.forpda.ui.views.adapters.BaseViewHolder;
 
@@ -177,7 +177,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<BaseViewHolder> {
             list.setHasFixedSize(true);
             list.setLayoutManager(new LinearLayoutManager(list.getContext()));
             list.setNestedScrollingEnabled(false);
-            list.addItemDecoration(new BrandFragment.SpacingItemDecoration(App.px16, true));
+            list.addItemDecoration(new DevicesFragment.SpacingItemDecoration(App.px16, true));
             adapter = new InfoAdapter();
             list.setAdapter(adapter);
             title.setText(R.string.profile_title_information);

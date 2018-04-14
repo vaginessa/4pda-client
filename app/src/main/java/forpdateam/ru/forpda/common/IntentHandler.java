@@ -27,7 +27,7 @@ import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
 import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.activities.imageviewer.ImageViewerActivity;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
-import forpdateam.ru.forpda.ui.fragments.devdb.brand.BrandFragment;
+import forpdateam.ru.forpda.ui.fragments.devdb.brand.DevicesFragment;
 import forpdateam.ru.forpda.ui.fragments.devdb.brands.BrandsFragment;
 import forpdateam.ru.forpda.ui.fragments.devdb.device.DeviceFragment;
 import forpdateam.ru.forpda.ui.fragments.favorites.FavoritesFragment;
@@ -196,9 +196,9 @@ public class IntentHandler {
                             if (uri.getPathSegments().get(1).matches("phones|pad|ebook|smartwatch")) {
                                 if (uri.getPathSegments().size() > 2 && !uri.getPathSegments().get(2).matches("new|select")) {
                                     run("devdb models brand");
-                                    args.putString(BrandFragment.ARG_CATEGORY_ID, uri.getPathSegments().get(1));
-                                    args.putString(BrandFragment.ARG_BRAND_ID, uri.getPathSegments().get(2));
-                                    TabManager.get().add(BrandFragment.class, args);
+                                    args.putString(DevicesFragment.ARG_CATEGORY_ID, uri.getPathSegments().get(1));
+                                    args.putString(DevicesFragment.ARG_BRAND_ID, uri.getPathSegments().get(2));
+                                    TabManager.get().add(DevicesFragment.class, args);
                                     return true;
                                 }
                                 run("devdb models");
