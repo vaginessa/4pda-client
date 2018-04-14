@@ -13,11 +13,10 @@ import com.arellomobile.mvp.presenter.ProvidePresenter;
 
 import org.jetbrains.annotations.NotNull;
 
-import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.common.webview.CustomWebChromeClient;
 import forpdateam.ru.forpda.common.webview.CustomWebViewClient;
 import forpdateam.ru.forpda.entity.remote.news.DetailsPage;
-import forpdateam.ru.forpda.model.interactors.devdb.ArticleInteractor;
+import forpdateam.ru.forpda.model.interactors.news.ArticleInteractor;
 import forpdateam.ru.forpda.presentation.articles.detail.content.ArticleContentPresenter;
 import forpdateam.ru.forpda.presentation.articles.detail.content.ArticleContentView;
 import forpdateam.ru.forpda.ui.activities.MainActivity;

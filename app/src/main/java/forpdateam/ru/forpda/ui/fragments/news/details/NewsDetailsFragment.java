@@ -10,7 +10,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -32,20 +31,13 @@ import java.util.ArrayList;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.apirx.RxApi;
-import forpdateam.ru.forpda.common.IntentHandler;
-import forpdateam.ru.forpda.common.Utils;
 import forpdateam.ru.forpda.entity.remote.news.DetailsPage;
-import forpdateam.ru.forpda.model.interactors.devdb.ArticleInteractor;
+import forpdateam.ru.forpda.model.interactors.news.ArticleInteractor;
 import forpdateam.ru.forpda.presentation.articles.detail.ArticleDetailPresenter;
 import forpdateam.ru.forpda.presentation.articles.detail.ArticleDetailView;
-import forpdateam.ru.forpda.presentation.mentions.MentionsPresenter;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import forpdateam.ru.forpda.ui.fragments.notes.NotesAddPopup;
 import forpdateam.ru.forpda.ui.views.ScrimHelper;
-import io.reactivex.Observable;
-
-import static forpdateam.ru.forpda.common.Utils.log;
 
 /**
  * Created by isanechek on 8/19/17.

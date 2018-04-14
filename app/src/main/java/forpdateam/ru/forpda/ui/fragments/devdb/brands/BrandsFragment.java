@@ -1,4 +1,4 @@
-package forpdateam.ru.forpda.ui.fragments.devdb;
+package forpdateam.ru.forpda.ui.fragments.devdb.brands;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -9,6 +9,11 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
+import com.arellomobile.mvp.presenter.InjectPresenter;
+import com.arellomobile.mvp.presenter.ProvidePresenter;
+
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -16,28 +21,31 @@ import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.entity.remote.devdb.Brands;
+import forpdateam.ru.forpda.presentation.devdb.brands.BrandsPresenter;
+import forpdateam.ru.forpda.presentation.devdb.brands.BrandsView;
 import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.RecyclerFragment;
-import forpdateam.ru.forpda.ui.fragments.devdb.adapters.BrandsAdapter;
+import forpdateam.ru.forpda.ui.fragments.devdb.SearchFragment;
+import forpdateam.ru.forpda.ui.fragments.devdb.brand.BrandFragment;
 
 /**
  * Created by radiationx on 08.08.17.
  */
 
-public class BrandsFragment extends RecyclerFragment implements BrandsAdapter.OnItemClickListener<Brands.Item> {
+public class BrandsFragment extends RecyclerFragment implements BrandsView, BrandsAdapter.OnItemClickListener<Brands.Item> {
     public final static String ARG_CATEGORY_ID = "CATEGORY_ID";
-    private final static String[] spinnerTitles = {
-            App.get().getString(R.string.brands_category_phones),
-            App.get().getString(R.string.brands_category_tabs),
-            App.get().getString(R.string.brands_category_ebook),
-            App.get().getString(R.string.brands_category_smartwatch)};
-    private final static String[] mansCats = {"phones", "pad", "ebook", "smartwatch"};
+
     private BrandsAdapter adapter;
-    private int selected = 0;
-    private Brands currentData;
+
+    @InjectPresenter
+    BrandsPresenter presenter;
+
+    @ProvidePresenter
+    BrandsPresenter provideMentionsPresenter() {
+        return new BrandsPresenter(App.get().Di().getDevDbRepository());
+    }
 
     public BrandsFragment() {
-        //configuration.setAlone(true);
         configuration.setDefaultTitle(App.get().getString(R.string.fragment_title_brands));
     }
 
@@ -47,13 +55,7 @@ public class BrandsFragment extends RecyclerFragment implements BrandsAdapter.On
         if (getArguments() != null) {
             String categoryId = getArguments().getString(ARG_CATEGORY_ID);
             if (categoryId != null) {
-                for (int i = 0; i < mansCats.length; i++) {
-                    if (mansCats[i].equals(categoryId)) {
-                        selected = i;
-                        break;
-                    }
-                }
-
+                presenter.initCategory(categoryId);
             }
         }
     }
@@ -62,7 +64,7 @@ public class BrandsFragment extends RecyclerFragment implements BrandsAdapter.On
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        refreshLayout.setOnRefreshListener(this::loadData);
+        refreshLayout.setOnRefreshListener(() -> presenter.loadBrands());
         titlesWrapper.setVisibility(View.GONE);
         toolbarSpinner.setVisibility(View.VISIBLE);
 
@@ -70,16 +72,12 @@ public class BrandsFragment extends RecyclerFragment implements BrandsAdapter.On
         recyclerView.setAdapter(adapter);
 
 
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, spinnerTitles);
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        toolbarSpinner.setAdapter(spinnerAdapter);
         toolbarSpinner.setPrompt("Category");
-        toolbarSpinner.setSelection(selected);
         toolbarSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                selected = position;
-                loadData();
+                presenter.selectCategory(position);
+                presenter.loadBrands();
             }
 
             @Override
@@ -96,43 +94,55 @@ public class BrandsFragment extends RecyclerFragment implements BrandsAdapter.On
         menu.add(R.string.fragment_title_device_search)
                 .setIcon(R.drawable.ic_toolbar_search)
                 .setOnMenuItemClickListener(item -> {
-                    TabManager.get().add(SearchFragment.class);
+                    presenter.openSearch();
                     return false;
                 })
                 .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
     }
 
     @Override
-    public boolean loadData() {
-        if (!super.loadData()) {
-            return false;
+    public void initCategories(@NotNull String[] categories, int position) {
+        ArrayList<String> spinnerTitles = new ArrayList<>();
+        for (String category : categories) {
+            spinnerTitles.add(getCategoryTitle(category));
         }
-        setRefreshing(true);
-        subscribe(RxApi.DevDb().getBrands(mansCats[selected]), this::onLoad, new Brands());
-        return true;
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, spinnerTitles);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        toolbarSpinner.setAdapter(spinnerAdapter);
+        toolbarSpinner.setSelection(position);
     }
 
-    private void onLoad(Brands brands) {
-        currentData = brands;
-        setRefreshing(false);
+    @Override
+    public void showData(@NotNull Brands data) {
+        setTitle(data.getCatTitle());
         adapter.clear();
-        for (Map.Entry<String, ArrayList<Brands.Item>> entry : brands.getLetterMap().entrySet()) {
+        for (Map.Entry<String, ArrayList<Brands.Item>> entry : data.getLetterMap().entrySet()) {
             adapter.addSection(entry.getKey(), entry.getValue());
         }
         adapter.notifyDataSetChanged();
-        setTitle(brands.getCatTitle());
     }
 
     @Override
     public void onItemClick(Brands.Item item) {
-        Bundle args = new Bundle();
-        args.putString(BrandFragment.ARG_CATEGORY_ID, currentData.getCatId());
-        args.putString(BrandFragment.ARG_BRAND_ID, item.getId());
-        TabManager.get().add(BrandFragment.class, args);
+        presenter.openBrand(item);
     }
 
     @Override
     public boolean onItemLongClick(Brands.Item item) {
         return false;
+    }
+
+    private String getCategoryTitle(String category) {
+        switch (category) {
+            case BrandsPresenter.CATEGORY_PHONES:
+                return App.get().getString(R.string.brands_category_phones);
+            case BrandsPresenter.CATEGORY_PAD:
+                return App.get().getString(R.string.brands_category_tabs);
+            case BrandsPresenter.CATEGORY_EBOOK:
+                return App.get().getString(R.string.brands_category_ebook);
+            case BrandsPresenter.CATEGORY_SMARTWATCH:
+                return App.get().getString(R.string.brands_category_smartwatch);
+        }
+        return null;
     }
 }

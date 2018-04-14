@@ -8,7 +8,7 @@ import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import forpdateam.ru.forpda.ui.fragments.auth.AuthFragment;
-import forpdateam.ru.forpda.ui.fragments.devdb.BrandsFragment;
+import forpdateam.ru.forpda.ui.fragments.devdb.brands.BrandsFragment;
 import forpdateam.ru.forpda.ui.fragments.favorites.FavoritesFragment;
 import forpdateam.ru.forpda.ui.fragments.forum.ForumFragment;
 import forpdateam.ru.forpda.ui.fragments.history.HistoryFragment;

@@ -1,4 +1,4 @@
-package forpdateam.ru.forpda.model.interactors.devdb
+package forpdateam.ru.forpda.model.interactors.news
 
 import com.jakewharton.rxrelay2.BehaviorRelay
 import forpdateam.ru.forpda.entity.remote.news.Comment

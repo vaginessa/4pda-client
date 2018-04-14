@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.ui.fragments.devdb.BrandFragment;
+import forpdateam.ru.forpda.ui.fragments.devdb.brand.BrandFragment;
 import forpdateam.ru.forpda.ui.fragments.devdb.device.SubDeviceFragment;
 
 /**

@@ -24,27 +24,21 @@ import com.arellomobile.mvp.presenter.ProvidePresenter;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Observer;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.common.simple.SimpleTextWatcher;
 import forpdateam.ru.forpda.entity.remote.news.Comment;
-import forpdateam.ru.forpda.entity.remote.news.DetailsPage;
-import forpdateam.ru.forpda.model.interactors.devdb.ArticleInteractor;
+import forpdateam.ru.forpda.model.interactors.news.ArticleInteractor;
 import forpdateam.ru.forpda.presentation.articles.detail.comments.ArticleCommentPresenter;
 import forpdateam.ru.forpda.presentation.articles.detail.comments.ArticleCommentView;
-import forpdateam.ru.forpda.ui.fragments.devdb.BrandFragment;
+import forpdateam.ru.forpda.ui.fragments.devdb.brand.BrandFragment;
 import forpdateam.ru.forpda.ui.views.ContentController;
 import forpdateam.ru.forpda.ui.views.FunnyContent;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by radiationx on 03.09.17.

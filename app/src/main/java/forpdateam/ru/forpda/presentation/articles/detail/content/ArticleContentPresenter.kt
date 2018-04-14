@@ -2,7 +2,7 @@ package forpdateam.ru.forpda.presentation.articles.detail.content
 
 import com.arellomobile.mvp.InjectViewState
 import forpdateam.ru.forpda.common.mvp.BasePresenter
-import forpdateam.ru.forpda.model.interactors.devdb.ArticleInteractor
+import forpdateam.ru.forpda.model.interactors.news.ArticleInteractor
 
 /**
  * Created by radiationx on 11.11.17.

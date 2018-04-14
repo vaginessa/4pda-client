@@ -1,4 +1,4 @@
-package forpdateam.ru.forpda.ui.fragments.devdb;
+package forpdateam.ru.forpda.ui.fragments.devdb.brand;
 
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -21,7 +21,8 @@ import forpdateam.ru.forpda.common.Utils;
 import forpdateam.ru.forpda.entity.remote.devdb.Brand;
 import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
-import forpdateam.ru.forpda.ui.fragments.devdb.adapters.BrandAdapter;
+import forpdateam.ru.forpda.ui.fragments.devdb.SearchFragment;
+import forpdateam.ru.forpda.ui.fragments.devdb.device.DeviceFragment;
 import forpdateam.ru.forpda.ui.fragments.notes.NotesAddPopup;
 import forpdateam.ru.forpda.ui.views.DynamicDialogMenu;
 import forpdateam.ru.forpda.ui.views.PauseOnScrollListener;

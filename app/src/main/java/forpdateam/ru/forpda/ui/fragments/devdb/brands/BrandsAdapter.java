@@ -1,4 +1,4 @@
-package forpdateam.ru.forpda.ui.fragments.devdb.adapters;
+package forpdateam.ru.forpda.ui.fragments.devdb.brands;
 
 import android.view.View;
 import android.view.ViewGroup;

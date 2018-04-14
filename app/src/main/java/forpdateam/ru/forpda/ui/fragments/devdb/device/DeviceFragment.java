@@ -1,4 +1,4 @@
-package forpdateam.ru.forpda.ui.fragments.devdb;
+package forpdateam.ru.forpda.ui.fragments.devdb.device;
 
 import android.content.Context;
 import android.graphics.Bitmap;

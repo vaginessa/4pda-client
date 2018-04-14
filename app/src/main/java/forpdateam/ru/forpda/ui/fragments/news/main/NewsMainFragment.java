@@ -21,7 +21,7 @@ import forpdateam.ru.forpda.entity.remote.news.NewsItem;
 import forpdateam.ru.forpda.presentation.articles.list.ArticlesListPresenter;
 import forpdateam.ru.forpda.presentation.articles.list.ArticlesListView;
 import forpdateam.ru.forpda.ui.fragments.RecyclerFragment;
-import forpdateam.ru.forpda.ui.fragments.devdb.BrandFragment;
+import forpdateam.ru.forpda.ui.fragments.devdb.brand.BrandFragment;
 import forpdateam.ru.forpda.ui.fragments.notes.NotesAddPopup;
 import forpdateam.ru.forpda.ui.views.DynamicDialogMenu;
 import forpdateam.ru.forpda.ui.views.PauseOnScrollListener;

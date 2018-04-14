@@ -3,7 +3,7 @@ package forpdateam.ru.forpda.presentation.articles.detail.comments
 import com.arellomobile.mvp.InjectViewState
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.remote.news.Comment
-import forpdateam.ru.forpda.model.interactors.devdb.ArticleInteractor
+import forpdateam.ru.forpda.model.interactors.news.ArticleInteractor
 import java.util.ArrayList
 
 /**
