@@ -5,16 +5,5 @@ package forpdateam.ru.forpda.apirx;
  */
 
 public class RxApi {
-    private static RxApi INSTANCE = null;
-    private static QmsRx qmsApi = null;
 
-    public static QmsRx Qms() {
-        if (qmsApi == null) qmsApi = new QmsRx();
-        return qmsApi;
-    }
-
-    public static RxApi get() {
-        if (INSTANCE == null) INSTANCE = new RxApi();
-        return INSTANCE;
-    }
 }

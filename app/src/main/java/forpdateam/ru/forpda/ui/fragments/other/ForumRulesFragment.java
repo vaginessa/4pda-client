@@ -18,6 +18,11 @@ import android.webkit.JavascriptInterface;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.arellomobile.mvp.presenter.InjectPresenter;
+import com.arellomobile.mvp.presenter.ProvidePresenter;
+
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 
 import forpdateam.ru.forpda.App;
@@ -27,6 +32,8 @@ import forpdateam.ru.forpda.common.Utils;
 import forpdateam.ru.forpda.common.webview.CustomWebChromeClient;
 import forpdateam.ru.forpda.common.webview.CustomWebViewClient;
 import forpdateam.ru.forpda.entity.remote.forum.ForumRules;
+import forpdateam.ru.forpda.presentation.forumrules.ForumRulesPresenter;
+import forpdateam.ru.forpda.presentation.forumrules.ForumRulesView;
 import forpdateam.ru.forpda.ui.activities.MainActivity;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import forpdateam.ru.forpda.ui.views.ExtendedWebView;
@@ -35,10 +42,18 @@ import forpdateam.ru.forpda.ui.views.ExtendedWebView;
  * Created by radiationx on 16.10.17.
  */
 
-public class ForumRulesFragment extends TabFragment {
+public class ForumRulesFragment extends TabFragment implements ForumRulesView {
     public final static String JS_INTERFACE = "IRules";
     private ExtendedWebView webView;
     protected int searchViewTag = 0;
+
+    @InjectPresenter
+    ForumRulesPresenter presenter;
+
+    @ProvidePresenter
+    ForumRulesPresenter provideMentionsPresenter() {
+        return new ForumRulesPresenter(App.get().Di().getForumRepository());
+    }
 
     public ForumRulesFragment() {
         configuration.setAlone(true);
@@ -82,21 +97,8 @@ public class ForumRulesFragment extends TabFragment {
     }
 
     @Override
-    public boolean loadData() {
-        if (!super.loadData()) {
-            return false;
-        }
-        setRefreshing(true);
-        subscribe(RxApi.Forum().getRules(true), this::onLoad, new ForumRules(), view1 -> loadData());
-        return true;
-    }
-
-    private void onLoad(ForumRules rules) {
-        webView.loadDataWithBaseURL("https://4pda.ru/forum/", rules.getHtml(), "text/html", "utf-8", null);
-        new Handler().postDelayed(() -> {
-            if (isAdded())
-                setRefreshing(false);
-        }, 1000);
+    public void showData(@NotNull ForumRules data) {
+        webView.loadDataWithBaseURL("https://4pda.ru/forum/", data.getHtml(), "text/html", "utf-8", null);
     }
 
     @JavascriptInterface

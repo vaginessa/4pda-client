@@ -17,6 +17,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.arellomobile.mvp.presenter.InjectPresenter;
+import com.arellomobile.mvp.presenter.ProvidePresenter;
+
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 
 import forpdateam.ru.forpda.App;
@@ -25,6 +30,9 @@ import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.common.webview.CustomWebChromeClient;
 import forpdateam.ru.forpda.common.webview.CustomWebViewClient;
 import forpdateam.ru.forpda.entity.remote.forum.Announce;
+import forpdateam.ru.forpda.presentation.announce.AnnouncePresenter;
+import forpdateam.ru.forpda.presentation.announce.AnnounceView;
+import forpdateam.ru.forpda.presentation.mentions.MentionsPresenter;
 import forpdateam.ru.forpda.ui.activities.MainActivity;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import forpdateam.ru.forpda.ui.views.ExtendedWebView;
@@ -33,15 +41,20 @@ import forpdateam.ru.forpda.ui.views.ExtendedWebView;
  * Created by radiationx on 16.10.17.
  */
 
-public class AnnounceFragment extends TabFragment {
+public class AnnounceFragment extends TabFragment implements AnnounceView{
     public final static String ARG_ANNOUNCE_ID = "ARG_ANNOUNCE_ID";
     public final static String ARG_FORUM_ID = "ARG_FORUM_ID";
     public final static String JS_INTERFACE = "IAnnounce";
     private ExtendedWebView webView;
     private int searchViewTag = 0;
-    private int id = 0;
-    private int forumId = 0;
 
+    @InjectPresenter
+    AnnouncePresenter presenter;
+
+    @ProvidePresenter
+    AnnouncePresenter provideMentionsPresenter() {
+        return new AnnouncePresenter(App.get().Di().getForumRepository());
+    }
 
     public AnnounceFragment() {
         configuration.setDefaultTitle("Объявление");
@@ -51,8 +64,8 @@ public class AnnounceFragment extends TabFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            id = getArguments().getInt(ARG_ANNOUNCE_ID);
-            forumId = getArguments().getInt(ARG_FORUM_ID);
+            presenter.setId(getArguments().getInt(ARG_ANNOUNCE_ID));
+            presenter.setForumId(getArguments().getInt(ARG_FORUM_ID));
         }
     }
 
@@ -93,22 +106,9 @@ public class AnnounceFragment extends TabFragment {
     }
 
     @Override
-    public boolean loadData() {
-        if (!super.loadData()) {
-            return false;
-        }
-        setRefreshing(true);
-        subscribe(RxApi.Forum().getAnnounce(id, forumId, true), this::onLoad, new Announce(), view1 -> loadData());
-        return true;
-    }
-
-    private void onLoad(Announce announce) {
-        setTitle(announce.getTitle());
-        webView.loadDataWithBaseURL("https://4pda.ru/forum/", announce.getHtml(), "text/html", "utf-8", null);
-        new Handler().postDelayed(() -> {
-            if (isAdded())
-                setRefreshing(false);
-        }, 1000);
+    public void showData(@NotNull Announce data) {
+        setTitle(data.getTitle());
+        webView.loadDataWithBaseURL("https://4pda.ru/forum/", data.getHtml(), "text/html", "utf-8", null);
     }
 
     private void addSearchOnPageItem(Menu menu) {
@@ -165,11 +165,11 @@ public class AnnounceFragment extends TabFragment {
         });
     }
 
-    protected void findNext(boolean next) {
+    private void findNext(boolean next) {
         webView.findNext(next);
     }
 
-    protected void findText(String text) {
+    private void findText(String text) {
         webView.findAllAsync(text);
     }
 
