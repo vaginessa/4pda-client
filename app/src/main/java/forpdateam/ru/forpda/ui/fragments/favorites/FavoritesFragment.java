@@ -56,7 +56,8 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
             App.get().getString(R.string.fav_subscribe_immediate),
             App.get().getString(R.string.fav_subscribe_daily),
             App.get().getString(R.string.fav_subscribe_weekly),
-            App.get().getString(R.string.fav_subscribe_pinned)};
+            App.get().getString(R.string.fav_subscribe_pinned)
+    };
 
     @InjectPresenter
     FavoritesPresenter presenter;
@@ -70,16 +71,13 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
     private FavoritesAdapter adapter;
 
     private boolean unreadTop = false;
-    private boolean loadAll = false;
     private PaginationHelper paginationHelper;
-    private int currentSt = 0;
 
     private BottomSheetDialog dialog;
     private ViewGroup sortingView;
     private Spinner keySpinner;
     private Spinner orderSpinner;
     private Button sortApply;
-    private Sorting sorting;
     private Observer favoritesPreferenceObserver = (observable, o) -> {
         if (o == null) return;
         String key = (String) o;
@@ -101,7 +99,7 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
                 break;
             }
             case Preferences.Lists.Favorites.LOAD_ALL: {
-                loadAll = Preferences.Lists.Favorites.isLoadAll(getContext());
+                presenter.setLoadAll(Preferences.Lists.Favorites.isLoadAll(getContext()));
                 break;
             }
         }
@@ -130,8 +128,8 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
     public void onAttach(Context context) {
         super.onAttach(context);
         unreadTop = Preferences.Lists.Topic.isUnreadTop(context);
-        loadAll = Preferences.Lists.Favorites.isLoadAll(context);
-        sorting = new Sorting(Preferences.Lists.Favorites.getSortingKey(context), Preferences.Lists.Favorites.getSortingOrder(context));
+        presenter.setLoadAll(Preferences.Lists.Favorites.isLoadAll(context));
+        presenter.setSorting(new Sorting(Preferences.Lists.Favorites.getSortingKey(context), Preferences.Lists.Favorites.getSortingOrder(context)));
     }
 
     @Nullable
@@ -161,7 +159,7 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
         dialogMenu.addItem(getPinText(false), (context, data) -> presenter.changeFav(FavoritesApi.ACTION_EDIT_PIN_STATE, data.isPin() ? "unpin" : "pin", data.getFavId()));
         dialogMenu.addItem(getString(R.string.delete), (context, data) -> presenter.changeFav(FavoritesApi.ACTION_DELETE, null, data.getFavId()));
 
-        refreshLayout.setOnRefreshListener(this::loadData);
+        refreshLayout.setOnRefreshListener(() -> presenter.loadFavorites());
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new FavoritesAdapter();
         adapter.setOnItemClickListener(adapterListener);
@@ -171,27 +169,28 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
 
         initSpinnerItems(keySpinner, new String[]{getString(R.string.fav_sort_last_post), getString(R.string.fav_sort_title)});
         initSpinnerItems(orderSpinner, new String[]{getString(R.string.sorting_asc), getString(R.string.sorting_desc)});
-        selectSpinners(sorting);
         sortApply.setOnClickListener(v -> {
+            String key = "", order = "";
             switch (keySpinner.getSelectedItemPosition()) {
                 case 0:
-                    sorting.setKey(Sorting.Key.LAST_POST);
+                    key = Sorting.Key.LAST_POST;
                     break;
                 case 1:
-                    sorting.setKey(Sorting.Key.TITLE);
+                    key = Sorting.Key.TITLE;
                     break;
             }
             switch (orderSpinner.getSelectedItemPosition()) {
                 case 0:
-                    sorting.setOrder(Sorting.Order.ASC);
+                    order = Sorting.Order.ASC;
                     break;
                 case 1:
-                    sorting.setOrder(Sorting.Order.DESC);
+                    order = Sorting.Order.DESC;
                     break;
             }
-            Preferences.Lists.Favorites.setSortingKey(getContext(), sorting.getKey());
-            Preferences.Lists.Favorites.setSortingOrder(getContext(), sorting.getOrder());
-            loadData();
+            presenter.updateSorting(key, order);
+            presenter.loadFavorites();
+            Preferences.Lists.Favorites.setSortingKey(getContext(), key);
+            Preferences.Lists.Favorites.setSortingOrder(getContext(), order);
             if (dialog != null && dialog.isShowing()) {
                 dialog.dismiss();
             }
@@ -211,7 +210,7 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
                             .setMessage(App.get().getString(R.string.mark_all_read) + "?")
                             .setPositiveButton(R.string.ok, (dialog, which) -> {
                                 ForumHelper.markAllRead(o -> {
-                                    loadData();
+                                    presenter.loadFavorites();
                                 });
                             })
                             .setNegativeButton(R.string.no, null)
@@ -235,19 +234,9 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
     }
 
     @Override
-    public boolean loadData() {
-        if (!super.loadData()) {
-            return false;
-        }
-        presenter.getFavorites(currentSt, loadAll, sorting);
-        return true;
-    }
-
-    @Override
-    public void onLoadFavorites(FavData data) {
+    public void onLoadFavorites(@NotNull FavData data) {
         presenter.saveFavorites(data.getItems());
-        sorting = data.getSorting();
-        selectSpinners(sorting);
+        selectSpinners(data.getSorting());
         paginationHelper.updatePagination(data.getPagination());
         setSubtitle(paginationHelper.getTitle());
     }
@@ -310,6 +299,11 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
         presenter.showFavorites();
     }
 
+    @Override
+    public void initSorting(@NotNull Sorting sorting) {
+        selectSpinners(sorting);
+    }
+
     private void selectSpinners(Sorting sorting) {
         switch (sorting.getKey()) {
             case Sorting.Key.LAST_POST:
@@ -338,12 +332,7 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
 
     private void handleEvent(TabNotification event) {
         if (!Preferences.Notifications.Favorites.isLiveTab(getContext())) return;
-        presenter.handleEvent(event, sorting, ClientHelper.getFavoritesCount());
-    }
-
-    @Override
-    public void changeFav(int action, String type, int favId) {
-        FavoritesHelper.changeFav(this::onChangeFav, action, favId, -1, type);
+        presenter.handleEvent(event, ClientHelper.getFavoritesCount());
     }
 
     public void markRead(int topicId) {
@@ -359,9 +348,9 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
             paginationHelper.destroy();
     }
 
-    private void onChangeFav(boolean v) {
+    @Override
+    public void onChangeFav(boolean result) {
         Toast.makeText(getContext(), R.string.action_complete, Toast.LENGTH_SHORT).show();
-        loadData();
     }
 
     @Override
@@ -406,8 +395,8 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
 
         @Override
         public void onSelectedPage(int pageNumber) {
-            currentSt = pageNumber;
-            loadData();
+            presenter.setCurrentSt(pageNumber);
+            presenter.loadFavorites();
         }
     };
 

@@ -20,9 +20,26 @@ class FavoritesPresenter(
         private val favoritesRepository: FavoritesRepository
 ) : BasePresenter<FavoritesView>() {
 
-    fun getFavorites(st: Int, all: Boolean, sorting: Sorting) {
+
+    var loadAll = false
+    var currentSt = 0
+    var sorting: Sorting? = null
+
+    override fun onFirstViewAttach() {
+        super.onFirstViewAttach()
+        loadFavorites()
+    }
+
+    fun updateSorting(key: String, order: String) {
+        sorting?.also {
+            it.key = key
+            it.order = order
+        }
+    }
+
+    fun loadFavorites() {
         favoritesRepository
-                .loadFavorites(st, all, sorting)
+                .loadFavorites(currentSt, loadAll, sorting)
                 .doOnTerminate { viewState.setRefreshing(true) }
                 .doAfterTerminate { viewState.setRefreshing(false) }
                 .subscribe({
@@ -64,7 +81,7 @@ class FavoritesPresenter(
                 .addToDisposable()
     }
 
-    fun handleEvent(event: TabNotification, sorting: Sorting, count: Int) {
+    fun handleEvent(event: TabNotification, count: Int) {
         if (event.isWebSocket && event.event.isNew) return
         favoritesRepository
                 .handleEvent(event, sorting, count)
@@ -107,8 +124,15 @@ class FavoritesPresenter(
         IntentHandler.handle("https://4pda.ru/forum/index.php?showforum=" + item.forumId)
     }
 
-    fun changeFav(action: Int, type: String, favId: Int) {
-        viewState.changeFav(action, type, favId)
+    fun changeFav(action: Int, type: String?, favId: Int) {
+        favoritesRepository
+                .editFavorites(action, favId, favId, type)
+                .subscribe({
+                    viewState.onChangeFav(it)
+                    loadFavorites()
+                }, {
+                    it.printStackTrace()
+                })
     }
 
     fun showSubscribeDialog(item: FavItem) {
