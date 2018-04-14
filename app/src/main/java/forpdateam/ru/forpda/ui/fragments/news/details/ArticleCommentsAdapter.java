@@ -12,8 +12,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
@@ -38,14 +41,14 @@ public class ArticleCommentsAdapter extends RecyclerView.Adapter<ArticleComments
         this.clickListener = clickListener;
     }
 
-    public void addAll(Collection<Comment> results) {
-        addAll(results, true);
+    public void addAll(@NotNull List<? extends Comment> comments) {
+        addAll(comments, true);
     }
 
-    public void addAll(Collection<Comment> results, boolean clearList) {
+    public void addAll(@NotNull List<? extends Comment> comments, boolean clearList) {
         if (clearList)
             clear();
-        list.addAll(results);
+        list.addAll(comments);
         notifyDataSetChanged();
     }
 

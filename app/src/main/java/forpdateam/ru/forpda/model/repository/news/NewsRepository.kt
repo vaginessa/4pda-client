@@ -34,8 +34,8 @@ class NewsRepository(
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 
-    fun replyComment(article: DetailsPage, commentId: Int, comment: String): Observable<Comment> = Observable
-            .fromCallable { newsApi.replyComment(article, commentId, comment) }
+    fun replyComment(articleId: Int, commentId: Int, comment: String): Observable<DetailsPage> = Observable
+            .fromCallable { newsApi.replyComment(articleId, commentId, comment) }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 
@@ -48,6 +48,11 @@ class NewsRepository(
     fun getDetails(url: String): Observable<DetailsPage> = Observable
             .fromCallable { newsApi.getDetails(url) }
             .map { transform(it) }
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.ui())
+
+    fun getComments(article: DetailsPage): Observable<Comment> = Observable
+            .fromCallable { newsApi.parseComments(article.karmaMap, article.commentsSource) }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 

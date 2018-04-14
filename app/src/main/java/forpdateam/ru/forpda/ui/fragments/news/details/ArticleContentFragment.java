@@ -8,10 +8,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 
+import com.arellomobile.mvp.presenter.InjectPresenter;
+import com.arellomobile.mvp.presenter.ProvidePresenter;
+
+import org.jetbrains.annotations.NotNull;
+
 import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.common.webview.CustomWebChromeClient;
 import forpdateam.ru.forpda.common.webview.CustomWebViewClient;
 import forpdateam.ru.forpda.entity.remote.news.DetailsPage;
+import forpdateam.ru.forpda.model.interactors.devdb.ArticleInteractor;
+import forpdateam.ru.forpda.presentation.articles.detail.content.ArticleContentPresenter;
+import forpdateam.ru.forpda.presentation.articles.detail.content.ArticleContentView;
 import forpdateam.ru.forpda.ui.activities.MainActivity;
 import forpdateam.ru.forpda.ui.views.ExtendedWebView;
 
@@ -19,13 +27,21 @@ import forpdateam.ru.forpda.ui.views.ExtendedWebView;
  * Created by radiationx on 03.09.17.
  */
 
-public class ArticleContentFragment extends Fragment {
+public class ArticleContentFragment extends Fragment implements ArticleContentView {
     public final static String JS_INTERFACE = "INews";
     private ExtendedWebView webView;
-    private DetailsPage article;
+    private ArticleInteractor interactor;
 
-    public ArticleContentFragment setArticle(DetailsPage article) {
-        this.article = article;
+    @InjectPresenter
+    ArticleContentPresenter presenter;
+
+    @ProvidePresenter
+    ArticleContentPresenter provideMentionsPresenter() {
+        return new ArticleContentPresenter(interactor);
+    }
+
+    public ArticleContentFragment setInteractor(ArticleInteractor interactor) {
+        this.interactor = interactor;
         return this;
     }
 
@@ -37,11 +53,15 @@ public class ArticleContentFragment extends Fragment {
         webView.setWebViewClient(new CustomWebViewClient());
         webView.setWebChromeClient(new CustomWebChromeClient());
         webView.addJavascriptInterface(this, JS_INTERFACE);
-        loadHtml();
         return webView;
     }
 
-    private void loadHtml() {
+    @Override
+    public void setRefreshing(boolean isRefreshing) {
+    }
+
+    @Override
+    public void showData(@NotNull DetailsPage article) {
         webView.loadDataWithBaseURL("https://4pda.ru/forum/", article.getHtml(), "text/html", "utf-8", null);
     }
 
@@ -65,11 +85,7 @@ public class ArticleContentFragment extends Fragment {
             for (int i = 0; i < answers.length; i++) {
                 answersId[i] = Integer.parseInt(answers[i]);
             }
-            NewsDetailsFragment fragment = ((NewsDetailsFragment) getParentFragment());
-            fragment.subscribe(RxApi.NewsList().sendPoll(from, pollId, answersId), page -> {
-                article.setHtml(page.getHtml());
-                loadHtml();
-            }, new DetailsPage());
+            presenter.sendPoll(from, pollId, answersId);
         });
     }
 

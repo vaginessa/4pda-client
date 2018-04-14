@@ -36,6 +36,7 @@ import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.common.Utils;
 import forpdateam.ru.forpda.entity.remote.news.DetailsPage;
+import forpdateam.ru.forpda.model.interactors.devdb.ArticleInteractor;
 import forpdateam.ru.forpda.presentation.articles.detail.ArticleDetailPresenter;
 import forpdateam.ru.forpda.presentation.articles.detail.ArticleDetailView;
 import forpdateam.ru.forpda.presentation.mentions.MentionsPresenter;
@@ -75,13 +76,17 @@ public class NewsDetailsFragment extends TabFragment implements ArticleDetailVie
     private TextView detailsCount;
     private TextView detailsDate;
 
+    private ArticleInteractor interactor = new ArticleInteractor(
+            new ArticleInteractor.InitData(),
+            App.get().Di().getNewsRepository()
+    );
 
     @InjectPresenter
     ArticleDetailPresenter presenter;
 
     @ProvidePresenter
     ArticleDetailPresenter provideMentionsPresenter() {
-        return new ArticleDetailPresenter(App.get().Di().getNewsRepository());
+        return new ArticleDetailPresenter(interactor);
     }
 
     public NewsDetailsFragment() {
@@ -95,9 +100,9 @@ public class NewsDetailsFragment extends TabFragment implements ArticleDetailVie
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            presenter.setNewsUrl(getArguments().getString(ARG_NEWS_URL));
-            presenter.setNewsId(getArguments().getInt(ARG_NEWS_ID, 0));
-            presenter.setCommentId(getArguments().getInt(ARG_NEWS_COMMENT_ID, 0));
+            interactor.getInitData().setNewsUrl(getArguments().getString(ARG_NEWS_URL));
+            interactor.getInitData().setNewsId(getArguments().getInt(ARG_NEWS_ID, 0));
+            interactor.getInitData().setCommentId(getArguments().getInt(ARG_NEWS_COMMENT_ID, 0));
             /*presenter.setNewsTitle(getArguments().getString(ARG_NEWS_TITLE));
             presenter.setNewsNick(getArguments().getString(ARG_NEWS_AUTHOR_NICK));
             presenter.setNewsDate(getArguments().getString(ARG_NEWS_DATE));
@@ -237,7 +242,7 @@ public class NewsDetailsFragment extends TabFragment implements ArticleDetailVie
             showArticleImage(data.getImgUrl());
         }
 
-        FragmentPagerAdapter pagerAdapter = new FragmentPagerAdapter(getChildFragmentManager(), data);
+        FragmentPagerAdapter pagerAdapter = new FragmentPagerAdapter(getChildFragmentManager(), interactor);
         fragmentsPager.setAdapter(pagerAdapter);
         if (data.getCommentId() != 0) {
             appBarLayout.setExpanded(false, true);
@@ -270,18 +275,18 @@ public class NewsDetailsFragment extends TabFragment implements ArticleDetailVie
     }
 
     private class FragmentPagerAdapter extends android.support.v4.app.FragmentPagerAdapter {
-        private DetailsPage article;
+        private ArticleInteractor interactor;
         private ArrayList<Fragment> fragments = new ArrayList<>();
         private ArrayList<String> titles = new ArrayList<>();
 
-        public FragmentPagerAdapter(FragmentManager fm, DetailsPage article) {
+        public FragmentPagerAdapter(FragmentManager fm, ArticleInteractor interactor) {
             super(fm);
-            this.article = article;
+            this.interactor = interactor;
 
-            fragments.add(new ArticleContentFragment().setArticle(this.article));
+            fragments.add(new ArticleContentFragment().setInteractor(this.interactor));
             titles.add(App.get().getString(R.string.news_page_content));
 
-            fragments.add(new ArticleCommentsFragment().setArticle(this.article));
+            fragments.add(new ArticleCommentsFragment().setInteractor(this.interactor));
             titles.add(App.get().getString(R.string.news_page_comments));
         }
 

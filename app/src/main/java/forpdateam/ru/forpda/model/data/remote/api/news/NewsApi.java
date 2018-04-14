@@ -270,7 +270,6 @@ public class NewsApi {
     private final Pattern userIdPattern = Pattern.compile("showuser=(\\d+)");
 
     public Comment parseComments(final SparseArray<Comment.Karma> karmaMap, String source) {
-        long time = System.currentTimeMillis();
         Document document = Parser.parse(source);
         Comment comments = new Comment();
         recurseComments(karmaMap, document, comments, 0);
@@ -342,19 +341,7 @@ public class NewsApi {
         return parentComment;
     }
 
-    public ArrayList<Comment> commentsToList(Comment comment) {
-        ArrayList<Comment> comments = new ArrayList<>();
-        recurseCommentsToList(comments, comment);
-        return comments;
-    }
 
-
-    public void recurseCommentsToList(ArrayList<Comment> comments, Comment comment) {
-        for (Comment child : comment.getChildren()) {
-            comments.add(new Comment(child));
-            recurseCommentsToList(comments, child);
-        }
-    }
 
     public Boolean likeComment(int articleId, int commentId) throws Exception {
         String url = "https://4pda.ru/wp-content/plugins/karma/ajax.php?p=" + articleId + "&c=" + commentId + "&v=1";
@@ -362,7 +349,7 @@ public class NewsApi {
         return true;
     }
 
-    public Comment replyComment(DetailsPage article, int commentId, String comment) throws Exception {
+    public DetailsPage replyComment(int articleId, int commentId, String comment) throws Exception {
         try {
             comment = URLEncoder.encode(comment, "Windows-1251");
         } catch (UnsupportedEncodingException e) {
@@ -370,15 +357,12 @@ public class NewsApi {
         }
         NetworkRequest.Builder builder = new NetworkRequest.Builder()
                 .url("https://4pda.ru/wp-comments-post.php")
-                .formHeader("comment_post_ID", Integer.toString(article.getId()))
+                .formHeader("comment_post_ID", Integer.toString(articleId))
                 .formHeader("comment_reply_ID", Integer.toString(commentId))
                 .formHeader("comment_reply_dp", commentId == 0 ? "0" : "1")
                 .formHeader("comment", comment, true);
         NetworkResponse response = webClient.request(builder.build());
-
-        DetailsPage newArticle = parseArticle(response.getBody());
-
-        return updateComments(article, newArticle);
+        return parseArticle(response.getBody());
     }
 
     public Comment updateComments(DetailsPage article, DetailsPage newArticle) {
