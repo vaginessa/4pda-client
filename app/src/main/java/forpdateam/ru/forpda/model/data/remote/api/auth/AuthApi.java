@@ -79,7 +79,7 @@ public class AuthApi {
     }
 
     public boolean logout() throws Exception {
-        NetworkResponse response =webClient.get("https://4pda.ru/forum/index.php?act=logout&CODE=03&k=".concat(webClient.getAuthKey()));
+        NetworkResponse response = webClient.get("https://4pda.ru/forum/index.php?act=logout&CODE=03&k=".concat(webClient.getAuthKey()));
 
         Matcher matcher = Pattern.compile("wr va-m text").matcher(response.getBody());
         if (matcher.find())

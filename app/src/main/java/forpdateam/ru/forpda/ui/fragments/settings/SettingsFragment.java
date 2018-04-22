@@ -18,9 +18,11 @@ import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.common.Preferences;
+import forpdateam.ru.forpda.model.repository.auth.AuthRepository;
 import forpdateam.ru.forpda.ui.activities.SettingsActivity;
 import forpdateam.ru.forpda.ui.activities.updatechecker.UpdateCheckerActivity;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -28,6 +30,9 @@ import io.reactivex.schedulers.Schedulers;
  */
 
 public class SettingsFragment extends BaseSettingFragment {
+    private AuthRepository authRepository = App.get().Di().getAuthRepository();
+    private Disposable disposable = null;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,17 +42,7 @@ public class SettingsFragment extends BaseSettingFragment {
                     .setOnPreferenceClickListener(preference -> {
                         new AlertDialog.Builder(getActivity())
                                 .setMessage(R.string.ask_logout)
-                                .setPositiveButton(R.string.ok, (dialog, which) -> RxApi.Auth().logout().onErrorReturn(throwable -> false)
-                                        .subscribeOn(Schedulers.io())
-                                        .observeOn(AndroidSchedulers.mainThread())
-                                        .subscribe(aBoolean -> {
-                                            if (aBoolean) {
-                                                Toast.makeText(App.getContext(), "Logout complete", Toast.LENGTH_LONG).show();
-                                                ClientHelper.get().notifyAuthChanged(ClientHelper.AUTH_STATE_LOGOUT);
-                                            } else {
-                                                Toast.makeText(App.getContext(), "Logout error", Toast.LENGTH_LONG).show();
-                                            }
-                                        }))
+                                .setPositiveButton(R.string.ok, (dialog, which) -> logoutRequest())
                                 .setNegativeButton(R.string.no, null)
                                 .show();
                         return false;
@@ -133,5 +128,31 @@ public class SettingsFragment extends BaseSettingFragment {
                     startActivity(intent);
                     return true;
                 });
+    }
+
+    private void logoutRequest() {
+        if (disposable != null) {
+            disposable.dispose();
+        }
+        disposable = authRepository
+                .signOut()
+                .subscribe(result -> {
+                    if (result) {
+                        Toast.makeText(App.getContext(), "Logout complete", Toast.LENGTH_LONG).show();
+                        ClientHelper.get().notifyAuthChanged(ClientHelper.AUTH_STATE_LOGOUT);
+                    } else {
+                        Toast.makeText(App.getContext(), "Logout error", Toast.LENGTH_LONG).show();
+                    }
+                }, ex -> {
+                    Toast.makeText(App.getContext(), "Logout error: " + ex, Toast.LENGTH_LONG).show();
+                });
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (disposable != null) {
+            disposable.dispose();
+        }
     }
 }

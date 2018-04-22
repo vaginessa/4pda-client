@@ -24,5 +24,9 @@ class AuthRepository(
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 
+    fun signOut(): Observable<Boolean> = Observable
+            .fromCallable { authApi.logout() }
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.ui())
 
 }
