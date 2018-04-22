@@ -12,6 +12,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.view.menu.ActionMenuItemView;
 import android.support.v7.widget.ActionMenuView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -34,12 +35,16 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.arellomobile.mvp.presenter.InjectPresenter;
+import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.nostra13.universalimageloader.core.ImageLoader;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Observer;
 
 import forpdateam.ru.forpda.App;
@@ -55,9 +60,14 @@ import forpdateam.ru.forpda.entity.remote.IBaseForumPost;
 import forpdateam.ru.forpda.entity.remote.search.SearchItem;
 import forpdateam.ru.forpda.entity.remote.search.SearchResult;
 import forpdateam.ru.forpda.entity.remote.search.SearchSettings;
+import forpdateam.ru.forpda.entity.remote.theme.ThemePage;
+import forpdateam.ru.forpda.model.data.remote.api.favorites.FavoritesApi;
+import forpdateam.ru.forpda.presentation.search.SearchPresenter;
+import forpdateam.ru.forpda.presentation.search.SearchSiteView;
 import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import forpdateam.ru.forpda.ui.fragments.devdb.brand.DevicesFragment;
+import forpdateam.ru.forpda.ui.fragments.favorites.FavoritesFragment;
 import forpdateam.ru.forpda.ui.fragments.theme.ThemeDialogsHelper;
 import forpdateam.ru.forpda.ui.fragments.theme.ThemeFragmentWeb;
 import forpdateam.ru.forpda.ui.fragments.theme.ThemeHelper;
@@ -75,22 +85,19 @@ import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip;
  * Created by radiationx on 29.01.17.
  */
 
-public class SearchFragment extends TabFragment implements IPostFunctions, ExtendedWebView.JsLifeCycleListener, SearchAdapter.OnItemClickListener<SearchItem> {
+public class SearchFragment extends TabFragment implements SearchSiteView, IPostFunctions, ExtendedWebView.JsLifeCycleListener, SearchAdapter.OnItemClickListener<SearchItem> {
+
     private final static String LOG_TAG = SearchFragment.class.getSimpleName();
     protected final static String JS_INTERFACE = "ISearch";
+
     private boolean scrollButtonEnable = false;
+
     private ViewGroup searchSettingsView;
     private ViewGroup nickBlock, resourceBlock, resultBlock, sortBlock, sourceBlock;
     private Spinner resourceSpinner, resultSpinner, sortSpinner, sourceSpinner;
     private TextView nickField;
     private Button submitButton, saveSettingsButton;
 
-    private List<String> resourceItems = Arrays.asList(SearchSettings.RESOURCE_FORUM.second, SearchSettings.RESOURCE_NEWS.second);
-    private List<String> resultItems = Arrays.asList(SearchSettings.RESULT_TOPICS.second, SearchSettings.RESULT_POSTS.second);
-    private List<String> sortItems = Arrays.asList(SearchSettings.SORT_DA.second, SearchSettings.SORT_DD.second, SearchSettings.SORT_REL.second);
-    private List<String> sourceItems = Arrays.asList(SearchSettings.SOURCE_ALL.second, SearchSettings.SOURCE_TITLES.second, SearchSettings.SOURCE_CONTENT.second);
-
-    private SearchSettings settings = new SearchSettings();
 
     private ExtendedWebView webView;
     private RecyclerView recyclerView;
@@ -98,9 +105,18 @@ public class SearchFragment extends TabFragment implements IPostFunctions, Exten
     private SearchAdapter adapter = new SearchAdapter();
     private CustomWebViewClient webViewClient;
 
-    private StringBuilder titleBuilder = new StringBuilder();
+
     private PaginationHelper paginationHelper;
     private DynamicDialogMenu<SearchFragment, IBaseForumPost> dialogMenu;
+
+
+    private SearchView searchView;
+    private MenuItem searchItem;
+    private BottomSheetDialog dialog;
+    private SimpleTooltip tooltip;
+
+    private MenuItem settingsMenuItem;
+
 
     private Observer searchPreferenceObserver = (observable, o) -> {
         if (o == null) return;
@@ -136,6 +152,18 @@ public class SearchFragment extends TabFragment implements IPostFunctions, Exten
         webView.evalJs("updateTypeAvatarState(" + isCircle + ")");
     }
 
+    @InjectPresenter
+    SearchPresenter presenter;
+
+    @ProvidePresenter
+    SearchPresenter provideThemePresenter() {
+        return new SearchPresenter(
+                App.get().Di().getSearchRepository(),
+                App.get().Di().getFavoritesRepository()
+        );
+    }
+
+
     public SearchFragment() {
         configuration.setDefaultTitle(App.get().getString(R.string.fragment_title_search));
     }
@@ -149,21 +177,12 @@ public class SearchFragment extends TabFragment implements IPostFunctions, Exten
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        String savedSettings = App.get().getPreferences().getString("search_settings", null);
-        if (savedSettings != null) {
-            settings = SearchSettings.parseSettings(settings, savedSettings);
-        }
+        String searchUrl = App.get().getPreferences().getString("search_settings", null);
         if (getArguments() != null) {
-            settings = SearchSettings.fromBundle(settings, getArguments());
+            searchUrl = getArguments().getString(TabFragment.ARG_TAB);
         }
+        presenter.initSearchSettings(searchUrl);
     }
-
-    private SearchView searchView;
-    private MenuItem searchItem;
-    private SearchResult data;
-    private BottomSheetDialog dialog;
-    private SimpleTooltip tooltip;
-
 
     @Override
     protected void initFabBehavior() {
@@ -222,6 +241,14 @@ public class SearchFragment extends TabFragment implements IPostFunctions, Exten
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        dialogMenu = new DynamicDialogMenu<>();
+        dialogMenu.addItem(getString(R.string.topic_to_begin), (context, data1) -> presenter.openTopicBegin(data1));
+        dialogMenu.addItem(getString(R.string.topic_newposts), (context, data1) -> presenter.openTopicNew(data1));
+        dialogMenu.addItem(getString(R.string.topic_lastposts), (context, data1) -> presenter.openTopicLast(data1));
+        dialogMenu.addItem(getString(R.string.copy_link), (context, data1) -> presenter.copyLink(data1));
+        dialogMenu.addItem(getString(R.string.open_theme_forum), (context, data1) -> presenter.openForum(data1));
+        dialogMenu.addItem(getString(R.string.add_to_favorites), ((context, data1) -> presenter.onClickAddInFav(data1)));
+
         fab.setOnClickListener(v -> {
             if (webView.getDirection() == ExtendedWebView.DIRECTION_DOWN) {
                 webView.pageDown(true);
@@ -264,8 +291,7 @@ public class SearchFragment extends TabFragment implements IPostFunctions, Exten
 
             @Override
             public void onSelectedPage(int pageNumber) {
-                settings.setSt(pageNumber);
-                loadData();
+                presenter.search(pageNumber);
             }
         });
 
@@ -274,11 +300,6 @@ public class SearchFragment extends TabFragment implements IPostFunctions, Exten
         //dialog.setPeekHeight(App.getKeyboardHeight());
         //dialog.getWindow().getDecorView().setFitsSystemWindows(true);
 
-
-        setItems(resourceSpinner, (String[]) resourceItems.toArray(), 0);
-        setItems(resultSpinner, (String[]) resultItems.toArray(), 0);
-        setItems(sortSpinner, (String[]) sortItems.toArray(), 0);
-        setItems(sourceSpinner, (String[]) sourceItems.toArray(), 1);
 
         SearchManager searchManager = (SearchManager) getMainActivity().getSystemService(Context.SEARCH_SERVICE);
         if (null != searchManager) {
@@ -307,10 +328,9 @@ public class SearchFragment extends TabFragment implements IPostFunctions, Exten
         searchSrcText.setPadding(0, searchSrcText.getPaddingTop(), 0, searchSrcText.getPaddingBottom());
 
 
-        fillSettingsData();
         searchItem.expandActionView();
         submitButton.setOnClickListener(v -> startSearch());
-        saveSettingsButton.setOnClickListener(v -> saveSettings());
+        saveSettingsButton.setOnClickListener(v -> presenter.saveSettings());
         //recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.addItemDecoration(new DevicesFragment.SpacingItemDecoration(App.px8, true));
@@ -319,7 +339,7 @@ public class SearchFragment extends TabFragment implements IPostFunctions, Exten
         recyclerView.setAdapter(adapter);
         refreshLayoutStyle(refreshLayout);
         refreshLayoutLongTrigger(refreshLayout);
-        refreshLayout.setOnRefreshListener(this::loadData);
+        refreshLayout.setOnRefreshListener(() -> presenter.refreshData());
         adapter.setOnItemClickListener(this);
 
         if (App.get().getPreferences().getBoolean("search.tooltip.settings", true)) {
@@ -358,14 +378,13 @@ public class SearchFragment extends TabFragment implements IPostFunctions, Exten
 
     }
 
-    private MenuItem settingsMenuItem;
 
     @Override
     protected void addBaseToolbarMenu(Menu menu) {
         super.addBaseToolbarMenu(menu);
         menu.add(R.string.copy_link)
                 .setOnMenuItemClickListener(menuItem -> {
-                    Utils.copyToClipBoard(settings.toUrl());
+                    presenter.copyLink();
                     return false;
                 });
         toolbar.inflateMenu(R.menu.qms_contacts_menu);
@@ -399,25 +418,55 @@ public class SearchFragment extends TabFragment implements IPostFunctions, Exten
         return super.onBackPressed();
     }
 
-    private boolean checkArg(String arg, Pair<String, String> pair) {
-        return arg.equals(pair.first);
+    @Override
+    public void showAddInFavDialog(@NotNull IBaseForumPost item) {
+        new AlertDialog.Builder(getContext())
+                .setTitle(R.string.favorites_subscribe_email)
+                .setItems(FavoritesFragment.SUB_NAMES, (dialog1, which1) -> {
+                    presenter.addTopicToFavorite(item.getId(), FavoritesApi.SUB_TYPES[which1]);
+                })
+                .show();
     }
 
-    private boolean checkName(String arg, Pair<String, String> pair) {
-        return arg.equals(pair.second);
+    @Override
+    public void onAddToFavorite(boolean result) {
+        Toast.makeText(getContext(), result ? getString(R.string.favorites_added) : getString(R.string.error_occurred), Toast.LENGTH_SHORT).show();
+        refreshToolbarMenuItems(true);
+    }
+
+    private boolean checkArg(String arg, Pair<String, String> pair) {
+        return arg.equals(pair.first);
     }
 
     private void setSelection(Spinner spinner, List<String> items, Pair<String, String> pair) {
         spinner.setSelection(items.indexOf(pair.second));
     }
 
-    private void fillSettingsData() {
+    private void setItems(Spinner spinner, List<String> items, int selection) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getMainActivity(), android.R.layout.simple_spinner_item, items);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setSelection(selection);
+        spinner.setOnItemSelectedListener(listener);
+    }
 
+    @Override
+    public void fillSettingsData(@NotNull SearchSettings settings, @NotNull Map<String, ? extends List<String>> fields) {
         searchView.post(() -> {
             searchView.setQuery(settings.getQuery(), false);
         });
 
         nickField.setText(settings.getNick());
+
+        List<String> resourceItems = fields.get(SearchPresenter.FIELD_RESOURCE);
+        List<String> resultItems = fields.get(SearchPresenter.FIELD_RESULT);
+        List<String> sortItems = fields.get(SearchPresenter.FIELD_SORT);
+        List<String> sourceItems = fields.get(SearchPresenter.FIELD_SOURCE);
+
+        setItems(resourceSpinner, resourceItems, 0);
+        setItems(resultSpinner, resultItems, 0);
+        setItems(sortSpinner, sortItems, 0);
+        setItems(sourceSpinner, sourceItems, 1);
 
         if (checkArg(settings.getResourceType(), SearchSettings.RESOURCE_NEWS)) {
             setSelection(resourceSpinner, resourceItems, SearchSettings.RESOURCE_NEWS);
@@ -448,44 +497,23 @@ public class SearchFragment extends TabFragment implements IPostFunctions, Exten
         }
     }
 
+
     private AdapterView.OnItemSelectedListener listener = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            String arg;
+            String field = null;
             if (parent == resourceSpinner) {
-                arg = resourceItems.get(position);
-                if (checkName(arg, SearchSettings.RESOURCE_NEWS)) {
-                    settings.setResourceType(SearchSettings.RESOURCE_NEWS.first);
-                    setNewsMode();
-                } else if (checkName(arg, SearchSettings.RESOURCE_FORUM)) {
-                    settings.setResourceType(SearchSettings.RESOURCE_FORUM.first);
-                    setForumMode();
-                }
+                field = SearchPresenter.FIELD_RESOURCE;
             } else if (parent == resultSpinner) {
-                arg = resultItems.get(position);
-                if (checkName(arg, SearchSettings.RESULT_TOPICS)) {
-                    settings.setResult(SearchSettings.RESULT_TOPICS.first);
-                } else if (checkName(arg, SearchSettings.RESULT_POSTS)) {
-                    settings.setResult(SearchSettings.RESULT_POSTS.first);
-                }
+                field = SearchPresenter.FIELD_RESULT;
             } else if (parent == sortSpinner) {
-                arg = sortItems.get(position);
-                if (checkName(arg, SearchSettings.SORT_DA)) {
-                    settings.setSort(SearchSettings.SORT_DA.first);
-                } else if (checkName(arg, SearchSettings.SORT_DD)) {
-                    settings.setSort(SearchSettings.SORT_DD.first);
-                } else if (checkName(arg, SearchSettings.SORT_REL)) {
-                    settings.setSort(SearchSettings.SORT_REL.first);
-                }
+                field = SearchPresenter.FIELD_SORT;
             } else if (parent == sourceSpinner) {
-                arg = sourceItems.get(position);
-                if (checkName(arg, SearchSettings.SOURCE_ALL)) {
-                    settings.setSource(SearchSettings.SOURCE_ALL.first);
-                } else if (checkName(arg, SearchSettings.SOURCE_TITLES)) {
-                    settings.setSource(SearchSettings.SOURCE_TITLES.first);
-                } else if (checkName(arg, SearchSettings.SOURCE_CONTENT)) {
-                    settings.setSource(SearchSettings.SOURCE_CONTENT.first);
-                }
+                field = SearchPresenter.FIELD_SOURCE;
+            }
+
+            if (field != null) {
+                presenter.updateSettings(field, position);
             }
         }
 
@@ -495,50 +523,34 @@ public class SearchFragment extends TabFragment implements IPostFunctions, Exten
         }
     };
 
-    private void setNewsMode() {
+    @Override
+    public void setNewsMode() {
         nickBlock.setVisibility(View.GONE);
         resultBlock.setVisibility(View.GONE);
         sortBlock.setVisibility(View.GONE);
         sourceBlock.setVisibility(View.GONE);
     }
 
-    private void setForumMode() {
+    @Override
+    public void setForumMode() {
         nickBlock.setVisibility(View.VISIBLE);
         resultBlock.setVisibility(View.VISIBLE);
         sortBlock.setVisibility(View.VISIBLE);
         sourceBlock.setVisibility(View.VISIBLE);
     }
 
-    private void setItems(Spinner spinner, String[] items, int selection) {
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getMainActivity(), android.R.layout.simple_spinner_item, items);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-        spinner.setSelection(selection);
-        spinner.setOnItemSelectedListener(listener);
-    }
-
-    private void saveSettings() {
-        SearchSettings saveSettings = new SearchSettings();
-        saveSettings.setResult(settings.getResult());
-        saveSettings.setSort(settings.getSort());
-        saveSettings.setSource(settings.getSource());
-        String saveUrl = saveSettings.toUrl();
-        Log.d(LOG_TAG, "SAVE SETTINGS " + saveUrl);
-        App.get().getPreferences().edit().putString("search_settings", saveUrl).apply();
-    }
-
     private void startSearch() {
-        settings.setSt(0);
-        settings.setQuery(searchView.getQuery().toString());
-        settings.setNick(nickField.getText().toString());
+        presenter.search(searchView.getQuery().toString(), nickField.getText().toString());
         if (dialog != null && dialog.isShowing()) {
             dialog.dismiss();
         }
-        loadData();
     }
 
-    private void buildTitle() {
-        titleBuilder.setLength(0);
+    @Override
+    public void onStartSearch(@NotNull SearchSettings settings) {
+        hidePopupWindows();
+
+        StringBuilder titleBuilder = new StringBuilder();
         titleBuilder.append("Поиск");
         if (settings.getResourceType().equals(SearchSettings.RESOURCE_NEWS.first)) {
             titleBuilder.append(" новостей");
@@ -559,31 +571,12 @@ public class SearchFragment extends TabFragment implements IPostFunctions, Exten
     }
 
     @Override
-    public boolean loadData() {
-        if (!super.loadData()) {
-            return false;
-        }
-        if (settings.getQuery().isEmpty() && settings.getNick().isEmpty()) {
-            return true;
-        }
-        buildTitle();
-        hidePopupWindows();
-        /*if (searchSettingsView.getVisibility() == View.VISIBLE) {
-            searchSettingsView.setVisibility(View.GONE);
-        }*/
-        setRefreshing(true);
-        boolean withHtml = settings.getResult().equals(SearchSettings.RESULT_POSTS.first) && settings.getResourceType().equals(SearchSettings.RESOURCE_FORUM.first);
-        subscribe(RxApi.Search().getSearch(settings, withHtml), this::onLoadData, new SearchResult(), v -> loadData());
-        return true;
-    }
-
-    private void onLoadData(SearchResult searchResult) {
+    public void showData(@NotNull SearchResult searchResult) {
         setRefreshing(false);
         recyclerView.scrollToPosition(0);
         hidePopupWindows();
-        data = searchResult;
         Log.d("SUKA", "SEARCH SIZE " + searchResult.getItems().size());
-        if (data.getItems().isEmpty()) {
+        if (searchResult.getItems().isEmpty()) {
             if (!contentController.contains(ContentController.TAG_NO_DATA)) {
                 FunnyContent funnyContent = new FunnyContent(getContext())
                         .setImage(R.drawable.ic_search)
@@ -595,8 +588,7 @@ public class SearchFragment extends TabFragment implements IPostFunctions, Exten
         } else {
             contentController.hideContent(ContentController.TAG_NO_DATA);
         }
-        Log.d("SUKA", "" + data.getSettings().getResult() + " : " + data.getSettings().getResourceType());
-        if (data.getSettings().getResult().equals(SearchSettings.RESULT_POSTS.first) && data.getSettings().getResourceType().equals(SearchSettings.RESOURCE_FORUM.first)) {
+        if (searchResult.getSettings().getResult().equals(SearchSettings.RESULT_POSTS.first) && searchResult.getSettings().getResourceType().equals(SearchSettings.RESOURCE_FORUM.first)) {
             for (int i = 0; i < refreshLayout.getChildCount(); i++) {
                 if (refreshLayout.getChildAt(i) instanceof RecyclerView) {
                     refreshLayout.removeViewAt(i);
@@ -617,7 +609,7 @@ public class SearchFragment extends TabFragment implements IPostFunctions, Exten
                 webView.setWebChromeClient(new CustomWebChromeClient());
             }
             Log.d("SUKA", "SEARCH SHOW WEBVIEW");
-            webView.loadDataWithBaseURL("https://4pda.ru/forum/", data.getHtml(), "text/html", "utf-8", null);
+            webView.loadDataWithBaseURL("https://4pda.ru/forum/", searchResult.getHtml(), "text/html", "utf-8", null);
         } else {
             for (int i = 0; i < refreshLayout.getChildCount(); i++) {
                 if (refreshLayout.getChildAt(i) instanceof ExtendedWebView) {
@@ -632,10 +624,10 @@ public class SearchFragment extends TabFragment implements IPostFunctions, Exten
             }
             Log.d("SUKA", "SEARCH SHOW RECYCLERVIEW");
             adapter.clear();
-            adapter.addAll(data.getItems());
+            adapter.addAll(searchResult.getItems());
         }
 
-        paginationHelper.updatePagination(data.getPagination());
+        paginationHelper.updatePagination(searchResult.getPagination());
         setSubtitle(paginationHelper.getTitle());
     }
 
@@ -684,50 +676,17 @@ public class SearchFragment extends TabFragment implements IPostFunctions, Exten
 
     @Override
     public void onItemClick(SearchItem item) {
-        String url = "";
-        if (settings.getResourceType().equals(SearchSettings.RESOURCE_NEWS.first)) {
-            url = "https://4pda.ru/index.php?p=" + item.getId();
-        } else {
-            url = "https://4pda.ru/forum/index.php?showtopic=" + item.getTopicId();
-            if (item.getId() != 0) {
-                url += "&view=findpost&p=" + item.getId();
-            }
-        }
-        IntentHandler.handle(url);
+        presenter.onItemClick(item);
     }
 
     @Override
     public boolean onItemLongClick(SearchItem item) {
-        if (dialogMenu == null) {
-            dialogMenu = new DynamicDialogMenu<>();
-            dialogMenu.addItem(getString(R.string.topic_to_begin), (context, data1) -> {
-                IntentHandler.handle("https://4pda.ru/forum/index.php?showtopic=" + data1.getTopicId());
-            });
-            dialogMenu.addItem(getString(R.string.topic_newposts), (context, data1) -> {
-                IntentHandler.handle("https://4pda.ru/forum/index.php?showtopic=" + data1.getTopicId() + "&view=getnewpost");
-            });
-            dialogMenu.addItem(getString(R.string.topic_lastposts), (context, data1) -> {
-                IntentHandler.handle("https://4pda.ru/forum/index.php?showtopic=" + data1.getTopicId() + "&view=getlastpost");
-            });
-            dialogMenu.addItem(getString(R.string.copy_link), (context, data1) -> {
-                String url = "";
-                if (settings.getResourceType().equals(SearchSettings.RESOURCE_NEWS.first)) {
-                    url = "https://4pda.ru/index.php?p=" + item.getId();
-                } else {
-                    url = "https://4pda.ru/forum/index.php?showtopic=" + item.getTopicId();
-                    if (item.getId() != 0) {
-                        url += "&view=findpost&p=" + item.getId();
-                    }
-                }
-                Utils.copyToClipBoard(url);
-            });
-            dialogMenu.addItem(getString(R.string.open_theme_forum), (context, data1) -> IntentHandler.handle("https://4pda.ru/forum/index.php?showforum=" + data1.getForumId()));
-            dialogMenu.addItem(getString(R.string.add_to_favorites), ((context, data1) -> {
-                FavoritesHelper.addWithDialog(getContext(), aBoolean -> {
-                    Toast.makeText(getContext(), getString(aBoolean ? R.string.favorites_added : R.string.error_occurred), Toast.LENGTH_SHORT).show();
-                }, data1.getId());
-            }));
-        }
+        presenter.onItemLongClick(item);
+        return false;
+    }
+
+    @Override
+    public void showItemDialogMenu(@NotNull SearchItem item, @NotNull SearchSettings settings) {
         dialogMenu.disallowAll();
         if (settings.getResourceType().equals(SearchSettings.RESOURCE_NEWS.first)) {
             dialogMenu.allow(3);
@@ -735,7 +694,6 @@ public class SearchFragment extends TabFragment implements IPostFunctions, Exten
             dialogMenu.allowAll();
         }
         dialogMenu.show(getContext(), SearchFragment.this, item);
-        return false;
     }
 
     @JavascriptInterface

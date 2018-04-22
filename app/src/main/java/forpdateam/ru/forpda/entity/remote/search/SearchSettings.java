@@ -281,13 +281,6 @@ public class SearchSettings {
         return url;
     }
 
-    public static SearchSettings fromBundle(SearchSettings settings, Bundle arguments) {
-        String url = arguments.getString(TabFragment.ARG_TAB);
-        if (url != null)
-            settings = SearchSettings.parseSettings(settings, url);
-        return settings;
-    }
-
     public int getSt() {
         return st;
     }
