@@ -18,11 +18,11 @@ android {
 
     def fileNaming = "apk/ForPDA"
 
-    def versionNumber = 70
+    def versionNumber = 74
 
     def versionMajor = "0"
     def versionMinor = "6"
-    def versionPatch = "7.2"
+    def versionPatch = "8.3"
 
     def versionBuild = -1
     def versionPropsFile = file('version.properties')
@@ -128,7 +128,7 @@ android {
 }
 
 ext {
-    supportLibVersion = '27.1.0'
+    supportLibVersion = '27.1.1'
     okHttpVersion = '3.9.0'
     rxCoreVersion = '2.1.5'
     rxAndroidVersion = '2.0.1'
@@ -136,20 +136,15 @@ ext {
 }
 
 dependencies {
-    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     implementation "com.android.support:palette-v7:${supportLibVersion}"
     implementation "com.android.support:appcompat-v7:${supportLibVersion}"
     implementation "com.android.support:design:${supportLibVersion}"
     implementation "com.android.support:cardview-v7:${supportLibVersion}"
     implementation "com.android.support:recyclerview-v7:${supportLibVersion}"
     implementation "com.android.support:preference-v7:${supportLibVersion}"
-//    implementation "android.arch.persistence.room:runtime:${archVersion}"
-//    implementation "android.arch.persistence.room:rxjava2:${archVersion}"
-//    annotationProcessor "android.arch.persistence.room:implementationr:${archVersion}"
-//    implementation "android.arch.lifecycle:runtime:${archVersion}"
-//    implementation "android.arch.lifecycle:extensions:${archVersion}"
-//    annotationProcessor "android.arch.lifecycle:implementationr:${archVersion}"
+
     implementation "com.squareup.okhttp3:okhttp:${okHttpVersion}"
     implementation "com.squareup.okhttp3:okhttp-urlconnection:${okHttpVersion}"
     implementation 'com.annimon:stream:1.1.4'

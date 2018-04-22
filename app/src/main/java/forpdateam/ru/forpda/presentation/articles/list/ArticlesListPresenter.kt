@@ -21,7 +21,7 @@ import forpdateam.ru.forpda.ui.fragments.search.SearchFragment
 class ArticlesListPresenter(
         private val newsRepository: NewsRepository
 ) : BasePresenter<ArticlesListView>() {
-    private val category = Constants.NEWS_CATEGORY_ALL
+    private val category = Constants.NEWS_CATEGORY_ROOT
     private var currentPage = 1
 
     override fun onFirstViewAttach() {
