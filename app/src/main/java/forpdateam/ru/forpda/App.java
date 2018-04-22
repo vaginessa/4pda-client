@@ -299,7 +299,6 @@ public class App extends android.app.Application {
                 .migration(new DbMigration())
                 .build();
         Realm.setDefaultConfiguration(configuration);
-        Client.get(getContext());
 
 
         getPreferences().registerOnSharedPreferenceChangeListener(preferenceChangeListener);
@@ -584,7 +583,7 @@ public class App extends android.app.Application {
                     protected HttpURLConnection createConnection(String url, Object extra) throws IOException {
                         HttpURLConnection conn = super.createConnection(url, extra);
                         if (pattern4pda.matcher(url).find()) {
-                            Map<String, Cookie> cookies = Client.get().getClientCookies();
+                            Map<String, Cookie> cookies = App.get().Di().getWebClient().getClientCookies();
                             String stringCookies = "";
                             for (Map.Entry<String, Cookie> cookieEntry : cookies.entrySet()) {
                                 stringCookies = stringCookies.concat(cookieEntry.getKey()).concat("=").concat(cookieEntry.getValue().value()).concat(";");

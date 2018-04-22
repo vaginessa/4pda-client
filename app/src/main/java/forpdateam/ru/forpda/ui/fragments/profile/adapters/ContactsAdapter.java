@@ -8,6 +8,7 @@ import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.entity.remote.profile.ProfileModel;
+import forpdateam.ru.forpda.model.repository.temp.TempHelper;
 import forpdateam.ru.forpda.ui.views.adapters.BaseAdapter;
 import forpdateam.ru.forpda.ui.views.adapters.BaseViewHolder;
 
@@ -37,7 +38,7 @@ class ContactsAdapter extends BaseAdapter<ProfileModel.Contact, ContactsAdapter.
 
         @Override
         public void bind(ProfileModel.Contact item) {
-            icon.setImageDrawable(App.getVecDrawable(icon.getContext(), ProfileRx.getContactIcon(item.getType())));
+            icon.setImageDrawable(App.getVecDrawable(icon.getContext(), TempHelper.INSTANCE.getContactIcon(item.getType())));
             icon.setContentDescription(item.getTitle());
         }
     }

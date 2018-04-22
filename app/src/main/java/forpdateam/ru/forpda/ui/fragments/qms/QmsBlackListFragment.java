@@ -75,7 +75,7 @@ public class QmsBlackListFragment extends RecyclerFragment implements QmsContact
             }
         });
 
-        refreshLayout.setOnRefreshListener(this::loadData);
+        refreshLayout.setOnRefreshListener(() -> presenter.loadContacts());
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         dialogMenu.addItem(getString(R.string.profile), (context, data) -> presenter.openProfile(data));

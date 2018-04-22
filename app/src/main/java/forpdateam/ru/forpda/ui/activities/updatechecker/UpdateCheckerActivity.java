@@ -31,6 +31,7 @@ import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
 import forpdateam.ru.forpda.ui.views.DynamicDialogMenu;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -111,8 +112,8 @@ public class UpdateCheckerActivity extends AppCompatActivity {
     private void refreshInfo() {
         setRefreshing(true);
         updateContent.removeAllViews();
-        Observable.fromCallable(() -> {
-            NetworkResponse response = Client.get(getApplicationContext()).get(JSON_LINK);
+        Disposable disposable = Observable.fromCallable(() -> {
+            NetworkResponse response = App.get().Di().getWebClient().get(JSON_LINK);
             String body;
             body = response.getBody();
             return body;

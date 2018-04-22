@@ -23,6 +23,7 @@ import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import forpdateam.ru.forpda.ui.views.ExtendedWebView;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -60,6 +61,7 @@ public class GoogleCaptchaFragment extends TabFragment {
         super.onViewCreated(view, savedInstanceState);
         setSubtitle("Это из-за VPN/Proxy и т.д.");
         webView.setWebViewClient(new CaptchaWebViewClient());
+        webView.loadDataWithBaseURL("https://4pda.ru/forum/", content, "text/html", "utf-8", null);
     }
 
     class CaptchaWebViewClient extends CustomWebViewClient {
@@ -68,7 +70,7 @@ public class GoogleCaptchaFragment extends TabFragment {
             Log.e("SUKA", uri.toString());
             if (Pattern.compile("https://4pda.ru/cdn-cgi/l/chk_captcha").matcher(uri.toString()).find()) {
                 NetworkRequest nr = new NetworkRequest.Builder().url(uri.toString()).withoutBody().build();
-                Observable.fromCallable(() -> Client.get().request(nr))
+                Disposable disposable = Observable.fromCallable(() -> App.get().Di().getWebClient().request(nr))
                         .onErrorReturn(throwable -> new NetworkResponse(null))
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -76,13 +78,6 @@ public class GoogleCaptchaFragment extends TabFragment {
             }
             return true;
         }
-    }
-
-    @Override
-    public boolean loadData() {
-        super.loadData();
-        webView.loadDataWithBaseURL("https://4pda.ru/forum/", content, "text/html", "utf-8", null);
-        return true;
     }
 
     private void onResponse(NetworkResponse response) {

@@ -67,7 +67,7 @@ public class HistoryFragment extends RecyclerFragment implements HistoryView {
         recyclerView.setAdapter(adapter);
 
         adapter.setItemClickListener(adapterListener);
-        refreshLayout.setOnRefreshListener(this::loadCacheData);
+        refreshLayout.setOnRefreshListener(() -> presenter.getHistory());
     }
 
     @Override
@@ -78,12 +78,6 @@ public class HistoryFragment extends RecyclerFragment implements HistoryView {
                     presenter.clear();
                     return false;
                 });
-    }
-
-    @Override
-    public void loadCacheData() {
-        super.loadCacheData();
-        presenter.getHistory();
     }
 
     @Override

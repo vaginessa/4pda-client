@@ -20,6 +20,7 @@ import forpdateam.ru.forpda.common.Preferences;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -28,10 +29,11 @@ import io.reactivex.schedulers.Schedulers;
 
 public class SimpleUpdateChecker {
     public void checkFromGitHub(Context context) {
-        Observable.fromCallable(() -> {
-            NetworkResponse response = Client.get(context).get(UpdateCheckerActivity.JSON_LINK);
-            return response.getBody();
-        })
+        Disposable disposable = Observable
+                .fromCallable(() -> {
+                    NetworkResponse response = App.get().Di().getWebClient().get(UpdateCheckerActivity.JSON_LINK);
+                    return response.getBody();
+                })
                 .onErrorReturn(throwable -> "")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

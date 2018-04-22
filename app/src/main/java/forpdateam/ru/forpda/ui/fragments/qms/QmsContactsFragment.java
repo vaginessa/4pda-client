@@ -77,7 +77,7 @@ public class QmsContactsFragment extends RecyclerFragment implements QmsContacts
         super.onViewCreated(view, savedInstanceState);
         initFabBehavior();
         refreshLayoutStyle(refreshLayout);
-        refreshLayout.setOnRefreshListener(this::loadData);
+        refreshLayout.setOnRefreshListener(() -> presenter.loadContacts());
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         PauseOnScrollListener pauseOnScrollListener = new PauseOnScrollListener(ImageLoader.getInstance(), true, true);
         recyclerView.addOnScrollListener(pauseOnScrollListener);

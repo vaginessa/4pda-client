@@ -1,9 +1,14 @@
 package forpdateam.ru.forpda.model.data.remote;
 
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import forpdateam.ru.forpda.model.data.remote.api.NetworkRequest;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
+import okhttp3.Cookie;
+import okhttp3.Request;
+import okhttp3.WebSocket;
+import okhttp3.WebSocketListener;
 
 /**
  * Created by radiationx on 26.03.17.
@@ -22,7 +27,11 @@ public interface IWebClient {
 
     String getAuthKey();
 
+    Map<String, Cookie> getClientCookies();
+
     void clearCookies();
+
+    WebSocket createWebSocketConnection(WebSocketListener webSocketListener);
 
     interface ProgressListener {
         void onProgress(int percent);

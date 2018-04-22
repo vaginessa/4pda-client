@@ -76,6 +76,7 @@ public class NotesFragment extends RecyclerFragment implements NotesAdapter.OnIt
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         refreshLayout.setOnRefreshListener(this::loadCacheData);
         recyclerView.addItemDecoration(new DevicesFragment.SpacingItemDecoration(App.px8, false));
+        loadCacheData();
     }
 
     @Override
@@ -106,9 +107,7 @@ public class NotesFragment extends RecyclerFragment implements NotesAdapter.OnIt
 
     }
 
-    @Override
     public void loadCacheData() {
-        super.loadCacheData();
         if (!realm.isClosed()) {
             setRefreshing(true);
             RealmResults<NoteItemBd> results = realm.where(NoteItemBd.class).findAllSorted("id", Sort.DESCENDING);

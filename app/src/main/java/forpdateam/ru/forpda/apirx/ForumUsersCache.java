@@ -3,6 +3,7 @@ package forpdateam.ru.forpda.apirx;
 import java.util.ArrayList;
 import java.util.List;
 
+import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.entity.db.ForumUserBd;
 import forpdateam.ru.forpda.entity.remote.others.user.ForumUser;
 import io.realm.Realm;
@@ -54,7 +55,7 @@ public class ForumUsersCache {
             return resultUser;
         }
 
-        List<ForumUser> loadedForumUsers = Api.Qms().findUser(nick);
+        List<ForumUser> loadedForumUsers = App.get().Di().getQmsApi().findUser(nick);
         for (ForumUser user : loadedForumUsers) {
             if (nick.equals(user.getNick())) {
                 resultUser = user;

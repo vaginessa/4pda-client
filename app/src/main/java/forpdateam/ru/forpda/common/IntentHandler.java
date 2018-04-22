@@ -46,6 +46,7 @@ import forpdateam.ru.forpda.ui.fragments.theme.ThemeFragmentWeb;
 import forpdateam.ru.forpda.ui.fragments.topics.TopicsFragment;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
@@ -57,40 +58,40 @@ public class IntentHandler {
     private final static String LOG_TAG = IntentHandler.class.getSimpleName();
 
     /*
-    *http://4pda.ru/forum/index.php?showuser=2556269
-    *https://4pda.ru/forum/index.php?showtopic=84979&view=getlastpost
-    *https://4pda.ru/forum/index.php?showtopic=84979&view=getnewpost
-    *https://4pda.ru/forum/index.php?showtopic=84979&view=findpost&p=51813850
-    *https://4pda.ru/forum/index.php?showtopic=84979&st=22460#entry51805351
-    *https://4pda.ru/forum/index.php?act=findpost&pid=51805351
-    *https://4pda.ru/forum/index.php?showforum=8&utm_source=ftmenu
-    *https://4pda.ru/forum/index.php?act=idx
-    *https://4pda.ru/forum/index.php?act=fav
-    *https://4pda.ru/forum/index.php?act=Members
-    *https://4pda.ru/forum/index.php?act=attach&code=showuser
-    *https://4pda.ru/forum/index.php?act=UserCP
-    *https://4pda.ru/forum/index.php?act=boardrules
-    *https://4pda.ru/forum/index.php?act=rep&view=history&mid=3916635
-    *https://4pda.ru/forum/index.php?act=qms
-    *https://4pda.ru/forum/index.php?act=qms&mid=5106086
-    *https://4pda.ru/forum/index.php?act=qms&mid=5106086&t=3127574
-    *https://4pda.ru/forum/index.php?act=Help
-    *https://4pda.ru/forum/index.php?act=search
-    *https://4pda.ru/forum/index.php?s=&act=Stats&view=who&t=84979
-    *https://4pda.ru/forum/index.php?act=search&query=hui&username=&forums%5B%5D=all&subforums=1&source=all&sort=rel&result=posts
-    *https://4pda.ru/devdb/
-    *https://4pda.ru/devdb/phones/
-    *https://4pda.ru/devdb/phones/acer
-    *https://4pda.ru/devdb/acer_liquid_z410_duo
-    *https://4pda.ru/special/polzovatelskoe-testirovanie-alcatel-idol-4s/
-    *https://4pda.ru
-    *https://4pda.ru/2016/08/04/315172/
-    *https://4pda.ru/reviews/tag/smart-watches/
-    *https://4pda.ru/articles/
-    *https://4pda.ru/pages/posts/3916635
-    *https://4pda.ru/pages/comments/3916635/
-    *https://4pda.ru/?s=hui
-    * */
+     *http://4pda.ru/forum/index.php?showuser=2556269
+     *https://4pda.ru/forum/index.php?showtopic=84979&view=getlastpost
+     *https://4pda.ru/forum/index.php?showtopic=84979&view=getnewpost
+     *https://4pda.ru/forum/index.php?showtopic=84979&view=findpost&p=51813850
+     *https://4pda.ru/forum/index.php?showtopic=84979&st=22460#entry51805351
+     *https://4pda.ru/forum/index.php?act=findpost&pid=51805351
+     *https://4pda.ru/forum/index.php?showforum=8&utm_source=ftmenu
+     *https://4pda.ru/forum/index.php?act=idx
+     *https://4pda.ru/forum/index.php?act=fav
+     *https://4pda.ru/forum/index.php?act=Members
+     *https://4pda.ru/forum/index.php?act=attach&code=showuser
+     *https://4pda.ru/forum/index.php?act=UserCP
+     *https://4pda.ru/forum/index.php?act=boardrules
+     *https://4pda.ru/forum/index.php?act=rep&view=history&mid=3916635
+     *https://4pda.ru/forum/index.php?act=qms
+     *https://4pda.ru/forum/index.php?act=qms&mid=5106086
+     *https://4pda.ru/forum/index.php?act=qms&mid=5106086&t=3127574
+     *https://4pda.ru/forum/index.php?act=Help
+     *https://4pda.ru/forum/index.php?act=search
+     *https://4pda.ru/forum/index.php?s=&act=Stats&view=who&t=84979
+     *https://4pda.ru/forum/index.php?act=search&query=hui&username=&forums%5B%5D=all&subforums=1&source=all&sort=rel&result=posts
+     *https://4pda.ru/devdb/
+     *https://4pda.ru/devdb/phones/
+     *https://4pda.ru/devdb/phones/acer
+     *https://4pda.ru/devdb/acer_liquid_z410_duo
+     *https://4pda.ru/special/polzovatelskoe-testirovanie-alcatel-idol-4s/
+     *https://4pda.ru
+     *https://4pda.ru/2016/08/04/315172/
+     *https://4pda.ru/reviews/tag/smart-watches/
+     *https://4pda.ru/articles/
+     *https://4pda.ru/pages/posts/3916635
+     *https://4pda.ru/pages/comments/3916635/
+     *https://4pda.ru/?s=hui
+     * */
     private final static String FORUM_PATH = "forum";
     private final static String DEVDB_PATH = "forum";
     private final static String SPECIAL_PATH = "forum";
@@ -404,7 +405,7 @@ public class IntentHandler {
 
     private static void redirectDownload(String fileName, String url) {
         Toast.makeText(App.getContext(), String.format(App.get().getString(R.string.perform_request_link), fileName), Toast.LENGTH_SHORT).show();
-        Observable.fromCallable(() -> Client.get().request(new NetworkRequest.Builder().url(url).withoutBody().build()))
+        Disposable disposable = Observable.fromCallable(() -> App.get().Di().getWebClient().request(new NetworkRequest.Builder().url(url).withoutBody().build()))
                 .onErrorReturn(throwable -> new NetworkResponse(null))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

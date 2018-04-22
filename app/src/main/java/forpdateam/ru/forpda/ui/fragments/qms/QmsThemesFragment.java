@@ -81,7 +81,7 @@ public class QmsThemesFragment extends RecyclerFragment implements QmsThemesAdap
         super.onViewCreated(view, savedInstanceState);
         initFabBehavior();
 
-        refreshLayout.setOnRefreshListener(this::loadData);
+        refreshLayout.setOnRefreshListener(() -> presenter.loadThemes());
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         fab.setImageDrawable(App.getVecDrawable(getContext(), R.drawable.ic_fab_create));

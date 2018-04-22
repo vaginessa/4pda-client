@@ -7,6 +7,7 @@ import android.widget.TextView;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.entity.remote.profile.ProfileModel;
+import forpdateam.ru.forpda.model.repository.temp.TempHelper;
 import forpdateam.ru.forpda.ui.views.adapters.BaseAdapter;
 import forpdateam.ru.forpda.ui.views.adapters.BaseViewHolder;
 
@@ -38,7 +39,7 @@ class StatsAdapter extends BaseAdapter<ProfileModel.Stat, StatsAdapter.StatHolde
 
         @Override
         public void bind(ProfileModel.Stat item) {
-            title.setText(ProfileRx.getTypeString(item.getType()));
+            title.setText(TempHelper.INSTANCE.getTypeString(item.getType()));
             value.setText(item.getValue());
         }
     }

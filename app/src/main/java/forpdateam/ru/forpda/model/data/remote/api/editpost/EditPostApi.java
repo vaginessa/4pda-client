@@ -24,6 +24,7 @@ import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkRequest;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
 import forpdateam.ru.forpda.model.data.remote.api.RequestFile;
+import forpdateam.ru.forpda.model.data.remote.api.theme.ThemeApi;
 
 /**
  * Created by radiationx on 10.01.17.
@@ -43,9 +44,11 @@ public class EditPostApi {
     private final static Pattern attachmentsPattern = Pattern.compile("(\\d+)\u0002([^\u0002]*?)\u0002([^\u0002]*?)\u0002(\\/\\/[^\u0002]*?)\u0002(\\d+)\u0002([0-9a-fA-F]+)(?:(?:\u0002(\\/\\/[^\u0002]*?)\u0002(\\d+)\u0002(\\d+))?(?:\u0003\u0004(\\d+)\u0003\u0004([^\u0002]*?)\u0003\u0004([^\u0002]*?)\u0003)?)?");
 
     private IWebClient webClient;
+    private ThemeApi themeApi;
 
-    public EditPostApi(IWebClient webClient) {
+    public EditPostApi(IWebClient webClient, ThemeApi themeApi) {
         this.webClient = webClient;
+        this.themeApi = themeApi;
     }
 
     public static void printPoll(EditPoll poll) {
@@ -412,6 +415,6 @@ public class EditPostApi {
         builder.formHeader("file-list", ids.toString());
         if (form.getPostId() != 0)
             builder.formHeader("p", "" + form.getPostId());
-        return Api.Theme().parsePage(url, webClient.request(builder.build()), false, false);
+        return themeApi.parsePage(url, webClient.request(builder.build()), false, false);
     }
 }

@@ -167,7 +167,7 @@ public class NotificationsService extends Service {
             Log.d(LOG_TAG, "WSListener onMessage: " + text);
             try {
                 App.get().notifyForbidden(false);
-                NotificationEvent event = Api.UniversalEvents().parseWebSocketEvent(text);
+                NotificationEvent event = App.get().Di().getEventsApi().parseWebSocketEvent(text);
 
                 if (event != null) {
                     if (event.getType() != NotificationEvent.Type.HAT_EDITED) {
@@ -302,7 +302,7 @@ public class NotificationsService extends Service {
         Log.e(LOG_TAG, "Start: " + networkState.getState() + " : " + connected + " : " + checkEvents);
         if (networkState.getState()) {
             if (!connected) {
-                webSocket = Client.get().createWebSocketConnection(webSocketListener);
+                webSocket = App.get().Di().getWebClient().createWebSocketConnection(webSocketListener);
                 connected = true;
             }
 
@@ -539,9 +539,9 @@ public class NotificationsService extends Service {
         String response = responseBuilder.toString();
 
         if (NotificationEvent.fromQms(source)) {
-            return Api.UniversalEvents().getQmsEvents(response);
+            return App.get().Di().getEventsApi().getQmsEvents(response);
         } else if (NotificationEvent.fromTheme(source)) {
-            return Api.UniversalEvents().getFavoritesEvents(response);
+            return App.get().Di().getEventsApi().getFavoritesEvents(response);
         }
         return new ArrayList<>();
     }
@@ -610,9 +610,9 @@ public class NotificationsService extends Service {
     private void loadEvents(Consumer<List<NotificationEvent>> consumer, NotificationEvent.Source source) {
         Observable<List<NotificationEvent>> observable = null;
         if (NotificationEvent.fromQms(source)) {
-            observable = Observable.fromCallable(() -> Api.UniversalEvents().getQmsEvents());
+            observable = Observable.fromCallable(() -> App.get().Di().getEventsApi().getQmsEvents());
         } else if (NotificationEvent.fromTheme(source)) {
-            observable = Observable.fromCallable(() -> Api.UniversalEvents().getFavoritesEvents());
+            observable = Observable.fromCallable(() -> App.get().Di().getEventsApi().getFavoritesEvents());
         }
 
         if (observable != null) {

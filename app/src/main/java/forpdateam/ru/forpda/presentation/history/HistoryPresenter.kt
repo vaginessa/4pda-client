@@ -18,6 +18,11 @@ class HistoryPresenter(
         private val historyRepository: HistoryRepository
 ) : BasePresenter<HistoryView>() {
 
+    override fun onFirstViewAttach() {
+        super.onFirstViewAttach()
+        getHistory()
+    }
+
     fun getHistory() {
         historyRepository
                 .getHistory()
