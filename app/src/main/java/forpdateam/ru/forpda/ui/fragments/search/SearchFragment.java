@@ -64,11 +64,14 @@ import forpdateam.ru.forpda.entity.remote.theme.ThemePage;
 import forpdateam.ru.forpda.model.data.remote.api.favorites.FavoritesApi;
 import forpdateam.ru.forpda.presentation.search.SearchPresenter;
 import forpdateam.ru.forpda.presentation.search.SearchSiteView;
+import forpdateam.ru.forpda.presentation.theme.ThemeJsInterface;
 import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import forpdateam.ru.forpda.ui.fragments.devdb.brand.DevicesFragment;
 import forpdateam.ru.forpda.ui.fragments.favorites.FavoritesFragment;
+import forpdateam.ru.forpda.ui.fragments.notes.NotesAddPopup;
 import forpdateam.ru.forpda.ui.fragments.theme.ThemeDialogsHelper;
+import forpdateam.ru.forpda.ui.fragments.theme.ThemeDialogsHelper_V2;
 import forpdateam.ru.forpda.ui.fragments.theme.ThemeFragmentWeb;
 import forpdateam.ru.forpda.ui.fragments.theme.ThemeHelper;
 import forpdateam.ru.forpda.ui.fragments.editpost.EditPostFragment;
@@ -85,10 +88,9 @@ import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip;
  * Created by radiationx on 29.01.17.
  */
 
-public class SearchFragment extends TabFragment implements SearchSiteView, IPostFunctions, ExtendedWebView.JsLifeCycleListener, SearchAdapter.OnItemClickListener<SearchItem> {
+public class SearchFragment extends TabFragment implements SearchSiteView, ExtendedWebView.JsLifeCycleListener, SearchAdapter.OnItemClickListener<SearchItem> {
 
     private final static String LOG_TAG = SearchFragment.class.getSimpleName();
-    protected final static String JS_INTERFACE = "ISearch";
 
     private boolean scrollButtonEnable = false;
 
@@ -116,6 +118,10 @@ public class SearchFragment extends TabFragment implements SearchSiteView, IPost
     private SimpleTooltip tooltip;
 
     private MenuItem settingsMenuItem;
+
+
+    private ThemeJsInterface jsInterface;
+    private ThemeDialogsHelper_V2 dialogsHelper;
 
 
     private Observer searchPreferenceObserver = (observable, o) -> {
@@ -159,7 +165,9 @@ public class SearchFragment extends TabFragment implements SearchSiteView, IPost
     SearchPresenter provideThemePresenter() {
         return new SearchPresenter(
                 App.get().Di().getSearchRepository(),
-                App.get().Di().getFavoritesRepository()
+                App.get().Di().getFavoritesRepository(),
+                App.get().Di().getThemeRepository(),
+                App.get().Di().getReputationRepository()
         );
     }
 
@@ -182,6 +190,7 @@ public class SearchFragment extends TabFragment implements SearchSiteView, IPost
             searchUrl = getArguments().getString(TabFragment.ARG_TAB);
         }
         presenter.initSearchSettings(searchUrl);
+        dialogsHelper = new ThemeDialogsHelper_V2(getContext());
     }
 
     @Override
@@ -240,6 +249,7 @@ public class SearchFragment extends TabFragment implements SearchSiteView, IPost
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        jsInterface = new ThemeJsInterface(presenter);
 
         dialogMenu = new DynamicDialogMenu<>();
         dialogMenu.addItem(getString(R.string.topic_to_begin), (context, data1) -> presenter.openTopicBegin(data1));
@@ -265,9 +275,7 @@ public class SearchFragment extends TabFragment implements SearchSiteView, IPost
         });
 
         webView.setJsLifeCycleListener(this);
-        webView.addJavascriptInterface(this, ThemeFragmentWeb.JS_INTERFACE);
-        webView.addJavascriptInterface(this, JS_INTERFACE);
-        webView.addJavascriptInterface(this, JS_POSTS_FUNCTIONS);
+        webView.addJavascriptInterface(jsInterface, ThemeFragmentWeb.JS_INTERFACE);
         webView.setRelativeFontSize(Preferences.Main.getWebViewSize(getContext()));
 
         fab.setSize(FloatingActionButton.SIZE_MINI);
@@ -423,7 +431,7 @@ public class SearchFragment extends TabFragment implements SearchSiteView, IPost
         new AlertDialog.Builder(getContext())
                 .setTitle(R.string.favorites_subscribe_email)
                 .setItems(FavoritesFragment.SUB_NAMES, (dialog1, which1) -> {
-                    presenter.addTopicToFavorite(item.getId(), FavoritesApi.SUB_TYPES[which1]);
+                    presenter.addTopicToFavorite(item.getTopicId(), FavoritesApi.SUB_TYPES[which1]);
                 })
                 .show();
     }
@@ -650,8 +658,6 @@ public class SearchFragment extends TabFragment implements SearchSiteView, IPost
         super.onDestroyView();
         App.get().removePreferenceChangeObserver(searchPreferenceObserver);
         unregisterForContextMenu(webView);
-        webView.removeJavascriptInterface(JS_INTERFACE);
-        webView.removeJavascriptInterface(JS_POSTS_FUNCTIONS);
         webView.removeJavascriptInterface(ThemeFragmentWeb.JS_INTERFACE);
         webView.setJsLifeCycleListener(null);
         webView.endWork();
@@ -696,7 +702,111 @@ public class SearchFragment extends TabFragment implements SearchSiteView, IPost
         dialogMenu.show(getContext(), SearchFragment.this, item);
     }
 
-    @JavascriptInterface
+
+    /* JS PRESENTER */
+
+    @Override
+    public void showNoteCreate(@NotNull String title, @NotNull String url) {
+        NotesAddPopup.showAddNoteDialog(getContext(), title, url);
+    }
+
+    @Override
+    public void deletePostUi(@NotNull IBaseForumPost post) {
+        webView.evalJs("onDeletePostClick(" + post.getId() + ");");
+    }
+
+    @Override
+    public void openAnchorDialog(@NotNull IBaseForumPost post, @NotNull String anchorName) {
+        dialogsHelper.openAnchorDialog(presenter, post, anchorName);
+    }
+
+    @Override
+    public void openSpoilerLinkDialog(@NotNull IBaseForumPost post, @NotNull String spoilNumber) {
+        dialogsHelper.openSpoilerLinkDialog(presenter, post, spoilNumber);
+    }
+
+    @Override
+    public void firstPage() {
+        paginationHelper.firstPage();
+    }
+
+    @Override
+    public void prevPage() {
+        paginationHelper.prevPage();
+    }
+
+    @Override
+    public void nextPage() {
+        paginationHelper.nextPage();
+    }
+
+    @Override
+    public void lastPage() {
+        paginationHelper.lastPage();
+    }
+
+    @Override
+    public void selectPage() {
+        paginationHelper.selectPageDialog();
+    }
+
+
+    public void toast(@NotNull final String text) {
+        Toast.makeText(getContext(), text, Toast.LENGTH_SHORT).show();
+    }
+
+    public void log(@NotNull String text) {
+        int maxLogSize = 1000;
+        for (int i = 0; i <= text.length() / maxLogSize; i++) {
+            int start = i * maxLogSize;
+            int end = (i + 1) * maxLogSize;
+            end = end > text.length() ? text.length() : end;
+            Log.v(LOG_TAG, text.substring(start, end));
+        }
+    }
+
+    @Override
+    public void showUserMenu(@NotNull IBaseForumPost post) {
+        dialogsHelper.showUserMenu(presenter, post);
+    }
+
+    @Override
+    public void showReputationMenu(@NotNull IBaseForumPost post) {
+        dialogsHelper.showReputationMenu(presenter, post);
+    }
+
+    @Override
+    public void showPostMenu(@NotNull IBaseForumPost post) {
+        dialogsHelper.showPostMenu(presenter, post);
+    }
+
+    @Override
+    public void reportPost(@NotNull IBaseForumPost post) {
+        dialogsHelper.tryReportPost(presenter, post);
+    }
+
+    @Override
+    public void deletePost(@NotNull IBaseForumPost post) {
+        dialogsHelper.deletePost(presenter, post);
+    }
+
+    @Override
+    public void votePost(@NotNull IBaseForumPost post, boolean type) {
+        dialogsHelper.votePost(presenter, post, type);
+    }
+
+    @Override
+    public void showChangeReputation(@NotNull IBaseForumPost post, boolean type) {
+        dialogsHelper.changeReputation(presenter, post, type);
+    }
+
+    @Override
+    public void editPost(@NotNull IBaseForumPost post) {
+        presenter.openEditPostForm(post.getId());
+    }
+
+
+    /*@JavascriptInterface
     public void firstPage() {
         if (getContext() == null)
             return;
@@ -842,10 +952,10 @@ public class SearchFragment extends TabFragment implements SearchSiteView, IPost
     public void deletePost(IBaseForumPost post) {
         if (getContext() == null)
             return;
-        /*ThemeDialogsHelper.deletePost(getContext(), post, aBoolean -> {
+        *//*ThemeDialogsHelper.deletePost(getContext(), post, aBoolean -> {
             if (aBoolean)
                 webView.evalJs("onDeletePostClick(" + post.getId() + ");");
-        });*/
+        });*//*
     }
 
     @Override
@@ -879,5 +989,5 @@ public class SearchFragment extends TabFragment implements SearchSiteView, IPost
         if (getContext() == null)
             return;
         runInUiThread(() -> Toast.makeText(getContext(), text, Toast.LENGTH_SHORT).show());
-    }
+    }*/
 }

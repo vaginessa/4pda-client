@@ -16,4 +16,29 @@ interface SearchSiteView : IBaseView {
 
     fun onAddToFavorite(result: Boolean)
     fun showAddInFavDialog(page: IBaseForumPost)
+    fun showNoteCreate(title: String, url: String)
+
+
+    fun firstPage()
+    fun prevPage()
+    fun nextPage()
+    fun lastPage()
+    fun selectPage()
+
+    fun deletePostUi(post: IBaseForumPost)
+    fun showUserMenu(post: IBaseForumPost)
+    fun showReputationMenu(post: IBaseForumPost)
+    fun showPostMenu(post: IBaseForumPost)
+    fun reportPost(post: IBaseForumPost)
+    fun deletePost(post: IBaseForumPost)
+    fun editPost(post: IBaseForumPost)
+    fun votePost(post: IBaseForumPost, type: Boolean)
+    fun showChangeReputation(post: IBaseForumPost, type: Boolean)
+
+    fun openAnchorDialog(post: IBaseForumPost, anchorName: String)
+    fun openSpoilerLinkDialog(post: IBaseForumPost, spoilNumber: String)
+
+    fun toast(text: String)
+    fun log(text: String)
+
 }

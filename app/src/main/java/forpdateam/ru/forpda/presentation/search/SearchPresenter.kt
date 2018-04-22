@@ -12,14 +12,19 @@ import forpdateam.ru.forpda.common.Utils
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.remote.IBaseForumPost
 import forpdateam.ru.forpda.entity.remote.search.SearchItem
+import forpdateam.ru.forpda.entity.remote.search.SearchResult
 import forpdateam.ru.forpda.entity.remote.search.SearchSettings
 import forpdateam.ru.forpda.entity.remote.theme.ThemePage
 import forpdateam.ru.forpda.model.data.remote.api.favorites.FavoritesApi
 import forpdateam.ru.forpda.model.data.remote.api.theme.ThemeApi
 import forpdateam.ru.forpda.model.repository.faviorites.FavoritesRepository
+import forpdateam.ru.forpda.model.repository.reputation.ReputationRepository
 import forpdateam.ru.forpda.model.repository.search.SearchRepository
+import forpdateam.ru.forpda.model.repository.theme.ThemeRepository
 import forpdateam.ru.forpda.presentation.theme.IThemePresenter
+import forpdateam.ru.forpda.ui.TabManager
 import forpdateam.ru.forpda.ui.activities.imageviewer.ImageViewerActivity
+import forpdateam.ru.forpda.ui.fragments.editpost.EditPostFragment
 import forpdateam.ru.forpda.ui.fragments.theme.ThemeFragmentWeb
 import org.acra.ACRA
 import java.io.UnsupportedEncodingException
@@ -30,7 +35,9 @@ import java.util.regex.Pattern
 @InjectViewState
 class SearchPresenter(
         private val searchRepository: SearchRepository,
-        private val favoritesRepository: FavoritesRepository
+        private val favoritesRepository: FavoritesRepository,
+        private val themeRepository: ThemeRepository,
+        private val reputationRepository: ReputationRepository
 ) : BasePresenter<SearchSiteView>(), IThemePresenter {
 
     companion object {
@@ -53,6 +60,8 @@ class SearchPresenter(
     )
 
     private var settings = SearchSettings()
+
+    private var currentData: SearchResult? = null
 
     fun initSearchSettings(url: String?) {
         url?.let {
@@ -78,6 +87,7 @@ class SearchPresenter(
                 }
                 .doAfterTerminate { viewState.setRefreshing(false) }
                 .subscribe({
+                    currentData = it
                     viewState.showData(it)
                 }, {
                     it.printStackTrace()
@@ -217,30 +227,32 @@ class SearchPresenter(
 
     /* ITHEME PReSNETER*/
 
-    override fun onPollResultsClick() {
-        val url = themeUrl
-                .replaceFirst("#[^&]*", "")
-                .replace("&mode=show", "")
-                .replace("&poll_open=true", "") + "&mode=show&poll_open=true"
-        loadUrl(url)
+    private fun unavailableFunction() {
+        toast("Действие невозможно")
     }
 
-    override fun onPollClick() {
-        val url = themeUrl
-                .replaceFirst("#[^&]*", "")
-                .replace("&mode=show", "")
-                .replace("&poll_open=true", "") + "&poll_open=true"
-        loadUrl(url)
-    }
+    override fun onPollResultsClick() = unavailableFunction()
 
+    override fun onPollClick() = unavailableFunction()
+
+    override fun onReplyPostClick(postId: Int) = unavailableFunction()
+
+    override fun onQuotePostClick(postId: Int, text: String) = unavailableFunction()
+
+    override fun quoteFromBuffer(postId: Int) = unavailableFunction()
+
+    override fun onPollHeaderClick(bValue: Boolean) = unavailableFunction()
+
+    override fun onHatHeaderClick(bValue: Boolean) = unavailableFunction()
+
+    override fun setHistoryBody(index: Int, body: String) = unavailableFunction()
 
     override fun shareText(text: String) {
         Utils.shareText(text)
     }
 
-
-    private fun getPostById(postId: Int): IBaseForumPost? = currentPage
-            ?.posts
+    private fun getPostById(postId: Int): IBaseForumPost? = currentData
+            ?.items
             ?.firstOrNull {
                 it.id == postId
             }
@@ -271,20 +283,6 @@ class SearchPresenter(
         getPostById(postId)?.let { viewState.reportPost(it) }
     }
 
-    override fun onReplyPostClick(postId: Int) {
-        getPostById(postId)?.let {
-            val text = "[snapback]${it.id}[/snapback] [b]${it.nick},[/b] \n"
-            viewState.insertText(text)
-        }
-    }
-
-    override fun onQuotePostClick(postId: Int, text: String) {
-        getPostById(postId)?.let {
-            val date = Utils.getForumDateTime(Utils.parseForumDateTime(it.getDate()))
-            val insert = "[quote name=\"${it.nick}\" date=\"$date\" post=${it.id}]$text[/quote]\n"
-            viewState.insertText(insert)
-        }
-    }
 
     override fun onDeletePostClick(postId: Int) {
         getPostById(postId)?.let { viewState.deletePost(it) }
@@ -304,18 +302,6 @@ class SearchPresenter(
 
     override fun onAnchorClick(postId: Int, name: String) {
         getPostById(postId)?.let { viewState.openAnchorDialog(it, name) }
-    }
-
-    override fun onPollHeaderClick(bValue: Boolean) {
-        currentPage?.let { it.isPollOpen = bValue }
-    }
-
-    override fun onHatHeaderClick(bValue: Boolean) {
-        currentPage?.let { it.isHatOpen = bValue }
-    }
-
-    override fun setHistoryBody(index: Int, body: String) {
-        history[index].html = body
     }
 
     override fun copyText(text: String) {
@@ -412,20 +398,12 @@ class SearchPresenter(
         }
     }
 
-    override fun quoteFromBuffer(postId: Int) {
-        getPostById(postId)?.let {
-            val text = Utils.readFromClipboard()
-            if (!text.isNullOrEmpty()) {
-                onQuotePostClick(postId, text)
-            }
-        }
-    }
 
     override fun reportPost(postId: Int, message: String) {
         getPostById(postId)?.let { post ->
-            currentPage?.let {
+            currentData?.let {
                 themeRepository
-                        .reportPost(it.id, post.id, message)
+                        .reportPost(post.topicId, post.id, message)
                         .subscribe({
                             toast("Жалоба отправлена")
                         }, {
@@ -454,10 +432,25 @@ class SearchPresenter(
 
     override fun createNote(postId: Int) {
         getPostById(postId)?.let {
-            val themeTitle: String = currentPage?.title.orEmpty()
-            val title = String.format(App.get().getString(R.string.post_Topic_Nick_Number), themeTitle, it.nick, it.id)
+            val topicTitle: String = if (it is SearchItem) {
+                it.title;
+            } else {
+                "пост из поиска_";
+            }
+            val title = String.format(App.get().getString(R.string.post_Topic_Nick_Number), topicTitle, it.nick, it.id)
             val url = "https://4pda.ru/forum/index.php?s=&showtopic=" + it.topicId + "&view=findpost&p=" + it.id
             viewState.showNoteCreate(title, url)
+        }
+    }
+
+    fun openEditPostForm(postId: Int) {
+        getPostById(postId)?.let {
+            val title: String = if (it is SearchItem) {
+                it.title;
+            } else {
+                "пост из поиска_";
+            }
+            TabManager.get().add(EditPostFragment.newInstance(postId, it.topicId, it.forumId, settings.st, title))
         }
     }
 
