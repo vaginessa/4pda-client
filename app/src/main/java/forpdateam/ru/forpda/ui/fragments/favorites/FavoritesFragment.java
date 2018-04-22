@@ -130,8 +130,13 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
     public void onAttach(Context context) {
         super.onAttach(context);
         unreadTop = Preferences.Lists.Topic.isUnreadTop(context);
-        presenter.setLoadAll(Preferences.Lists.Favorites.isLoadAll(context));
-        presenter.setSorting(new Sorting(Preferences.Lists.Favorites.getSortingKey(context), Preferences.Lists.Favorites.getSortingOrder(context)));
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        presenter.setLoadAll(Preferences.Lists.Favorites.isLoadAll(getContext()));
+        presenter.setSorting(new Sorting(Preferences.Lists.Favorites.getSortingKey(getContext()), Preferences.Lists.Favorites.getSortingOrder(getContext())));
     }
 
     @Nullable

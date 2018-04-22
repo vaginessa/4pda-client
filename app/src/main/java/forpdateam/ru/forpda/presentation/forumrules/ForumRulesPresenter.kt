@@ -28,7 +28,7 @@ class ForumRulesPresenter(
                 .doOnTerminate { viewState.setRefreshing(true) }
                 //.doAfterTerminate { viewState.setRefreshing(false) }
                 .subscribe({
-
+                    viewState.showData(it)
                 }, {
                     it.printStackTrace()
                 })
