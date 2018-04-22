@@ -43,6 +43,16 @@ class QmsChatPresenter(
         loadChat()
     }
 
+    fun findUser(nick:String){
+        qmsRepository
+                .findUser(nick)
+                .subscribe({
+
+                },{
+                    it.printStackTrace()
+                })
+    }
+
     fun loadChat() {
         qmsRepository
                 .getChat(userId, themeId)

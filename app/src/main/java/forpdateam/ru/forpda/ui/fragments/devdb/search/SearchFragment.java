@@ -22,18 +22,13 @@ import org.jetbrains.annotations.NotNull;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.apirx.RxApi;
-import forpdateam.ru.forpda.common.Utils;
 import forpdateam.ru.forpda.entity.remote.devdb.Brand;
 import forpdateam.ru.forpda.entity.remote.devdb.DeviceSearch;
-import forpdateam.ru.forpda.presentation.devdb.devices.DevicesPresenter;
 import forpdateam.ru.forpda.presentation.devdb.search.SearchDevicesPresenter;
 import forpdateam.ru.forpda.presentation.devdb.search.SearchDevicesView;
-import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import forpdateam.ru.forpda.ui.fragments.devdb.brand.DevicesAdapter;
 import forpdateam.ru.forpda.ui.fragments.devdb.brand.DevicesFragment;
-import forpdateam.ru.forpda.ui.fragments.devdb.device.DeviceFragment;
 import forpdateam.ru.forpda.ui.fragments.notes.NotesAddPopup;
 import forpdateam.ru.forpda.ui.views.DynamicDialogMenu;
 import forpdateam.ru.forpda.ui.views.PauseOnScrollListener;

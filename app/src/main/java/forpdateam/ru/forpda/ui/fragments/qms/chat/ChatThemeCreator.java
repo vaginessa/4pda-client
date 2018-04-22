@@ -14,9 +14,9 @@ import java.util.List;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.common.simple.SimpleTextWatcher;
 import forpdateam.ru.forpda.entity.remote.others.user.ForumUser;
+import forpdateam.ru.forpda.presentation.qms.chat.QmsChatPresenter;
 
 /**
  * Created by radiationx on 11.06.17.
@@ -24,6 +24,7 @@ import forpdateam.ru.forpda.entity.remote.others.user.ForumUser;
 
 public class ChatThemeCreator {
     private QmsChatFragment fragment;
+    private QmsChatPresenter presenter;
     private ViewStub viewStub;
     private AppCompatAutoCompleteTextView nickField;
     private AppCompatEditText titleField;
@@ -41,24 +42,25 @@ public class ChatThemeCreator {
     private int userId = -1;
     private String userNick, themeTitle;
 
-    public ChatThemeCreator(QmsChatFragment fragment) {
+    public ChatThemeCreator(QmsChatFragment fragment, QmsChatPresenter presenter) {
         this.fragment = fragment;
+        this.presenter = presenter;
         viewStub = (ViewStub) this.fragment.findViewById(R.id.toolbar_content);
         viewStub.setLayoutResource(R.layout.toolbar_qms_new_theme);
         viewStub.inflate();
         nickField = (AppCompatAutoCompleteTextView) this.fragment.findViewById(R.id.qms_theme_nick_field);
         titleField = (AppCompatEditText) this.fragment.findViewById(R.id.qms_theme_title_field);
-        this.userId = this.fragment.currentChat.getUserId();
-        this.userNick = this.fragment.currentChat.getNick();
-        this.themeTitle = this.fragment.currentChat.getTitle();
+        this.userId = this.presenter.getUserId();
+        this.userNick = this.presenter.getNick();
+        this.themeTitle = this.presenter.getTitle();
         initCreatorViews();
     }
 
     private void searchUser(String nick) {
-        fragment.subscribe(RxApi.Qms().findUser(nick), this::onShowSearchRes, new ArrayList<>());
+        presenter.findUser(nick);
     }
 
-    private void onShowSearchRes(List<ForumUser> res) {
+    void onShowSearchRes(List<? extends ForumUser> res) {
         List<String> nicks = new ArrayList<>();
         for (ForumUser user : res) {
             nicks.add(user.getNick());

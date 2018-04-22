@@ -41,14 +41,9 @@ import java.util.Observer;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.apirx.RxApi;
-import forpdateam.ru.forpda.common.IntentHandler;
-import forpdateam.ru.forpda.common.Utils;
-import forpdateam.ru.forpda.entity.remote.devdb.Brand;
 import forpdateam.ru.forpda.entity.remote.devdb.Device;
 import forpdateam.ru.forpda.presentation.devdb.device.DevicePresenter;
 import forpdateam.ru.forpda.presentation.devdb.device.DeviceView;
-import forpdateam.ru.forpda.presentation.devdb.devices.DevicesView;
 import forpdateam.ru.forpda.ui.activities.imageviewer.ImageViewerActivity;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import forpdateam.ru.forpda.ui.fragments.devdb.DevDbHelper;

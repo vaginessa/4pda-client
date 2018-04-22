@@ -2,6 +2,7 @@ package forpdateam.ru.forpda.presentation.qms.chat
 
 import forpdateam.ru.forpda.common.mvp.IBaseView
 import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem
+import forpdateam.ru.forpda.entity.remote.others.user.ForumUser
 import forpdateam.ru.forpda.entity.remote.qms.QmsChatModel
 import forpdateam.ru.forpda.entity.remote.qms.QmsMessage
 
@@ -10,6 +11,7 @@ import forpdateam.ru.forpda.entity.remote.qms.QmsMessage
  */
 
 interface QmsChatView : IBaseView {
+    fun onShowSearchRes(res: List<ForumUser>)
     fun showChat(data: QmsChatModel)
     fun onNewThemeCreate(data: QmsChatModel)
     fun onSentMessage(items: List<QmsMessage>)

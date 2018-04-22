@@ -37,6 +37,7 @@ import forpdateam.ru.forpda.common.webview.CustomWebChromeClient;
 import forpdateam.ru.forpda.common.webview.CustomWebViewClient;
 import forpdateam.ru.forpda.entity.app.TabNotification;
 import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem;
+import forpdateam.ru.forpda.entity.remote.others.user.ForumUser;
 import forpdateam.ru.forpda.entity.remote.qms.QmsChatModel;
 import forpdateam.ru.forpda.entity.remote.qms.QmsMessage;
 import forpdateam.ru.forpda.model.data.remote.api.RequestFile;
@@ -175,7 +176,7 @@ public class QmsChatFragment extends TabFragment implements ChatThemeCreator.The
         App.get().addPreferenceChangeObserver(chatPreferenceObserver);
 
         if (presenter.getThemeId() == QmsChatModel.NOT_CREATED) {
-            themeCreator = new ChatThemeCreator(this);
+            themeCreator = new ChatThemeCreator(this, presenter);
         }
     }
 
@@ -257,6 +258,11 @@ public class QmsChatFragment extends TabFragment implements ChatThemeCreator.The
     @Override
     public void temp_sendNewTheme() {
         themeCreator.sendNewTheme();
+    }
+
+    @Override
+    public void onShowSearchRes(@NotNull List<? extends ForumUser> res) {
+        themeCreator.onShowSearchRes(res);
     }
 
     @Override

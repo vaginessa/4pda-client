@@ -14,16 +14,13 @@ import android.widget.Toast;
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.BuildConfig;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.apirx.RxApi;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.common.Preferences;
 import forpdateam.ru.forpda.model.repository.auth.AuthRepository;
 import forpdateam.ru.forpda.ui.activities.SettingsActivity;
 import forpdateam.ru.forpda.ui.activities.updatechecker.UpdateCheckerActivity;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by radiationx on 25.12.16.
