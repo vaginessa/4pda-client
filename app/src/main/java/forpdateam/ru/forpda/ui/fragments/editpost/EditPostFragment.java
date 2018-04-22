@@ -56,7 +56,7 @@ public class EditPostFragment extends TabFragment implements EditPostView {
     EditPostPresenter presenter;
 
     @ProvidePresenter
-    EditPostPresenter provideThemePresenter() {
+    EditPostPresenter providePresenter() {
         return new EditPostPresenter(
                 App.get().Di().getEditPostRepository()
         );

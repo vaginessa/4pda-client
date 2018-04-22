@@ -77,7 +77,7 @@ public class NewsDetailsFragment extends TabFragment implements ArticleDetailVie
     ArticleDetailPresenter presenter;
 
     @ProvidePresenter
-    ArticleDetailPresenter provideMentionsPresenter() {
+    ArticleDetailPresenter providePresenter() {
         return new ArticleDetailPresenter(interactor);
     }
 

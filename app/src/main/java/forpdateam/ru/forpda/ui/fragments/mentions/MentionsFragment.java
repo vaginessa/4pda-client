@@ -35,20 +35,20 @@ import forpdateam.ru.forpda.ui.views.pagination.PaginationHelper;
 
 public class MentionsFragment extends RecyclerFragment implements MentionsView {
 
+    private DynamicDialogMenu<MentionsFragment, MentionItem> dialogMenu;
+    private MentionsAdapter adapter;
+    private PaginationHelper paginationHelper;
+
     @InjectPresenter
     MentionsPresenter presenter;
 
     @ProvidePresenter
-    MentionsPresenter provideMentionsPresenter() {
+    MentionsPresenter providePresenter() {
         return new MentionsPresenter(
                 App.get().Di().getMentionsRepository(),
                 App.get().Di().getFavoritesRepository()
         );
     }
-
-    private DynamicDialogMenu<MentionsFragment, MentionItem> dialogMenu;
-    private MentionsAdapter adapter;
-    private PaginationHelper paginationHelper;
 
     public MentionsFragment() {
         configuration.setAlone(true);

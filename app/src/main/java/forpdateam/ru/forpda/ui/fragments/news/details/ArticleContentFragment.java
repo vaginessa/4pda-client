@@ -35,7 +35,7 @@ public class ArticleContentFragment extends Fragment implements ArticleContentVi
     ArticleContentPresenter presenter;
 
     @ProvidePresenter
-    ArticleContentPresenter provideMentionsPresenter() {
+    ArticleContentPresenter providePresenter() {
         return new ArticleContentPresenter(interactor);
     }
 

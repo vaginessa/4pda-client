@@ -46,7 +46,7 @@ public class TopicsFragment extends RecyclerFragment implements TopicsView {
     TopicsPresenter presenter;
 
     @ProvidePresenter
-    TopicsPresenter provideReputationPresenter() {
+    TopicsPresenter providePresenter() {
         return new TopicsPresenter(
                 App.get().Di().getTopicsRepository(),
                 App.get().Di().getForumRepository(),

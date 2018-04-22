@@ -46,17 +46,6 @@ import forpdateam.ru.forpda.ui.views.drawers.Drawers;
  */
 public class AuthFragment extends TabFragment implements AuthView {
 
-    @InjectPresenter
-    AuthPresenter presenter;
-
-    @ProvidePresenter
-    AuthPresenter provideAuthPresenter() {
-        return new AuthPresenter(
-                App.get().Di().getAuthRepository(),
-                App.get().Di().getProfileRepository()
-        );
-    }
-
     private EditText nick, password, captcha;
     private ImageView captchaImage, avatar;
     private AuthForm authForm;
@@ -69,6 +58,17 @@ public class AuthFragment extends TabFragment implements AuthView {
     private RelativeLayout complete;
     private TextView completeText;
     private CircularProgressView progressView;
+
+    @InjectPresenter
+    AuthPresenter presenter;
+
+    @ProvidePresenter
+    AuthPresenter providePresenter() {
+        return new AuthPresenter(
+                App.get().Di().getAuthRepository(),
+                App.get().Di().getProfileRepository()
+        );
+    }
 
     public AuthFragment() {
         configuration.setDefaultTitle(App.get().getString(R.string.fragment_title_auth));

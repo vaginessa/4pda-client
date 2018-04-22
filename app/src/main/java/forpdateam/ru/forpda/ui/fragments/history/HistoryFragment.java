@@ -35,18 +35,19 @@ import io.realm.Realm;
  */
 
 public class HistoryFragment extends RecyclerFragment implements HistoryView {
+
     private final static SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yy, HH:mm", Locale.getDefault());
+
+    private HistoryAdapter adapter;
+    private DynamicDialogMenu<HistoryFragment, HistoryItem> dialogMenu;
 
     @InjectPresenter
     HistoryPresenter presenter;
 
     @ProvidePresenter
-    HistoryPresenter provideHistoryPresenter() {
+    HistoryPresenter providePresenter() {
         return new HistoryPresenter(App.get().Di().getHistoryRepository());
     }
-
-    private HistoryAdapter adapter;
-    private DynamicDialogMenu<HistoryFragment, HistoryItem> dialogMenu;
 
     public HistoryFragment() {
         configuration.setUseCache(true);

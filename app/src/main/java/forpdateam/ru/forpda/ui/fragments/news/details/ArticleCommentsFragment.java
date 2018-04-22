@@ -73,7 +73,7 @@ public class ArticleCommentsFragment extends Fragment implements ArticleCommentV
     ArticleCommentPresenter presenter;
 
     @ProvidePresenter
-    ArticleCommentPresenter provideMentionsPresenter() {
+    ArticleCommentPresenter providePresenter() {
         return new ArticleCommentPresenter(interactor);
     }
 

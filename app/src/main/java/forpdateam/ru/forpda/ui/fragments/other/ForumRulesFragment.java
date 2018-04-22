@@ -49,7 +49,7 @@ public class ForumRulesFragment extends TabFragment implements ForumRulesView {
     ForumRulesPresenter presenter;
 
     @ProvidePresenter
-    ForumRulesPresenter provideMentionsPresenter() {
+    ForumRulesPresenter providePresenter() {
         return new ForumRulesPresenter(App.get().Di().getForumRepository());
     }
 

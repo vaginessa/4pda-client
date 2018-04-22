@@ -49,7 +49,7 @@ public class AnnounceFragment extends TabFragment implements AnnounceView{
     AnnouncePresenter presenter;
 
     @ProvidePresenter
-    AnnouncePresenter provideMentionsPresenter() {
+    AnnouncePresenter providePresenter() {
         return new AnnouncePresenter(App.get().Di().getForumRepository());
     }
 

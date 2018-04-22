@@ -152,7 +152,7 @@ public class SearchFragment extends TabFragment implements SearchSiteView, Exten
     SearchPresenter presenter;
 
     @ProvidePresenter
-    SearchPresenter provideThemePresenter() {
+    SearchPresenter providePresenter() {
         return new SearchPresenter(
                 App.get().Di().getSearchRepository(),
                 App.get().Di().getFavoritesRepository(),

@@ -29,6 +29,7 @@ import forpdateam.ru.forpda.ui.fragments.RecyclerFragment;
  */
 
 public class BrandsFragment extends RecyclerFragment implements BrandsView, BrandsAdapter.OnItemClickListener<Brands.Item> {
+
     public final static String ARG_CATEGORY_ID = "CATEGORY_ID";
 
     private BrandsAdapter adapter;
@@ -37,7 +38,7 @@ public class BrandsFragment extends RecyclerFragment implements BrandsView, Bran
     BrandsPresenter presenter;
 
     @ProvidePresenter
-    BrandsPresenter provideMentionsPresenter() {
+    BrandsPresenter providePresenter() {
         return new BrandsPresenter(App.get().Di().getDevDbRepository());
     }
 

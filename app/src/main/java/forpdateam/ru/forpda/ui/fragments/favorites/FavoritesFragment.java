@@ -49,6 +49,7 @@ import forpdateam.ru.forpda.ui.views.pagination.PaginationHelper;
  */
 
 public class FavoritesFragment extends RecyclerFragment implements FavoritesView {
+
     public final static CharSequence[] SUB_NAMES = {
             App.get().getString(R.string.fav_subscribe_none),
             App.get().getString(R.string.fav_subscribe_delayed),
@@ -57,17 +58,6 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
             App.get().getString(R.string.fav_subscribe_weekly),
             App.get().getString(R.string.fav_subscribe_pinned)
     };
-
-    @InjectPresenter
-    FavoritesPresenter presenter;
-
-    @ProvidePresenter
-    FavoritesPresenter provideFavoritesPresenter() {
-        return new FavoritesPresenter(
-                App.get().Di().getFavoritesRepository(),
-                App.get().Di().getForumRepository()
-        );
-    }
 
     private DynamicDialogMenu<FavoritesFragment, FavItem> dialogMenu;
     private FavoritesAdapter adapter;
@@ -80,6 +70,24 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
     private Spinner keySpinner;
     private Spinner orderSpinner;
     private Button sortApply;
+
+    private Observer notification = (observable, o) -> {
+        if (o == null) return;
+        TabNotification event = (TabNotification) o;
+        runInUiThread(() -> handleEvent(event));
+    };
+
+    @InjectPresenter
+    FavoritesPresenter presenter;
+
+    @ProvidePresenter
+    FavoritesPresenter providePresenter() {
+        return new FavoritesPresenter(
+                App.get().Di().getFavoritesRepository(),
+                App.get().Di().getForumRepository()
+        );
+    }
+
     private Observer favoritesPreferenceObserver = (observable, o) -> {
         if (o == null) return;
         String key = (String) o;
@@ -105,12 +113,6 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
                 break;
             }
         }
-    };
-
-    private Observer notification = (observable, o) -> {
-        if (o == null) return;
-        TabNotification event = (TabNotification) o;
-        runInUiThread(() -> handleEvent(event));
     };
 
     public FavoritesFragment() {

@@ -46,14 +46,6 @@ import io.reactivex.schedulers.Schedulers;
 
 public class ReputationFragment extends RecyclerFragment implements ReputationView {
 
-    @InjectPresenter
-    ReputationPresenter presenter;
-
-    @ProvidePresenter
-    ReputationPresenter provideReputationPresenter() {
-        return new ReputationPresenter(App.get().Di().getReputationRepository());
-    }
-
     private ReputationAdapter adapter;
     private PaginationHelper paginationHelper;
     private DynamicDialogMenu<ReputationFragment, RepItem> dialogMenu;
@@ -63,6 +55,15 @@ public class ReputationFragment extends RecyclerFragment implements ReputationVi
     private MenuItem repModeMenuItem;
     private MenuItem upRepMenuItem;
     private MenuItem downRepMenuItem;
+
+
+    @InjectPresenter
+    ReputationPresenter presenter;
+
+    @ProvidePresenter
+    ReputationPresenter providePresenter() {
+        return new ReputationPresenter(App.get().Di().getReputationRepository());
+    }
 
     public ReputationFragment() {
         configuration.setDefaultTitle(App.get().getString(R.string.fragment_title_reputation));

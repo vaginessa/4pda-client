@@ -144,7 +144,7 @@ public abstract class ThemeFragment extends TabFragment implements ThemeView {
     ThemePresenter presenter;
 
     @ProvidePresenter
-    ThemePresenter provideThemePresenter() {
+    ThemePresenter providePresenter() {
         return new ThemePresenter(
                 App.get().Di().getThemeRepository(),
                 App.get().Di().getReputationRepository(),

@@ -72,6 +72,7 @@ class SearchPresenter(
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
         viewState.fillSettingsData(settings, fields)
+        refreshData()
     }
 
     fun refreshData() {

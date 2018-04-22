@@ -51,14 +51,6 @@ import io.reactivex.Observable;
  */
 public class ProfileFragment extends TabFragment implements ProfileAdapter.ClickListener, ProfileView {
 
-    @InjectPresenter
-    ProfilePresenter presenter;
-
-    @ProvidePresenter
-    ProfilePresenter provideProfilePresenter() {
-        return new ProfilePresenter(App.get().Di().getProfileRepository());
-    }
-
     private RecyclerView recyclerView;
     private TextView nick, group, sign;
     private ImageView avatar;
@@ -68,6 +60,14 @@ public class ProfileFragment extends TabFragment implements ProfileAdapter.Click
     private MenuItem writeMenuItem;
 
     private ProfileAdapter adapter;
+
+    @InjectPresenter
+    ProfilePresenter presenter;
+
+    @ProvidePresenter
+    ProfilePresenter providePresenter() {
+        return new ProfilePresenter(App.get().Di().getProfileRepository());
+    }
 
     public ProfileFragment() {
         configuration.setFitSystemWindow(true);

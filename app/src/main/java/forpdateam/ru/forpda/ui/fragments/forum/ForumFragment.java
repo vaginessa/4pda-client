@@ -39,16 +39,9 @@ import io.realm.RealmResults;
 public class ForumFragment extends TabFragment implements ForumView {
     public final static String ARG_FORUM_ID = "ARG_FORUM_ID";
 
-    @InjectPresenter
-    ForumPresenter presenter;
-
-    @ProvidePresenter
-    ForumPresenter provideForumPresenter() {
-        return new ForumPresenter(
-                App.get().Di().getForumRepository(),
-                App.get().Di().getFavoritesRepository()
-        );
-    }
+    private TreeNode root;
+    private AndroidTreeView tView;
+    private int forumId = -1;
 
     private NestedScrollView treeContainer;
     private RealmResults<ForumItemFlatBd> results;
@@ -76,10 +69,17 @@ public class ForumFragment extends TabFragment implements ForumView {
         dialogMenu.show(getContext(), ForumFragment.this, item);
         return false;
     };
-    TreeNode root;
-    AndroidTreeView tView;
-    int forumId = -1;
 
+    @InjectPresenter
+    ForumPresenter presenter;
+
+    @ProvidePresenter
+    ForumPresenter providePresenter() {
+        return new ForumPresenter(
+                App.get().Di().getForumRepository(),
+                App.get().Di().getFavoritesRepository()
+        );
+    }
 
     public ForumFragment() {
         configuration.setUseCache(true);
