@@ -23,7 +23,7 @@ import forpdateam.ru.forpda.model.repository.theme.ThemeRepository
 import forpdateam.ru.forpda.ui.TabManager
 import forpdateam.ru.forpda.ui.activities.imageviewer.ImageViewerActivity
 import forpdateam.ru.forpda.ui.fragments.theme.ThemeFragmentWeb
-import forpdateam.ru.forpda.ui.fragments.theme.editpost.EditPostFragment
+import forpdateam.ru.forpda.ui.fragments.editpost.EditPostFragment
 import org.acra.ACRA
 import java.io.UnsupportedEncodingException
 import java.net.URLEncoder

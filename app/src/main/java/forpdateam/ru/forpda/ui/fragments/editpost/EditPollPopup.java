@@ -1,4 +1,4 @@
-package forpdateam.ru.forpda.ui.fragments.theme.editpost;
+package forpdateam.ru.forpda.ui.fragments.editpost;
 
 import android.content.Context;
 import android.support.design.widget.BottomSheetDialog;

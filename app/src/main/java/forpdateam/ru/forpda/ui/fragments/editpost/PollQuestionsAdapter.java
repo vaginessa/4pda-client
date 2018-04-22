@@ -1,4 +1,4 @@
-package forpdateam.ru.forpda.ui.fragments.theme.editpost;
+package forpdateam.ru.forpda.ui.fragments.editpost;
 
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatCheckBox;

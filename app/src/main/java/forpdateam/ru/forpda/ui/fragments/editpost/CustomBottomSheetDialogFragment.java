@@ -1,4 +1,4 @@
-package forpdateam.ru.forpda.ui.fragments.theme.editpost;
+package forpdateam.ru.forpda.ui.fragments.editpost;
 
 import android.app.Dialog;
 import android.content.DialogInterface;

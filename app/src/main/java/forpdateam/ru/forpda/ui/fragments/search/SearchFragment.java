@@ -61,7 +61,7 @@ import forpdateam.ru.forpda.ui.fragments.devdb.brand.DevicesFragment;
 import forpdateam.ru.forpda.ui.fragments.theme.ThemeDialogsHelper;
 import forpdateam.ru.forpda.ui.fragments.theme.ThemeFragmentWeb;
 import forpdateam.ru.forpda.ui.fragments.theme.ThemeHelper;
-import forpdateam.ru.forpda.ui.fragments.theme.editpost.EditPostFragment;
+import forpdateam.ru.forpda.ui.fragments.editpost.EditPostFragment;
 import forpdateam.ru.forpda.ui.views.ContentController;
 import forpdateam.ru.forpda.ui.views.DynamicDialogMenu;
 import forpdateam.ru.forpda.ui.views.ExtendedWebView;
