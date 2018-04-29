@@ -38,7 +38,8 @@ class ThemePresenter(
         private val themeRepository: ThemeRepository,
         private val reputationRepository: ReputationRepository,
         private val editorRepository: PostEditorRepository,
-        private val favoritesRepository: FavoritesRepository
+        private val favoritesRepository: FavoritesRepository,
+        private val themeTemplate: ThemeTemplate
 ) : BasePresenter<ThemeView>(), IThemePresenter {
 
 
@@ -74,6 +75,7 @@ class ThemePresenter(
         viewState.updateHistoryLastHtml()
         themeRepository
                 .getTheme(url, true, hatOpen, pollOpen)
+                .map { themeTemplate.mapEntity(it) }
                 .doOnTerminate { viewState.setRefreshing(true) }
                 .doAfterTerminate { viewState.setRefreshing(false) }
                 .subscribe({
@@ -151,6 +153,7 @@ class ThemePresenter(
             viewState.setMessageRefreshing(true)
             themeRepository
                     .sendPost(it)
+                    .map { themeTemplate.mapEntity(it) }
                     .doOnTerminate { viewState.setMessageRefreshing(true) }
                     .doAfterTerminate { viewState.setMessageRefreshing(false) }
                     .subscribe({

@@ -74,13 +74,11 @@ class QmsRepository(
     //Chat
     fun getChat(userId: Int, themeId: Int): Observable<QmsChatModel> = Observable
             .fromCallable { qmsApi.getChat(userId, themeId) }
-            .map { TempHelper.transform(it, false) }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 
     fun sendNewTheme(nick: String, title: String, mess: String): Observable<QmsChatModel> = Observable
             .fromCallable { qmsApi.sendNewTheme(nick, title, mess) }
-            .map { TempHelper.transform(it, false) }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 

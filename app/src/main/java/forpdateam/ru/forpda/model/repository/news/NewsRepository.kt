@@ -30,7 +30,6 @@ class NewsRepository(
 
     fun sendPoll(from: String, pollId: Int, answersId: IntArray): Observable<DetailsPage> = Observable
             .fromCallable { newsApi.sendPoll(from, pollId, answersId) }
-            .map { transform(it) }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 
@@ -41,13 +40,11 @@ class NewsRepository(
 
     fun getDetails(id: Int): Observable<DetailsPage> = Observable
             .fromCallable { newsApi.getDetails(id) }
-            .map { transform(it) }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 
     fun getDetails(url: String): Observable<DetailsPage> = Observable
             .fromCallable { newsApi.getDetails(url) }
-            .map { transform(it) }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 
@@ -55,23 +52,5 @@ class NewsRepository(
             .fromCallable { newsApi.parseComments(article.karmaMap, article.commentsSource) }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
-
-    private fun transform(page: DetailsPage): DetailsPage {
-        val t = App.get().getTemplate(App.TEMPLATE_NEWS)
-        App.setTemplateResStrings(t)
-        t!!.setVariableOpt("style_type", App.get().cssStyleType)
-        t.setVariableOpt("details_title", ApiUtils.htmlEncode(page.title))
-        t.setVariableOpt("details_content", page.html)
-        for (material in page.materials) {
-            t.setVariableOpt("material_id", material.id)
-            t.setVariableOpt("material_image", material.imageUrl)
-            t.setVariableOpt("material_title", material.title)
-            t.addBlockOpt("material")
-        }
-        page.html = t.generateOutput()
-        t.reset()
-
-        return page
-    }
 
 }

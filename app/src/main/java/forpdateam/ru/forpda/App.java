@@ -117,21 +117,14 @@ import static org.acra.ReportField.USER_APP_START_DATE;
 )
 
 public class App extends android.app.Application {
-    public final static String TEMPLATE_THEME = "theme";
-    public final static String TEMPLATE_SEARCH = "search";
     public final static String TEMPLATE_QMS_CHAT = "qms_chat";
     public final static String TEMPLATE_QMS_CHAT_MESS = "qms_chat_mess";
-    public final static String TEMPLATE_NEWS = "news";
-    public final static String TEMPLATE_FORUM_RULES = "forum_rules";
-    public final static String TEMPLATE_ANNOUNCE = "announce";
     public static int px2, px4, px6, px8, px12, px14, px16, px20, px24, px32, px36, px40, px48, px56, px64;
     private static int savedKeyboardHeight = 0;
     public static int keyboardHeight = 0;
     public static int statusBarHeight = 0;
     public static int navigationBarHeight = 0;
-    public static HashMap<String, String> templateStringCache = new HashMap<>();
     private static App instance;
-    private Map<String, MiniTemplator> templates = new HashMap<>();
     private float density = 1.0f;
     private SharedPreferences preferences;
     private SimpleObservable preferenceChangeObservables = new SimpleObservable();
@@ -189,11 +182,6 @@ public class App extends android.app.Application {
     public boolean isDarkTheme() {
         return Preferences.Main.Theme.isDark(getContext());
     }
-
-    public String getCssStyleType() {
-        return isDarkTheme() ? "dark" : "light";
-    }
-
 
     public boolean isWebViewFound(Context context) {
         if (webViewFound == null) {
@@ -280,14 +268,17 @@ public class App extends android.app.Application {
         px56 = getContext().getResources().getDimensionPixelSize(R.dimen.dp56);
         px64 = getContext().getResources().getDimensionPixelSize(R.dimen.dp64);
 
+        HashMap<String, String> templateStringCache = new HashMap<>();
         for (Field f : R.string.class.getFields()) {
             try {
                 if (f.getName().contains("res_s_")) {
                     templateStringCache.put(f.getName(), getString(f.getInt(f)));
                 }
-            } catch (Exception ignore) {
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
         }
+        dependencies.getTemplateManager().setStaticStrings(templateStringCache);
 
         keyboardHeight = getPreferences().getInt("keyboard_height", getContext().getResources().getDimensionPixelSize(R.dimen.default_keyboard_height));
         savedKeyboardHeight = keyboardHeight;
@@ -393,20 +384,6 @@ public class App extends android.app.Application {
         return mServiceConnection;
     }
 
-    public static HashMap<String, String> getTemplateStringCache() {
-        return templateStringCache;
-    }
-
-    public static MiniTemplator setTemplateResStrings(MiniTemplator t) {
-        for (Map.Entry<String, String> entry : t.getVariables().entrySet()) {
-            String cacheValue = App.getTemplateStringCache().get(entry.getKey());
-            if (cacheValue != null) {
-                t.setVariable(entry.getKey(), cacheValue);
-            }
-        }
-        return t;
-    }
-
     public static int getToolBarHeight(Context context) {
         int[] attrs = new int[]{R.attr.actionBarSize};
         TypedArray ta = context.obtainStyledAttributes(attrs);
@@ -499,37 +476,6 @@ public class App extends android.app.Application {
         if (keyboardHeight == savedKeyboardHeight) return;
         App.get().getPreferences().edit().putInt("keyboard_height", keyboardHeight).apply();
     }
-
-
-    public MiniTemplator getTemplate(String name) {
-        MiniTemplator template = templates.get(name);
-        if (template == null) {
-            template = findTemplate(name);
-            if (template != null) {
-                templates.put(name, template);
-            }
-        }
-        return template;
-    }
-
-    private MiniTemplator findTemplate(String name) {
-        MiniTemplator template = null;
-        try {
-            InputStream stream = App.get().getAssets().open("template_".concat(name).concat(".html"));
-            try {
-                template = new MiniTemplator.Builder().build(stream, Charset.forName("utf-8"));
-            } catch (Exception e) {
-                e.printStackTrace();
-                Toast.makeText(getContext(), String.format(getString(R.string.template_error), name, e.getMessage()), Toast.LENGTH_LONG).show();
-                //создание пустого шаблона
-                template = new MiniTemplator.Builder().build(new ByteArrayInputStream("Template error!".getBytes(Charset.forName("utf-8"))), Charset.forName("utf-8"));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return template;
-    }
-
 
     public float getDensity() {
         return density;

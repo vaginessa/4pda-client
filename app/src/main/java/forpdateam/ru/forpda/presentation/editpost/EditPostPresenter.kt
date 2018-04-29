@@ -6,6 +6,7 @@ import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem
 import forpdateam.ru.forpda.entity.remote.editpost.EditPostForm
 import forpdateam.ru.forpda.model.data.remote.api.RequestFile
 import forpdateam.ru.forpda.model.repository.posteditor.PostEditorRepository
+import forpdateam.ru.forpda.presentation.theme.ThemeTemplate
 
 /**
  * Created by radiationx on 11.11.17.
@@ -13,7 +14,8 @@ import forpdateam.ru.forpda.model.repository.posteditor.PostEditorRepository
 
 @InjectViewState
 class EditPostPresenter(
-        private val editorRepository: PostEditorRepository
+        private val editorRepository: PostEditorRepository,
+        private val themeTemplate: ThemeTemplate
 ) : BasePresenter<EditPostView>() {
 
     private val postForm = EditPostForm()
@@ -47,6 +49,7 @@ class EditPostPresenter(
         }
         editorRepository
                 .sendPost(postForm)
+                .map { themeTemplate.mapEntity(it) }
                 .subscribe({
                     viewState.onPostSend(it, postForm)
                 }, {

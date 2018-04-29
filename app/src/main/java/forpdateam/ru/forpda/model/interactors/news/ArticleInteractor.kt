@@ -4,11 +4,13 @@ import com.jakewharton.rxrelay2.BehaviorRelay
 import forpdateam.ru.forpda.entity.remote.news.Comment
 import forpdateam.ru.forpda.entity.remote.news.DetailsPage
 import forpdateam.ru.forpda.model.repository.news.NewsRepository
+import forpdateam.ru.forpda.presentation.articles.detail.ArticleTemplate
 import io.reactivex.Observable
 
 class ArticleInteractor(
         val initData: InitData,
-        private val newsRepository: NewsRepository
+        private val newsRepository: NewsRepository,
+        private val articleTemplate: ArticleTemplate
 ) {
 
     private val dataRelay = BehaviorRelay.create<DetailsPage>()
@@ -22,6 +24,7 @@ class ArticleInteractor(
             ?.let {
                 newsRepository.getDetails(it)
             } ?: newsRepository.getDetails(initData.newsId)
+            .map { articleTemplate.mapEntity(it) }
             .doOnNext { updateData(it) }
 
     fun likeComment(commentId: Int) = newsRepository
@@ -32,6 +35,7 @@ class ArticleInteractor(
 
     fun replyComment(commentId: Int, comment: String): Observable<DetailsPage> = newsRepository
             .replyComment(initData.newsId, commentId, comment)
+            .map { articleTemplate.mapEntity(it) }
             .doOnNext { updateData(it) }
 
     private fun updateData(article: DetailsPage) {
@@ -53,6 +57,8 @@ class ArticleInteractor(
                     it.printStackTrace()
                 })
     }
+
+
 
     data class InitData(
             var newsUrl: String? = null,

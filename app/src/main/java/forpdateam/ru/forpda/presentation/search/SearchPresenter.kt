@@ -37,7 +37,8 @@ class SearchPresenter(
         private val searchRepository: SearchRepository,
         private val favoritesRepository: FavoritesRepository,
         private val themeRepository: ThemeRepository,
-        private val reputationRepository: ReputationRepository
+        private val reputationRepository: ReputationRepository,
+        private val searchTemplate: SearchTemplate
 ) : BasePresenter<SearchSiteView>(), IThemePresenter {
 
     companion object {
@@ -81,7 +82,10 @@ class SearchPresenter(
         }
         val withHtml = settings.result == SearchSettings.RESULT_POSTS.first && settings.resourceType.equals(SearchSettings.RESOURCE_FORUM.first)
         searchRepository
-                .getSearch(settings, withHtml)
+                .getSearch(settings)
+                .map {
+                    if (withHtml) searchTemplate.mapEntity(it) else it
+                }
                 .doOnTerminate {
                     viewState.setRefreshing(true)
                     viewState.onStartSearch(settings)

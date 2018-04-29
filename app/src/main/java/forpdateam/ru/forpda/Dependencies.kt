@@ -35,6 +35,10 @@ import forpdateam.ru.forpda.model.repository.theme.ThemeRepository
 import forpdateam.ru.forpda.model.repository.topics.TopicsRepository
 import forpdateam.ru.forpda.model.system.AppNetworkState
 import forpdateam.ru.forpda.model.system.AppSchedulers
+import forpdateam.ru.forpda.presentation.announce.AnnounceTemplate
+import forpdateam.ru.forpda.presentation.forumrules.ForumRulesTemplate
+import forpdateam.ru.forpda.presentation.qms.chat.QmsChatTemplate
+import forpdateam.ru.forpda.ui.TemplateManager
 
 /**
  * Created by radiationx on 01.01.18.
@@ -48,6 +52,11 @@ class Dependencies internal constructor(
     var schedulers: SchedulersProvider = AppSchedulers()
 
     val webClient: IWebClient = Client(context)
+
+    val templateManager = TemplateManager(context)
+    val forumRulesTemplate = ForumRulesTemplate(templateManager)
+    val announceTemplate = AnnounceTemplate(templateManager)
+    val qmsChatTemplate = QmsChatTemplate(templateManager)
 
     val authApi = AuthApi(webClient)
     val devDbApi = DevDbApi(webClient)

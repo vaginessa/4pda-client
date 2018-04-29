@@ -19,20 +19,12 @@ class ThemeRepository(
 ) {
 
     fun getTheme(url: String, withHtml: Boolean, hatOpen: Boolean, pollOpen: Boolean): Observable<ThemePage> = Observable
-            .fromCallable {
-                themeApi.getTheme(url, hatOpen, pollOpen)
-            }
-            .map {
-                TempHelper.transform(it, withHtml)
-            }
+            .fromCallable { themeApi.getTheme(url, hatOpen, pollOpen) }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 
     fun sendPost(form: EditPostForm): Observable<ThemePage> = Observable
             .fromCallable { editPostApi.sendPost(form) }
-            .map {
-                TempHelper.transform(it, true)
-            }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 

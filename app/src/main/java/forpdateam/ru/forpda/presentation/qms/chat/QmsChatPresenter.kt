@@ -25,7 +25,8 @@ import io.reactivex.schedulers.Schedulers
 
 @InjectViewState
 class QmsChatPresenter(
-        private val qmsRepository: QmsRepository
+        private val qmsRepository: QmsRepository,
+        private val qmsChatTemplate: QmsChatTemplate
 ) : BasePresenter<QmsChatView>(), IQmsChatPresenter {
 
     var themeId = 0
@@ -47,7 +48,7 @@ class QmsChatPresenter(
         qmsRepository
                 .findUser(nick)
                 .subscribe({
-
+                    viewState.onShowSearchRes(it)
                 },{
                     it.printStackTrace()
                 })
@@ -56,6 +57,7 @@ class QmsChatPresenter(
     fun loadChat() {
         qmsRepository
                 .getChat(userId, themeId)
+                .map { qmsChatTemplate.mapEntity(it) }
                 .doOnTerminate { viewState.setRefreshing(true) }
                 .doAfterTerminate { viewState.setRefreshing(false) }
                 .subscribe({
@@ -71,6 +73,7 @@ class QmsChatPresenter(
     fun sendNewTheme(nick: String, title: String, message: String) {
         qmsRepository
                 .sendNewTheme(nick, title, message)
+                .map { qmsChatTemplate.mapEntity(it) }
                 .doOnTerminate { viewState.setRefreshing(true) }
                 .doAfterTerminate { viewState.setRefreshing(false) }
                 .subscribe({

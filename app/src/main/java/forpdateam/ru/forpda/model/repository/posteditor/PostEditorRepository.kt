@@ -35,7 +35,6 @@ class PostEditorRepository(
 
     fun sendPost(form: EditPostForm): Observable<ThemePage> = Observable
             .fromCallable { editPostApi.sendPost(form) }
-            .map { TempHelper.transform(it, true) }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 

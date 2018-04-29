@@ -55,15 +55,13 @@ class ForumRepository(
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 
-    fun getRules(withHtml: Boolean): Observable<ForumRules> = Observable
+    fun getRules(): Observable<ForumRules> = Observable
             .fromCallable { forumApi.rules }
-            .map { transform(it, withHtml) }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 
-    fun getAnnounce(id: Int, forumId: Int, withHtml: Boolean): Observable<Announce> = Observable
+    fun getAnnounce(id: Int, forumId: Int): Observable<Announce> = Observable
             .fromCallable { forumApi.getAnnounce(id, forumId) }
-            .map { transform(it, withHtml) }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 
@@ -91,37 +89,4 @@ class ForumRepository(
         }
     }
 
-
-    @Throws(Exception::class)
-    fun transform(rules: ForumRules, withHtml: Boolean): ForumRules {
-        if (withHtml) {
-            val t = App.get().getTemplate(App.TEMPLATE_FORUM_RULES)
-            App.setTemplateResStrings(t)
-            t!!.setVariableOpt("style_type", App.get().cssStyleType)
-
-            for (item in rules.items) {
-                t.setVariableOpt("type", if (item.isHeader) "header" else "")
-                t.setVariableOpt("number", item.number)
-                t.setVariableOpt("text", item.text)
-                t.addBlockOpt("rules_item")
-            }
-
-            rules.html = t.generateOutput()
-            t.reset()
-        }
-        return rules
-    }
-
-    @Throws(Exception::class)
-    fun transform(announce: Announce, withHtml: Boolean): Announce {
-        if (withHtml) {
-            val t = App.get().getTemplate(App.TEMPLATE_ANNOUNCE)
-            App.setTemplateResStrings(t)
-            t!!.setVariableOpt("style_type", App.get().cssStyleType)
-            t.setVariableOpt("body", announce.html)
-            announce.html = t.generateOutput()
-            t.reset()
-        }
-        return announce
-    }
 }
