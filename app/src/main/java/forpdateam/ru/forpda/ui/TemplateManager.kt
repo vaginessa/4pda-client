@@ -34,9 +34,9 @@ class TemplateManager(
     }
 
     fun fillStaticStrings(template: MiniTemplator): MiniTemplator = template.apply {
-        variables.forEach { key, value ->
-            staticStrings[key]?.let {
-                setVariable(key, it)
+        variables.forEach { entry ->
+            staticStrings[entry.key]?.let {
+                setVariable(entry.key, it)
             }
         }
     }

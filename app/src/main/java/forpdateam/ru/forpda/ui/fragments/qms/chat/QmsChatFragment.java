@@ -43,6 +43,7 @@ import forpdateam.ru.forpda.entity.remote.qms.QmsMessage;
 import forpdateam.ru.forpda.model.data.remote.api.RequestFile;
 import forpdateam.ru.forpda.model.repository.temp.TempHelper;
 import forpdateam.ru.forpda.presentation.qms.chat.QmsChatPresenter;
+import forpdateam.ru.forpda.presentation.qms.chat.QmsChatTemplate;
 import forpdateam.ru.forpda.presentation.qms.chat.QmsChatView;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import forpdateam.ru.forpda.ui.fragments.notes.NotesAddPopup;
@@ -84,13 +85,17 @@ public class QmsChatFragment extends TabFragment implements ChatThemeCreator.The
         }
     };
 
+    private QmsChatTemplate qmsChatTemplate = App.get().Di().getQmsChatTemplate();
 
     @InjectPresenter
     QmsChatPresenter presenter;
 
     @ProvidePresenter
     QmsChatPresenter providePresenter() {
-        return new QmsChatPresenter(App.get().Di().getQmsRepository());
+        return new QmsChatPresenter(
+                App.get().Di().getQmsRepository(),
+                App.get().Di().getQmsChatTemplate()
+        );
     }
 
     private Observer notification = (observable, o) -> {
@@ -269,21 +274,6 @@ public class QmsChatFragment extends TabFragment implements ChatThemeCreator.The
     public void showChat(@NotNull QmsChatModel data) {
         App.get().subscribeQms(notification);
         progressBar.setVisibility(View.GONE);
-
-        MiniTemplator t = App.get().getTemplate(App.TEMPLATE_QMS_CHAT_MESS);
-        App.setTemplateResStrings(t);
-        int end = data.getMessages().size();
-        int start = Math.max(end - 30, 0);
-        TempHelper.INSTANCE.generateMess(t, data.getMessages(), start, end);
-        String messagesSrc = t.generateOutput();
-        t.reset();
-        data.setShowedMessIndex(start);
-
-        messagesSrc = TempHelper.INSTANCE.transformMessageSrc(messagesSrc);
-
-        Log.d(LOG_TAG, "showNewMess");
-        webView.evalJs("showNewMess('".concat(messagesSrc).concat("', true)"));
-
         refreshToolbarMenuItems(true);
         setTitles(data.getTitle(), data.getNick());
     }
@@ -304,13 +294,7 @@ public class QmsChatFragment extends TabFragment implements ChatThemeCreator.The
 
     //Chat
     private void loadBaseWebContainer() {
-        MiniTemplator t = App.get().getTemplate(App.TEMPLATE_QMS_CHAT);
-        App.setTemplateResStrings(t);
-        t.setVariableOpt("style_type", App.get().getCssStyleType());
-        t.setVariableOpt("body_type", "qms");
-        t.setVariableOpt("messages", "");
-        String html = t.generateOutput();
-        t.reset();
+        String html = qmsChatTemplate.generateHtmlBase();
         webView.loadDataWithBaseURL("https://4pda.ru/forum/", html, "text/html", "utf-8", null);
     }
 
@@ -319,15 +303,8 @@ public class QmsChatFragment extends TabFragment implements ChatThemeCreator.The
     public void onNewMessages(@NotNull List<? extends QmsMessage> items) {
         Log.d(LOG_TAG, "Returned messages " + items.size());
         if (!items.isEmpty()) {
-            MiniTemplator t = App.get().getTemplate(App.TEMPLATE_QMS_CHAT_MESS);
-            App.setTemplateResStrings(t);
-            for (int i = 0; i < items.size(); i++) {
-                QmsMessage message = items.get(i);
-                TempHelper.INSTANCE.generateMess(t, message);
-            }
-            String messagesSrc = t.generateOutput();
-            t.reset();
-            messagesSrc = TempHelper.INSTANCE.transformMessageSrc(messagesSrc);
+            String html = qmsChatTemplate.generate(items);
+            String messagesSrc = TempHelper.INSTANCE.transformMessageSrc(html);
             webView.evalJs("showNewMess('".concat(messagesSrc).concat("', true)"));
         }
     }
@@ -374,12 +351,8 @@ public class QmsChatFragment extends TabFragment implements ChatThemeCreator.The
 
     @Override
     public void showMoreMessages(@NotNull List<? extends QmsMessage> items, int startIndex, int endIndex) {
-        MiniTemplator t = App.get().getTemplate(App.TEMPLATE_QMS_CHAT_MESS);
-        App.setTemplateResStrings(t);
-        TempHelper.INSTANCE.generateMess(t, items, startIndex, endIndex);
-        String messagesSrc = t.generateOutput();
-        t.reset();
-        messagesSrc = TempHelper.INSTANCE.transformMessageSrc(messagesSrc);
+        String html = qmsChatTemplate.generate(items, startIndex, endIndex);
+        String messagesSrc = TempHelper.INSTANCE.transformMessageSrc(html);
         webView.evalJs("showMoreMess('" + messagesSrc + "')");
     }
 

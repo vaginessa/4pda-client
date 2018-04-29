@@ -1,5 +1,6 @@
 package forpdateam.ru.forpda.presentation.articles.detail
 
+import android.util.Log
 import forpdateam.ru.forpda.App
 import forpdateam.ru.forpda.entity.remote.forum.ForumRules
 import forpdateam.ru.forpda.entity.remote.news.DetailsPage

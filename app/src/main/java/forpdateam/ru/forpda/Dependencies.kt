@@ -35,9 +35,14 @@ import forpdateam.ru.forpda.model.repository.theme.ThemeRepository
 import forpdateam.ru.forpda.model.repository.topics.TopicsRepository
 import forpdateam.ru.forpda.model.system.AppNetworkState
 import forpdateam.ru.forpda.model.system.AppSchedulers
+import forpdateam.ru.forpda.model.system.AppTheme
 import forpdateam.ru.forpda.presentation.announce.AnnounceTemplate
+import forpdateam.ru.forpda.presentation.articles.detail.ArticleTemplate
 import forpdateam.ru.forpda.presentation.forumrules.ForumRulesTemplate
 import forpdateam.ru.forpda.presentation.qms.chat.QmsChatTemplate
+import forpdateam.ru.forpda.presentation.search.SearchTemplate
+import forpdateam.ru.forpda.presentation.theme.ThemeTemplate
+import forpdateam.ru.forpda.ui.AppThemeHolder
 import forpdateam.ru.forpda.ui.TemplateManager
 
 /**
@@ -47,13 +52,17 @@ import forpdateam.ru.forpda.ui.TemplateManager
 class Dependencies internal constructor(
         context: Context
 ) {
-    var networkState: NetworkStateProvider = AppNetworkState(context)
+    val networkState: NetworkStateProvider = AppNetworkState(context)
 
-    var schedulers: SchedulersProvider = AppSchedulers()
+    val schedulers: SchedulersProvider = AppSchedulers()
 
     val webClient: IWebClient = Client(context)
 
-    val templateManager = TemplateManager(context)
+    val appTheme: AppThemeHolder = AppTheme(context)
+    val templateManager = TemplateManager(context, appTheme)
+    val themeTemplate = ThemeTemplate(templateManager)
+    val articleTemplate = ArticleTemplate(templateManager)
+    val searchTemplate = SearchTemplate(templateManager)
     val forumRulesTemplate = ForumRulesTemplate(templateManager)
     val announceTemplate = AnnounceTemplate(templateManager)
     val qmsChatTemplate = QmsChatTemplate(templateManager)

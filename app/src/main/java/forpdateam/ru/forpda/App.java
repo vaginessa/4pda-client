@@ -117,8 +117,6 @@ import static org.acra.ReportField.USER_APP_START_DATE;
 )
 
 public class App extends android.app.Application {
-    public final static String TEMPLATE_QMS_CHAT = "qms_chat";
-    public final static String TEMPLATE_QMS_CHAT_MESS = "qms_chat_mess";
     public static int px2, px4, px6, px8, px12, px14, px16, px20, px24, px32, px36, px40, px48, px56, px64;
     private static int savedKeyboardHeight = 0;
     public static int keyboardHeight = 0;

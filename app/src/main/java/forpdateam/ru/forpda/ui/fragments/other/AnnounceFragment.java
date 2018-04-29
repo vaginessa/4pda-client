@@ -38,7 +38,7 @@ import forpdateam.ru.forpda.ui.views.ExtendedWebView;
  * Created by radiationx on 16.10.17.
  */
 
-public class AnnounceFragment extends TabFragment implements AnnounceView{
+public class AnnounceFragment extends TabFragment implements AnnounceView {
     public final static String ARG_ANNOUNCE_ID = "ARG_ANNOUNCE_ID";
     public final static String ARG_FORUM_ID = "ARG_FORUM_ID";
     public final static String JS_INTERFACE = "IAnnounce";
@@ -50,7 +50,10 @@ public class AnnounceFragment extends TabFragment implements AnnounceView{
 
     @ProvidePresenter
     AnnouncePresenter providePresenter() {
-        return new AnnouncePresenter(App.get().Di().getForumRepository());
+        return new AnnouncePresenter(
+                App.get().Di().getForumRepository(),
+                App.get().Di().getAnnounceTemplate()
+        );
     }
 
     public AnnounceFragment() {

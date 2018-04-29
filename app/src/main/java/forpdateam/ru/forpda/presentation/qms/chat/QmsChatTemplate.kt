@@ -1,7 +1,6 @@
 package forpdateam.ru.forpda.presentation.qms.chat
 
 import biz.source_code.miniTemplator.MiniTemplator
-import forpdateam.ru.forpda.entity.remote.news.DetailsPage
 import forpdateam.ru.forpda.entity.remote.qms.QmsChatModel
 import forpdateam.ru.forpda.entity.remote.qms.QmsMessage
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils
@@ -41,14 +40,43 @@ class QmsChatTemplate(
         return result
     }
 
-    fun generateMessages(template: MiniTemplator, messages: List<QmsMessage>, start: Int, end: Int): MiniTemplator {
+    fun generateHtmlBase(): String {
+        val template = templateManager.getTemplate(TemplateManager.TEMPLATE_QMS_CHAT)
+        template.apply {
+            templateManager.fillStaticStrings(this)
+            setVariableOpt("style_type", templateManager.getThemeType())
+            setVariableOpt("body_type", "qms")
+            setVariableOpt("messages", "")
+        }
+
+        val result = template.generateOutput()
+        template.reset()
+        return result
+    }
+
+    fun generate(messages: List<QmsMessage>): String {
+        return generate(messages, 0, messages.size)
+    }
+
+    fun generate(messages: List<QmsMessage>, startIndex: Int, endIndex: Int): String {
+        val template = templateManager.getTemplate(TemplateManager.TEMPLATE_QMS_CHAT_MESS)
+        template.apply {
+            templateManager.fillStaticStrings(this)
+            generateMessages(template, messages, startIndex, endIndex)
+        }
+        val result = template.generateOutput()
+        template.reset()
+        return result
+    }
+
+    private fun generateMessages(template: MiniTemplator, messages: List<QmsMessage>, start: Int, end: Int): MiniTemplator {
         for (i in start until end) {
             generateMessage(template, messages[i])
         }
         return template
     }
 
-    fun generateMessage(template: MiniTemplator, mess: QmsMessage): MiniTemplator {
+    private fun generateMessage(template: MiniTemplator, mess: QmsMessage): MiniTemplator {
         template.apply {
             if (mess.isDate) {
                 setVariableOpt("date", mess.date)

@@ -44,33 +44,6 @@ object TempHelper {
         return contacts
     }
 
-
-
-    fun generateMess(t: MiniTemplator?, messages: List<QmsMessage>, start: Int, end: Int): MiniTemplator? {
-        for (i in start until end) {
-            val mess = messages[i]
-            generateMess(t, mess)
-        }
-        return t
-    }
-
-     fun generateMess(t: MiniTemplator?, mess: QmsMessage): MiniTemplator {
-        if (mess.isDate) {
-            t!!.setVariableOpt("date", mess.date)
-            t.addBlockOpt("date")
-        } else {
-            t!!.setVariableOpt("from_class", if (mess.isMyMessage) "our" else "his")
-            t.setVariableOpt("unread_class", if (mess.readStatus) "" else "unread")
-            t.setVariableOpt("mess_id", mess.id)
-            t.setVariableOpt("content", mess.content)
-            t.setVariableOpt("time", mess.time)
-            t.addBlockOpt("mess")
-        }
-        t.addBlockOpt("item")
-
-        return t
-    }
-
     fun transformMessageSrc(messagesSrcIn: String): String {
         var messagesSrc = messagesSrcIn
         messagesSrc = messagesSrc.replace("\n".toRegex(), "").replace("'".toRegex(), "&apos;")

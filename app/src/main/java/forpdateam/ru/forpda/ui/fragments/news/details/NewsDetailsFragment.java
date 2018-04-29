@@ -70,7 +70,8 @@ public class NewsDetailsFragment extends TabFragment implements ArticleDetailVie
 
     private ArticleInteractor interactor = new ArticleInteractor(
             new ArticleInteractor.InitData(),
-            App.get().Di().getNewsRepository()
+            App.get().Di().getNewsRepository(),
+            App.get().Di().getArticleTemplate()
     );
 
     @InjectPresenter

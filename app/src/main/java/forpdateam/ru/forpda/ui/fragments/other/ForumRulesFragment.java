@@ -50,7 +50,10 @@ public class ForumRulesFragment extends TabFragment implements ForumRulesView {
 
     @ProvidePresenter
     ForumRulesPresenter providePresenter() {
-        return new ForumRulesPresenter(App.get().Di().getForumRepository());
+        return new ForumRulesPresenter(
+                App.get().Di().getForumRepository(),
+                App.get().Di().getForumRulesTemplate()
+        );
     }
 
     public ForumRulesFragment() {

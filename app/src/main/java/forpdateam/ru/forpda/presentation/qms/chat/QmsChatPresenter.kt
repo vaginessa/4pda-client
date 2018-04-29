@@ -44,25 +44,27 @@ class QmsChatPresenter(
         loadChat()
     }
 
-    fun findUser(nick:String){
+    fun findUser(nick: String) {
         qmsRepository
                 .findUser(nick)
                 .subscribe({
                     viewState.onShowSearchRes(it)
-                },{
+                }, {
                     it.printStackTrace()
                 })
+                .addToDisposable()
     }
 
     fun loadChat() {
         qmsRepository
                 .getChat(userId, themeId)
-                .map { qmsChatTemplate.mapEntity(it) }
+                //.map { qmsChatTemplate.mapEntity(it) }
                 .doOnTerminate { viewState.setRefreshing(true) }
                 .doAfterTerminate { viewState.setRefreshing(false) }
                 .subscribe({
                     currentData = it
                     viewState.showChat(it)
+                    initOnNewMessages(it)
                     tryShowAvatar()
                 }, {
                     it.printStackTrace()
@@ -73,13 +75,14 @@ class QmsChatPresenter(
     fun sendNewTheme(nick: String, title: String, message: String) {
         qmsRepository
                 .sendNewTheme(nick, title, message)
-                .map { qmsChatTemplate.mapEntity(it) }
+                //.map { qmsChatTemplate.mapEntity(it) }
                 .doOnTerminate { viewState.setRefreshing(true) }
                 .doAfterTerminate { viewState.setRefreshing(false) }
                 .subscribe({
                     currentData = it
                     viewState.onNewThemeCreate(it)
                     viewState.showChat(it)
+                    initOnNewMessages(it)
                     tryShowAvatar()
                 }, {
                     it.printStackTrace()
@@ -197,6 +200,14 @@ class QmsChatPresenter(
                     })
                     .addToDisposable()
         }
+    }
+
+    private fun initOnNewMessages(data: QmsChatModel) {
+        val end = data.messages.size
+        val start = Math.max(end - 30, 0)
+        data.showedMessIndex = start
+        val newMessages = data.messages.subList(start, end)
+        viewState.onNewMessages(newMessages)
     }
 
     private fun onNewMessages(items: List<QmsMessage>) {
