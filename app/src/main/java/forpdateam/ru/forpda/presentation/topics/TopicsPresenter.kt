@@ -61,6 +61,7 @@ class TopicsPresenter(
                 }, {
                     it.printStackTrace()
                 })
+                .addToDisposable()
     }
 
     fun addTopicToFavorite(topicId: Int, subType: String) {
@@ -71,6 +72,7 @@ class TopicsPresenter(
                 }, {
                     it.printStackTrace()
                 })
+                .addToDisposable()
     }
 
     fun markRead() {
@@ -81,6 +83,7 @@ class TopicsPresenter(
                 }, {
                     it.printStackTrace()
                 })
+                .addToDisposable()
     }
 
     fun openForum() {

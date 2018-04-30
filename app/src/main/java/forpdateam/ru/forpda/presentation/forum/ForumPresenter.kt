@@ -81,6 +81,7 @@ class ForumPresenter(
                 }, {
                     it.printStackTrace()
                 })
+                .addToDisposable()
     }
 
     fun markAllRead() {
@@ -91,6 +92,7 @@ class ForumPresenter(
                 }, {
                     it.printStackTrace()
                 })
+                .addToDisposable()
     }
 
     fun addToFavorite(forumId: Int, subType: String) {
@@ -101,6 +103,7 @@ class ForumPresenter(
                 }, {
                     it.printStackTrace()
                 })
+                .addToDisposable()
     }
 
     fun copyLink(item: ForumItemTree) {

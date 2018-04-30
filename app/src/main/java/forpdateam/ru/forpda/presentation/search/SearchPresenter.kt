@@ -97,6 +97,7 @@ class SearchPresenter(
                 }, {
                     it.printStackTrace()
                 })
+                .addToDisposable()
     }
 
     fun search(query: String, nick: String) {

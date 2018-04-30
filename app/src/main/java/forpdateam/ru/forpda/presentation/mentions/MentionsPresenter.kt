@@ -50,6 +50,7 @@ class MentionsPresenter(
                 }, {
                     it.printStackTrace()
                 })
+                .addToDisposable()
     }
 
     fun onItemClick(item: MentionItem) {

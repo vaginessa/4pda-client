@@ -108,6 +108,7 @@ class ThemePresenter(
                 }, {
                     it.printStackTrace()
                 })
+                .addToDisposable()
     }
 
     fun deleteTopicFromFavorite(favId: Int) {
@@ -121,6 +122,7 @@ class ThemePresenter(
                 }, {
                     it.printStackTrace()
                 })
+                .addToDisposable()
     }
 
     private fun createEditPostForm(message: String, attachments: MutableList<AttachmentItem>): EditPostForm? = currentPage?.let {

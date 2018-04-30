@@ -55,6 +55,7 @@ class EditPostPresenter(
                 }, {
                     it.printStackTrace()
                 })
+                .addToDisposable()
     }
 
     fun loadForm() {
@@ -71,6 +72,7 @@ class EditPostPresenter(
                 }, {
                     it.printStackTrace()
                 })
+                .addToDisposable()
     }
 
     fun uploadFiles(files: List<RequestFile>, pending: List<AttachmentItem>) {

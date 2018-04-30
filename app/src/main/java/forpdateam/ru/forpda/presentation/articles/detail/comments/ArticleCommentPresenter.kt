@@ -68,6 +68,7 @@ class ArticleCommentPresenter(
                 }, {
                     it.printStackTrace()
                 })
+                .addToDisposable()
     }
 
     fun commentsToList(comment: Comment): ArrayList<Comment> {

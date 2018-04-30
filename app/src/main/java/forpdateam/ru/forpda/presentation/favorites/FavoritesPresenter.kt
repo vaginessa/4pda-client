@@ -103,6 +103,7 @@ class FavoritesPresenter(
                 }, {
                     it.printStackTrace()
                 })
+                .addToDisposable()
     }
 
     fun onItemClick(item: FavItem) {
