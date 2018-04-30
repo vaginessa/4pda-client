@@ -2,10 +2,9 @@ package forpdateam.ru.forpda.presentation.theme
 
 import forpdateam.ru.forpda.App
 import forpdateam.ru.forpda.R
-import forpdateam.ru.forpda.apirx.ForumUsersCache
+import forpdateam.ru.forpda.model.data.cache.forumuser.ForumUsersCache
 import forpdateam.ru.forpda.client.ClientHelper
 import forpdateam.ru.forpda.common.Preferences
-import forpdateam.ru.forpda.entity.remote.news.DetailsPage
 import forpdateam.ru.forpda.entity.remote.others.user.ForumUser
 import forpdateam.ru.forpda.entity.remote.theme.ThemePage
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils
@@ -24,15 +23,6 @@ class ThemeTemplate(
     fun mapEntity(page: ThemePage): ThemePage = page.apply { html = mapString(page) }
 
     fun mapString(page: ThemePage): String {
-        val forumUsers = ArrayList<ForumUser>()
-        for (post in page.posts) {
-            val forumUser = ForumUser()
-            forumUser.id = post.userId
-            forumUser.nick = post.nick
-            forumUser.avatar = post.avatar
-        }
-        ForumUsersCache.saveUsers(forumUsers)
-
         val memberId = ClientHelper.getUserId()
         val template = templateManager.getTemplate(TemplateManager.TEMPLATE_THEME)
 

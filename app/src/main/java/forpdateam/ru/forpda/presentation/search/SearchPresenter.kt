@@ -1,9 +1,6 @@
 package forpdateam.ru.forpda.presentation.search
 
-import android.net.Uri
-import android.util.Log
 import android.util.Pair
-import android.widget.Spinner
 import com.arellomobile.mvp.InjectViewState
 import forpdateam.ru.forpda.App
 import forpdateam.ru.forpda.R
@@ -11,26 +8,19 @@ import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.Utils
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.remote.IBaseForumPost
+import forpdateam.ru.forpda.entity.remote.others.user.ForumUser
 import forpdateam.ru.forpda.entity.remote.search.SearchItem
 import forpdateam.ru.forpda.entity.remote.search.SearchResult
 import forpdateam.ru.forpda.entity.remote.search.SearchSettings
-import forpdateam.ru.forpda.entity.remote.theme.ThemePage
+import forpdateam.ru.forpda.model.data.cache.forumuser.ForumUsersCache
 import forpdateam.ru.forpda.model.data.remote.api.favorites.FavoritesApi
-import forpdateam.ru.forpda.model.data.remote.api.theme.ThemeApi
 import forpdateam.ru.forpda.model.repository.faviorites.FavoritesRepository
 import forpdateam.ru.forpda.model.repository.reputation.ReputationRepository
 import forpdateam.ru.forpda.model.repository.search.SearchRepository
 import forpdateam.ru.forpda.model.repository.theme.ThemeRepository
 import forpdateam.ru.forpda.presentation.theme.IThemePresenter
 import forpdateam.ru.forpda.ui.TabManager
-import forpdateam.ru.forpda.ui.activities.imageviewer.ImageViewerActivity
 import forpdateam.ru.forpda.ui.fragments.editpost.EditPostFragment
-import forpdateam.ru.forpda.ui.fragments.theme.ThemeFragmentWeb
-import org.acra.ACRA
-import java.io.UnsupportedEncodingException
-import java.net.URLEncoder
-import java.util.*
-import java.util.regex.Pattern
 
 @InjectViewState
 class SearchPresenter(

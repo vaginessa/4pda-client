@@ -1,8 +1,10 @@
 package forpdateam.ru.forpda.model.repository.theme
 
 import forpdateam.ru.forpda.entity.remote.editpost.EditPostForm
+import forpdateam.ru.forpda.entity.remote.others.user.ForumUser
 import forpdateam.ru.forpda.entity.remote.theme.ThemePage
 import forpdateam.ru.forpda.model.SchedulersProvider
+import forpdateam.ru.forpda.model.data.cache.forumuser.ForumUsersCache
 import forpdateam.ru.forpda.model.data.remote.api.editpost.EditPostApi
 import forpdateam.ru.forpda.model.data.remote.api.theme.ThemeApi
 import forpdateam.ru.forpda.model.repository.temp.TempHelper
@@ -15,16 +17,12 @@ import io.reactivex.Observable
 class ThemeRepository(
         private val schedulers: SchedulersProvider,
         private val themeApi: ThemeApi,
-        private val editPostApi: EditPostApi
+        private val forumUsersCache: ForumUsersCache
 ) {
 
     fun getTheme(url: String, withHtml: Boolean, hatOpen: Boolean, pollOpen: Boolean): Observable<ThemePage> = Observable
             .fromCallable { themeApi.getTheme(url, hatOpen, pollOpen) }
-            .subscribeOn(schedulers.io())
-            .observeOn(schedulers.ui())
-
-    fun sendPost(form: EditPostForm): Observable<ThemePage> = Observable
-            .fromCallable { editPostApi.sendPost(form) }
+            .doOnNext { saveUsers(it) }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 
@@ -42,4 +40,15 @@ class ThemeRepository(
             .fromCallable { themeApi.votePost(postId, type) }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
+
+    private fun saveUsers(page: ThemePage) {
+        val forumUsers = page.posts.map { post ->
+            ForumUser().apply {
+                id = post.userId
+                nick = post.nick
+                avatar = post.avatar
+            }
+        }
+        forumUsersCache.saveUsers(forumUsers)
+    }
 }

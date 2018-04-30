@@ -20,9 +20,11 @@ import java.net.URLDecoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import forpdateam.ru.forpda.apirx.ForumUsersCache;
+import forpdateam.ru.forpda.App;
+import forpdateam.ru.forpda.model.data.cache.forumuser.ForumUsersCache;
 import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.entity.remote.others.user.ForumUser;
+import forpdateam.ru.forpda.model.repository.avatar.AvatarRepository;
 
 /**
  * Created by radiationx on 12.09.17.
@@ -34,6 +36,8 @@ public class CustomWebViewClient extends WebViewClient {
     private final static String TYPE_URL = "url";
 
     private Pattern cachePattern = Pattern.compile("app_cache:avatars\\?(url|nick)=([\\s\\S]*)");
+
+    private AvatarRepository avatarRepository = App.get().Di().getAvatarRepository();
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -55,9 +59,7 @@ public class CustomWebViewClient extends WebViewClient {
                 String avatarUrl = null;
                 switch (type) {
                     case TYPE_NICK:
-                        ForumUser forumUser = ForumUsersCache.loadUserByNick(value);
-                        Log.d(LOG_TAG, "Loaded user " + forumUser.getId() + " : " + forumUser.getNick() + " : " + forumUser.getAvatar());
-                        avatarUrl = forumUser.getAvatar();
+                        avatarUrl = avatarRepository.getAvatarSync(value);
                         break;
                     case TYPE_URL:
                         avatarUrl = value;

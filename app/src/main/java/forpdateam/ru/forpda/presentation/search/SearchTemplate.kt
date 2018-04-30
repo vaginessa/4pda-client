@@ -1,16 +1,11 @@
 package forpdateam.ru.forpda.presentation.search
 
-import forpdateam.ru.forpda.App
-import forpdateam.ru.forpda.apirx.ForumUsersCache
 import forpdateam.ru.forpda.client.ClientHelper
 import forpdateam.ru.forpda.common.Preferences
-import forpdateam.ru.forpda.entity.remote.news.DetailsPage
-import forpdateam.ru.forpda.entity.remote.others.user.ForumUser
 import forpdateam.ru.forpda.entity.remote.search.SearchResult
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils
 import forpdateam.ru.forpda.model.repository.temp.TempHelper
 import forpdateam.ru.forpda.ui.TemplateManager
-import java.util.ArrayList
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -23,15 +18,6 @@ class SearchTemplate(
     fun mapEntity(page: SearchResult): SearchResult = page.apply { html = mapString(page) }
 
     private fun mapString(page: SearchResult): String {
-        val forumUsers = ArrayList<ForumUser>()
-        for (post in page.items) {
-            val forumUser = ForumUser()
-            forumUser.id = post.userId
-            forumUser.nick = post.nick
-            forumUser.avatar = post.avatar
-        }
-        ForumUsersCache.saveUsers(forumUsers)
-
         val memberId = ClientHelper.getUserId()
         val template = templateManager.getTemplate(TemplateManager.TEMPLATE_SEARCH)
 

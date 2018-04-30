@@ -2,8 +2,10 @@ package forpdateam.ru.forpda.model.repository.posteditor
 
 import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem
 import forpdateam.ru.forpda.entity.remote.editpost.EditPostForm
+import forpdateam.ru.forpda.entity.remote.others.user.ForumUser
 import forpdateam.ru.forpda.entity.remote.theme.ThemePage
 import forpdateam.ru.forpda.model.SchedulersProvider
+import forpdateam.ru.forpda.model.data.cache.forumuser.ForumUsersCache
 import forpdateam.ru.forpda.model.data.remote.api.RequestFile
 import forpdateam.ru.forpda.model.data.remote.api.editpost.EditPostApi
 import forpdateam.ru.forpda.model.repository.temp.TempHelper
@@ -15,7 +17,8 @@ import io.reactivex.Observable
 
 class PostEditorRepository(
         private val schedulers: SchedulersProvider,
-        private val editPostApi: EditPostApi
+        private val editPostApi: EditPostApi,
+        private val forumUsersCache: ForumUsersCache
 ) {
 
     fun loadForm(postId: Int): Observable<EditPostForm> = Observable
@@ -35,7 +38,19 @@ class PostEditorRepository(
 
     fun sendPost(form: EditPostForm): Observable<ThemePage> = Observable
             .fromCallable { editPostApi.sendPost(form) }
+            .doOnNext { saveUsers(it) }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
+
+    private fun saveUsers(page: ThemePage) {
+        val forumUsers = page.posts.map { post ->
+            ForumUser().apply {
+                id = post.userId
+                nick = post.nick
+                avatar = post.avatar
+            }
+        }
+        forumUsersCache.saveUsers(forumUsers)
+    }
 
 }

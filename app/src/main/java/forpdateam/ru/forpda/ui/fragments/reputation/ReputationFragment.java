@@ -20,9 +20,11 @@ import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
+import org.jetbrains.annotations.NotNull;
+
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.apirx.ForumUsersCache;
+import forpdateam.ru.forpda.model.data.cache.forumuser.ForumUsersCache;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.entity.remote.others.user.ForumUser;
 import forpdateam.ru.forpda.entity.remote.reputation.RepData;
@@ -62,7 +64,10 @@ public class ReputationFragment extends RecyclerFragment implements ReputationVi
 
     @ProvidePresenter
     ReputationPresenter providePresenter() {
-        return new ReputationPresenter(App.get().Di().getReputationRepository());
+        return new ReputationPresenter(
+                App.get().Di().getReputationRepository(),
+                App.get().Di().getAvatarRepository()
+        );
     }
 
     public ReputationFragment() {
@@ -201,23 +206,11 @@ public class ReputationFragment extends RecyclerFragment implements ReputationVi
         refreshToolbarMenuItems(!isRefreshing);
     }
 
-    private void tryShowAvatar(RepData repData) {
+    @Override
+    public void showAvatar(@NotNull String avatarUrl) {
+        ImageLoader.getInstance().displayImage(avatarUrl, toolbarImageView);
+        toolbarImageView.setVisibility(View.VISIBLE);
         toolbarImageView.setContentDescription(getString(R.string.user_avatar));
-        toolbarImageView.setOnClickListener(view1 -> presenter.navigateToProfile(repData.getId()));
-        if (repData.getNick() != null) {
-            Observable.fromCallable(() -> ForumUsersCache.loadUserByNick(repData.getNick()))
-                    .onErrorReturn(throwable -> new ForumUser())
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(forumUser -> {
-                        if (forumUser.getAvatar() != null && !forumUser.getAvatar().isEmpty()) {
-                            ImageLoader.getInstance().displayImage(forumUser.getAvatar(), toolbarImageView);
-                            toolbarImageView.setVisibility(View.VISIBLE);
-                        }
-                    });
-        } else {
-            toolbarImageView.setVisibility(View.GONE);
-        }
     }
 
     @Override
@@ -234,8 +227,6 @@ public class ReputationFragment extends RecyclerFragment implements ReputationVi
             contentController.hideContent(ContentController.TAG_NO_DATA);
         }
 
-        tryShowAvatar(repData);
-
         adapter.addAll(repData.getItems());
         paginationHelper.updatePagination(repData.getPagination());
         refreshToolbarMenuItems(true);
@@ -243,6 +234,7 @@ public class ReputationFragment extends RecyclerFragment implements ReputationVi
         setTabTitle("Репутация " + repData.getNick() + (repData.getMode().equals(ReputationApi.MODE_FROM) ? ": кому изменял" : ""));
         setTitle("Репутация " + repData.getNick() + (repData.getMode().equals(ReputationApi.MODE_FROM) ? ": кому изменял" : ""));
         listScrollTop();
+        toolbarImageView.setOnClickListener(view1 -> presenter.navigateToProfile(repData.getId()));
     }
 
     @Override

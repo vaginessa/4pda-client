@@ -42,8 +42,7 @@ import java.util.concurrent.TimeoutException;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.apirx.ForumUsersCache;
-import forpdateam.ru.forpda.client.Client;
+import forpdateam.ru.forpda.model.data.cache.forumuser.ForumUsersCache;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.BitmapUtils;
 import forpdateam.ru.forpda.common.Preferences;
@@ -52,12 +51,14 @@ import forpdateam.ru.forpda.entity.remote.events.NotificationEvent;
 import forpdateam.ru.forpda.entity.remote.others.user.ForumUser;
 import forpdateam.ru.forpda.model.NetworkStateProvider;
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
+import forpdateam.ru.forpda.model.repository.avatar.AvatarRepository;
 import forpdateam.ru.forpda.ui.activities.MainActivity;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.Response;
 import okhttp3.WebSocket;
@@ -98,6 +99,8 @@ public class NotificationsService extends Service {
             handlePendingEvents(source);
         }
     };
+
+    private AvatarRepository avatarRepository = App.get().Di().getAvatarRepository();
 
     private Observer loginObserver = (observable, o) -> {
         if (o == null) o = false;
@@ -624,28 +627,6 @@ public class NotificationsService extends Service {
         }
     }
 
-    public Bitmap loadAvatar(NotificationEvent event) throws Exception {
-        Bitmap bitmap = null;
-        if (!event.fromSite()) {
-            ForumUser forumUser = ForumUsersCache.getUserById(event.getUserId());
-            Log.d(LOG_TAG, "Forum user from cache " + forumUser);
-            if (forumUser == null) {
-                forumUser = ForumUsersCache.loadUserByNick(event.getUserNick());
-                Log.d(LOG_TAG, "Forum user from network " + forumUser);
-            }
-
-            if (forumUser != null) {
-                bitmap = ImageLoader.getInstance().loadImageSync(forumUser.getAvatar());
-                Log.d(LOG_TAG, "Loaded avatar bitmap" + bitmap);
-                if (bitmap != null) {
-                    Log.d(LOG_TAG, "Bitmap h/w: " + bitmap.getHeight() + " : " + bitmap.getWidth());
-                }
-            }
-        }
-
-        return bitmap;
-    }
-
     public void notifyTabs(TabNotification event) {
         Log.d("SUKA", "notifyTabs");
         try {
@@ -768,7 +749,9 @@ public class NotificationsService extends Service {
         }
 
         if (Preferences.Notifications.Main.isAvatarsEnabled(getApplicationContext())) {
-            Observable.fromCallable(() -> loadAvatar(event))
+            avatarRepository
+                    .getAvatar(event.getUserId(), event.getUserNick())
+                    .map(s -> ImageLoader.getInstance().loadImageSync(s))
                     .onErrorReturn(throwable -> ImageLoader.getInstance().loadImageSync("assets://av.png"))
                     .map(bitmap -> {
                         if (bitmap != null) {
@@ -852,8 +835,8 @@ public class NotificationsService extends Service {
 
 
     /*
-    * DEFAULT EVENT
-    * */
+     * DEFAULT EVENT
+     * */
 
     @DrawableRes
     public int createSmallIcon(NotificationEvent event) {
@@ -939,8 +922,8 @@ public class NotificationsService extends Service {
 
 
     /*
-    * STACKED EVENTS
-    * */
+     * STACKED EVENTS
+     * */
     private String createStackedTitle(List<NotificationEvent> events) {
         return createStackedSummary(events);
     }

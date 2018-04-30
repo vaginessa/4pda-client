@@ -6,6 +6,7 @@ import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.remote.reputation.RepData
 import forpdateam.ru.forpda.entity.remote.reputation.RepItem
 import forpdateam.ru.forpda.model.data.remote.api.reputation.ReputationApi
+import forpdateam.ru.forpda.model.repository.avatar.AvatarRepository
 import forpdateam.ru.forpda.model.repository.reputation.ReputationRepository
 
 /**
@@ -14,7 +15,8 @@ import forpdateam.ru.forpda.model.repository.reputation.ReputationRepository
 
 @InjectViewState
 class ReputationPresenter(
-        private val reputationRepository: ReputationRepository
+        private val reputationRepository: ReputationRepository,
+        private val avatarRepository: AvatarRepository
 ) : BasePresenter<ReputationView>() {
 
     var currentData = RepData()
@@ -31,6 +33,7 @@ class ReputationPresenter(
                 .doAfterTerminate { viewState.setRefreshing(false) }
                 .subscribe({
                     viewState.showReputation(it)
+                    tryShowAvatar(it)
                 }, {
                     this.handleErrorRx(it)
                 })
@@ -47,6 +50,17 @@ class ReputationPresenter(
                     loadReputation()
                 }, {
                     this.handleErrorRx(it)
+                })
+                .addToDisposable()
+    }
+
+    private fun tryShowAvatar(data: RepData) {
+        avatarRepository
+                .getAvatar(data.nick)
+                .subscribe({
+                    viewState.showAvatar(it)
+                }, {
+                    it.printStackTrace()
                 })
                 .addToDisposable()
     }

@@ -153,7 +153,7 @@ class ThemePresenter(
     fun sendMessage(message: String, attachments: MutableList<AttachmentItem>) {
         createEditPostForm(message, attachments)?.let {
             viewState.setMessageRefreshing(true)
-            themeRepository
+            editorRepository
                     .sendPost(it)
                     .map { themeTemplate.mapEntity(it) }
                     .doOnTerminate { viewState.setMessageRefreshing(true) }

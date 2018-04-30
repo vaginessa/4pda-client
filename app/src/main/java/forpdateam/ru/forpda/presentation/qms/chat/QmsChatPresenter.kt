@@ -2,7 +2,7 @@ package forpdateam.ru.forpda.presentation.qms.chat
 
 import android.os.Bundle
 import com.arellomobile.mvp.InjectViewState
-import forpdateam.ru.forpda.apirx.ForumUsersCache
+import forpdateam.ru.forpda.model.data.cache.forumuser.ForumUsersCache
 import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.app.TabNotification
@@ -11,6 +11,7 @@ import forpdateam.ru.forpda.entity.remote.events.NotificationEvent
 import forpdateam.ru.forpda.entity.remote.qms.QmsChatModel
 import forpdateam.ru.forpda.entity.remote.qms.QmsMessage
 import forpdateam.ru.forpda.model.data.remote.api.RequestFile
+import forpdateam.ru.forpda.model.repository.avatar.AvatarRepository
 import forpdateam.ru.forpda.model.repository.qms.QmsRepository
 import forpdateam.ru.forpda.ui.TabManager
 import forpdateam.ru.forpda.ui.fragments.TabFragment
@@ -26,7 +27,8 @@ import io.reactivex.schedulers.Schedulers
 @InjectViewState
 class QmsChatPresenter(
         private val qmsRepository: QmsRepository,
-        private val qmsChatTemplate: QmsChatTemplate
+        private val qmsChatTemplate: QmsChatTemplate,
+        private val avatarRepository: AvatarRepository
 ) : BasePresenter<QmsChatView>(), IQmsChatPresenter {
 
     var themeId = 0
@@ -118,24 +120,21 @@ class QmsChatPresenter(
     }
 
     private fun tryShowAvatar() {
-        Observable
-                .fromCallable {
-                    var result: String? = null
-                    result = avatarUrl?.let { it } ?: result
-                    result = currentData?.avatarUrl?.let { it } ?: result
-                    if (result == null) {
-                        currentData?.nick?.let {
-                            result = ForumUsersCache.loadUserByNick(it).avatar
-                        }
-                    }
-                    result
-                }
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    it?.let { viewState.showAvatar(it) }
-                }, { })
-                .addToDisposable()
+        val result = avatarUrl?.let { it } ?: currentData?.avatarUrl?.let { it }
+        if (result != null) {
+            viewState.showAvatar(result)
+        } else {
+            currentData?.let {
+                avatarRepository
+                        .getAvatar(it.nick)
+                        .subscribe({
+                            viewState.showAvatar(it)
+                        }, {
+                            it.printStackTrace()
+                        })
+                        .addToDisposable()
+            }
+        }
     }
 
 

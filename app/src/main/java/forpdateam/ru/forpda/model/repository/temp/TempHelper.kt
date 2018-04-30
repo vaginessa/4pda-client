@@ -2,24 +2,14 @@ package forpdateam.ru.forpda.model.repository.temp
 
 import android.support.annotation.DrawableRes
 import android.support.annotation.StringRes
-import biz.source_code.miniTemplator.MiniTemplator
-import forpdateam.ru.forpda.App
 import forpdateam.ru.forpda.R
-import forpdateam.ru.forpda.apirx.ForumUsersCache
-import forpdateam.ru.forpda.client.ClientHelper
-import forpdateam.ru.forpda.common.Preferences
+import forpdateam.ru.forpda.model.data.cache.forumuser.ForumUsersCache
 import forpdateam.ru.forpda.entity.remote.others.user.ForumUser
 import forpdateam.ru.forpda.entity.remote.profile.ProfileModel
-import forpdateam.ru.forpda.entity.remote.qms.QmsChatModel
 import forpdateam.ru.forpda.entity.remote.qms.QmsContact
-import forpdateam.ru.forpda.entity.remote.qms.QmsMessage
-import forpdateam.ru.forpda.entity.remote.theme.ThemePage
-import forpdateam.ru.forpda.model.data.remote.api.ApiUtils
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.*
-import java.util.regex.Matcher
-import java.util.regex.Pattern
 
 /**
  * Created by radiationx on 30.03.18.
@@ -32,17 +22,7 @@ object TempHelper {
 
 
     /* QMS */
-    fun interceptContacts(contacts: ArrayList<QmsContact>): ArrayList<QmsContact> {
-        val forumUsers = ArrayList<ForumUser>()
-        for (post in contacts) {
-            val forumUser = ForumUser()
-            forumUser.id = post.id
-            forumUser.nick = post.nick
-            forumUser.avatar = post.avatar
-        }
-        ForumUsersCache.saveUsers(forumUsers)
-        return contacts
-    }
+
 
     fun transformMessageSrc(messagesSrcIn: String): String {
         var messagesSrc = messagesSrcIn

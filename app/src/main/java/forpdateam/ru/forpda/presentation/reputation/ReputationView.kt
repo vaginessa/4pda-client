@@ -12,4 +12,5 @@ interface ReputationView : IBaseView {
     fun showReputation(repData: RepData)
     fun onChangeReputation(result: Boolean)
     fun showItemDialogMenu(item: RepItem)
+    fun showAvatar(avatarUrl: String)
 }

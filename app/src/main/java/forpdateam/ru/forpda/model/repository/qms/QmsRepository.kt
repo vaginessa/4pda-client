@@ -6,9 +6,9 @@ import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem
 import forpdateam.ru.forpda.entity.remote.others.user.ForumUser
 import forpdateam.ru.forpda.entity.remote.qms.*
 import forpdateam.ru.forpda.model.SchedulersProvider
+import forpdateam.ru.forpda.model.data.cache.forumuser.ForumUsersCache
 import forpdateam.ru.forpda.model.data.remote.api.RequestFile
 import forpdateam.ru.forpda.model.data.remote.api.qms.QmsApi
-import forpdateam.ru.forpda.model.repository.temp.TempHelper
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.realm.Realm
@@ -20,7 +20,8 @@ import java.util.*
 
 class QmsRepository(
         private val schedulers: SchedulersProvider,
-        private val qmsApi: QmsApi
+        private val qmsApi: QmsApi,
+        private val forumUsersCache: ForumUsersCache
 ) {
 
     //Common
@@ -42,7 +43,7 @@ class QmsRepository(
     //Contacts
     fun getContactList(): Observable<List<QmsContact>> = Observable
             .fromCallable { qmsApi.contactList }
-            .map { TempHelper.interceptContacts(it) }
+            .doOnNext { saveUsers(it) }
             .flatMap { saveContactsCache(it) }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
@@ -103,7 +104,16 @@ class QmsRepository(
             .observeOn(schedulers.ui())
 
 
-
+    private fun saveUsers(contacts: List<QmsContact>) {
+        val forumUsers = contacts.map { contact ->
+            ForumUser().apply {
+                id = contact.id
+                nick = contact.nick
+                avatar = contact.avatar
+            }
+        }
+        forumUsersCache.saveUsers(forumUsers)
+    }
 
 
     /*
