@@ -1,17 +1,18 @@
 package forpdateam.ru.forpda.model.repository.qms
 
-import forpdateam.ru.forpda.entity.db.qms.QmsContactBd
-import forpdateam.ru.forpda.entity.db.qms.QmsThemesBd
 import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem
 import forpdateam.ru.forpda.entity.remote.others.user.ForumUser
-import forpdateam.ru.forpda.entity.remote.qms.*
+import forpdateam.ru.forpda.entity.remote.qms.QmsChatModel
+import forpdateam.ru.forpda.entity.remote.qms.QmsContact
+import forpdateam.ru.forpda.entity.remote.qms.QmsMessage
+import forpdateam.ru.forpda.entity.remote.qms.QmsThemes
 import forpdateam.ru.forpda.model.SchedulersProvider
 import forpdateam.ru.forpda.model.data.cache.forumuser.ForumUsersCache
+import forpdateam.ru.forpda.model.data.cache.qms.QmsCache
 import forpdateam.ru.forpda.model.data.remote.api.RequestFile
 import forpdateam.ru.forpda.model.data.remote.api.qms.QmsApi
 import io.reactivex.Completable
 import io.reactivex.Observable
-import io.realm.Realm
 import java.util.*
 
 /**
@@ -21,6 +22,7 @@ import java.util.*
 class QmsRepository(
         private val schedulers: SchedulersProvider,
         private val qmsApi: QmsApi,
+        private val qmsCache: QmsCache,
         private val forumUsersCache: ForumUsersCache
 ) {
 
@@ -123,71 +125,26 @@ class QmsRepository(
     * */
 
     fun saveContactsCache(items: List<QmsContact>): Observable<List<QmsContact>> = Completable
-            .fromCallable {
-                Realm.getDefaultInstance().use { realm ->
-                    realm.executeTransaction { r ->
-                        r.delete(QmsContactBd::class.java)
-                        val bdList = ArrayList<QmsContactBd>()
-                        for (contact in items) {
-                            bdList.add(QmsContactBd(contact))
-                        }
-                        r.copyToRealmOrUpdate(bdList)
-                        bdList.clear()
-                    }
-                }
-            }
+            .fromCallable { qmsCache.saveContacts(items) }
             .toObservable<List<QmsContact>>()
             .flatMap { getContactsCache() }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 
     fun getContactsCache(): Observable<List<QmsContact>> = Observable
-            .fromCallable {
-                val currentItems = mutableListOf<QmsContact>()
-                Realm.getDefaultInstance().use { realm ->
-                    val results = realm.where(QmsContactBd::class.java).findAll()
-                    for (qmsContactBd in results) {
-                        val contact = QmsContact(qmsContactBd)
-                        currentItems.add(contact)
-                    }
-                }
-                currentItems as List<QmsContact>
-            }
+            .fromCallable { qmsCache.getContacts() }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 
     fun saveThemesCache(data: QmsThemes): Observable<QmsThemes> = Completable
-            .fromCallable {
-                Realm.getDefaultInstance().use { realm ->
-                    realm.executeTransaction({ r ->
-                        r.where(QmsThemesBd::class.java)
-                                .equalTo("userId", data.getUserId())
-                                .findAll()
-                                .deleteAllFromRealm()
-                        val qmsThemesBd = QmsThemesBd(data)
-                        r.copyToRealmOrUpdate(qmsThemesBd)
-                        qmsThemesBd.themes.clear()
-                    })
-                }
-            }
+            .fromCallable { qmsCache.saveThemes(data) }
             .toObservable<QmsThemes>()
             .flatMap { getThemesCache(data.userId) }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 
     fun getThemesCache(userId: Int): Observable<QmsThemes> = Observable
-            .fromCallable {
-                Realm.getDefaultInstance().use { realm ->
-                    val results = realm
-                            .where(QmsThemesBd::class.java)
-                            .equalTo("userId", userId)
-                            .findAll()
-                            .last()
-                    QmsThemes(results).apply {
-                        themes.addAll(results.themes.map { QmsTheme(it) })
-                    }
-                }
-            }
+            .fromCallable { qmsCache.getThemes(userId) }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 

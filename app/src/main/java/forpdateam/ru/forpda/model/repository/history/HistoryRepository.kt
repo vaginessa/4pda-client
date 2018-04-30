@@ -1,61 +1,32 @@
 package forpdateam.ru.forpda.model.repository.history
 
 import forpdateam.ru.forpda.entity.app.history.HistoryItem
-import forpdateam.ru.forpda.entity.db.history.HistoryItemBd
 import forpdateam.ru.forpda.model.SchedulersProvider
+import forpdateam.ru.forpda.model.data.cache.history.HistoryCache
 import io.reactivex.Completable
 import io.reactivex.Observable
-import io.realm.Realm
-import io.realm.Sort
-import java.util.*
 
 /**
  * Created by radiationx on 01.01.18.
  */
 
 class HistoryRepository(
-        private val schedulers: SchedulersProvider
+        private val schedulers: SchedulersProvider,
+        private val historyCache: HistoryCache
 ) {
 
     fun getHistory(): Observable<List<HistoryItem>> = Observable
-            .fromCallable<List<HistoryItem>> {
-                val items = ArrayList<HistoryItem>()
-                Realm.getDefaultInstance().use { realm ->
-                    val results = realm
-                            .where(HistoryItemBd::class.java)
-                            .findAllSorted("unixTime", Sort.DESCENDING)
-                    for (itemBd in results) {
-                        items.add(HistoryItem(itemBd))
-                    }
-                }
-                items
-            }
+            .fromCallable { historyCache.getHistory() }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 
     fun remove(id: Int): Completable = Completable
-            .fromRunnable {
-                Realm.getDefaultInstance().use { realm ->
-                    realm.executeTransaction { realm1 ->
-                        realm1.where(HistoryItemBd::class.java)
-                                .equalTo("id", id)
-                                .findAll()
-                                .deleteAllFromRealm()
-                    }
-                }
-            }
+            .fromRunnable { historyCache.remove(id) }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 
-
     fun clear(): Completable = Completable
-            .fromRunnable {
-                Realm.getDefaultInstance().use { realm ->
-                    realm.executeTransaction { realm1 ->
-                        realm1.delete(HistoryItemBd::class.java)
-                    }
-                }
-            }
+            .fromRunnable { historyCache.clear() }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 

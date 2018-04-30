@@ -2,15 +2,13 @@ package forpdateam.ru.forpda.model.repository.forum
 
 import forpdateam.ru.forpda.entity.db.forum.ForumItemFlatBd
 import forpdateam.ru.forpda.entity.remote.forum.Announce
-import forpdateam.ru.forpda.entity.remote.forum.ForumItemFlat
 import forpdateam.ru.forpda.entity.remote.forum.ForumItemTree
 import forpdateam.ru.forpda.entity.remote.forum.ForumRules
 import forpdateam.ru.forpda.model.SchedulersProvider
+import forpdateam.ru.forpda.model.data.cache.forum.ForumCache
 import forpdateam.ru.forpda.model.data.remote.api.forum.ForumApi
 import io.reactivex.Completable
 import io.reactivex.Observable
-import io.realm.Realm
-import java.util.*
 
 /**
  * Created by radiationx on 03.01.18.
@@ -18,7 +16,8 @@ import java.util.*
 
 class ForumRepository(
         private val schedulers: SchedulersProvider,
-        private val forumApi: ForumApi
+        private val forumApi: ForumApi,
+        private val forumCache: ForumCache
 ) {
 
     fun getForums(): Observable<ForumItemTree> = Observable
@@ -28,18 +27,9 @@ class ForumRepository(
 
     fun getCache(): Observable<ForumItemTree> = Observable
             .fromCallable {
-                val items = ArrayList<ForumItemFlat>()
-                Realm.getDefaultInstance().use { realm ->
-                    val results = realm
-                            .where(ForumItemFlatBd::class.java)
-                            .findAll()
-                    for (itemBd in results) {
-                        items.add(ForumItemFlat(itemBd))
-                    }
+                ForumItemTree().apply {
+                    forumApi.transformToTree(forumCache.getItems(), this)
                 }
-                val forumItemTree = ForumItemTree()
-                forumApi.transformToTree(items, forumItemTree)
-                forumItemTree
             }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
@@ -66,15 +56,10 @@ class ForumRepository(
 
     fun saveCache(rootForum: ForumItemTree): Completable = Completable
             .fromRunnable {
-                Realm.getDefaultInstance().use { realm ->
-                    realm.executeTransaction { r ->
-                        r.delete(ForumItemFlatBd::class.java)
-                        val items = ArrayList<ForumItemFlatBd>()
-                        transformToList(items, rootForum)
-                        r.copyToRealmOrUpdate(items)
-                        items.clear()
-                    }
+                val items = mutableListOf<ForumItemFlatBd>().apply {
+                    transformToList(this, rootForum)
                 }
+                forumCache.saveItems(items)
             }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())

@@ -5,7 +5,10 @@ import forpdateam.ru.forpda.client.Client
 import forpdateam.ru.forpda.model.NetworkStateProvider
 import forpdateam.ru.forpda.model.SchedulersProvider
 import forpdateam.ru.forpda.model.data.cache.favorites.FavoritesCache
+import forpdateam.ru.forpda.model.data.cache.forum.ForumCache
 import forpdateam.ru.forpda.model.data.cache.forumuser.ForumUsersCache
+import forpdateam.ru.forpda.model.data.cache.history.HistoryCache
+import forpdateam.ru.forpda.model.data.cache.qms.QmsCache
 import forpdateam.ru.forpda.model.data.providers.UserSourceProvider
 import forpdateam.ru.forpda.model.data.remote.IWebClient
 import forpdateam.ru.forpda.model.data.remote.api.auth.AuthApi
@@ -89,18 +92,21 @@ class Dependencies internal constructor(
     val userSource = UserSourceProvider(qmsApi)
     val forumUsersCache = ForumUsersCache(userSource)
     val favoritesCache = FavoritesCache()
+    val forumCache = ForumCache()
+    val historyCache = HistoryCache()
+    val qmsCache = QmsCache()
 
     val avatarRepository = AvatarRepository(forumUsersCache, schedulers)
     val favoritesRepository = FavoritesRepository(schedulers, favoritesApi, favoritesCache)
-    val historyRepository = HistoryRepository(schedulers)
+    val historyRepository = HistoryRepository(schedulers, historyCache)
     val mentionsRepository = MentionsRepository(schedulers, mentionsApi)
     val authRepository = AuthRepository(schedulers, authApi)
     val profileRepository = ProfileRepository(schedulers, profileApi)
     val reputationRepository = ReputationRepository(schedulers, reputationApi)
-    val forumRepository = ForumRepository(schedulers, forumApi)
+    val forumRepository = ForumRepository(schedulers, forumApi, forumCache)
     val topicsRepository = TopicsRepository(schedulers, topicsApi)
     val themeRepository = ThemeRepository(schedulers, themeApi, forumUsersCache)
-    val qmsRepository = QmsRepository(schedulers, qmsApi, forumUsersCache)
+    val qmsRepository = QmsRepository(schedulers, qmsApi, qmsCache, forumUsersCache)
     val searchRepository = SearchRepository(schedulers, searchApi, forumUsersCache)
     val newsRepository = NewsRepository(schedulers, newsApi)
     val devDbRepository = DevDbRepository(schedulers, devDbApi)

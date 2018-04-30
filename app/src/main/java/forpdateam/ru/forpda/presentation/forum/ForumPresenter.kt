@@ -43,7 +43,7 @@ class ForumPresenter(
                 .addToDisposable()
     }
 
-    fun getCacheForums() {
+    private fun getCacheForums() {
         forumRepository
                 .getCache()
                 .doOnTerminate { viewState.setRefreshing(true) }
