@@ -19,6 +19,7 @@ import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
+import com.arellomobile.mvp.MvpAppCompatFragment;
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 
@@ -44,7 +45,7 @@ import forpdateam.ru.forpda.ui.views.FunnyContent;
  * Created by radiationx on 03.09.17.
  */
 
-public class ArticleCommentsFragment extends Fragment implements ArticleCommentView, ArticleCommentsAdapter.ClickListener {
+public class ArticleCommentsFragment extends MvpAppCompatFragment implements ArticleCommentView, ArticleCommentsAdapter.ClickListener {
     private SwipeRefreshLayout refreshLayout;
     private RecyclerView recyclerView;
     private EditText messageField;

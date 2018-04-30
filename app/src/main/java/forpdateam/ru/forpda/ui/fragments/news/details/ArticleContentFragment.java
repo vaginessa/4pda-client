@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 
+import com.arellomobile.mvp.MvpAppCompatFragment;
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 
@@ -26,7 +27,7 @@ import forpdateam.ru.forpda.ui.views.ExtendedWebView;
  * Created by radiationx on 03.09.17.
  */
 
-public class ArticleContentFragment extends Fragment implements ArticleContentView {
+public class ArticleContentFragment extends MvpAppCompatFragment implements ArticleContentView {
     public final static String JS_INTERFACE = "INews";
     private ExtendedWebView webView;
     private ArticleInteractor interactor;
