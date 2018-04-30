@@ -1,6 +1,5 @@
 package forpdateam.ru.forpda.presentation.theme
 
-import android.util.Log
 import forpdateam.ru.forpda.App
 import forpdateam.ru.forpda.R
 import forpdateam.ru.forpda.client.ClientHelper
