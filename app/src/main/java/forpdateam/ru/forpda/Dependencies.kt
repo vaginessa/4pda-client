@@ -105,7 +105,7 @@ class Dependencies internal constructor(
     val reputationRepository = ReputationRepository(schedulers, reputationApi)
     val forumRepository = ForumRepository(schedulers, forumApi, forumCache)
     val topicsRepository = TopicsRepository(schedulers, topicsApi)
-    val themeRepository = ThemeRepository(schedulers, themeApi, forumUsersCache)
+    val themeRepository = ThemeRepository(schedulers, themeApi, historyCache, forumUsersCache)
     val qmsRepository = QmsRepository(schedulers, qmsApi, qmsCache, forumUsersCache)
     val searchRepository = SearchRepository(schedulers, searchApi, forumUsersCache)
     val newsRepository = NewsRepository(schedulers, newsApi)

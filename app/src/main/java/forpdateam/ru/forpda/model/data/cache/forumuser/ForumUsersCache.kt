@@ -12,17 +12,14 @@ class ForumUsersCache(
         private val userSource: UserSource
 ) {
 
-    fun saveUser(forumUser: ForumUser) {
-        saveUsers(listOf(forumUser))
-    }
+    fun saveUser(forumUser: ForumUser) = saveUsers(listOf(forumUser))
 
-    fun saveUsers(forumUsers: List<ForumUser>) {
-        Realm.getDefaultInstance().use {
-            it.executeTransaction { realm ->
-                realm.insertOrUpdate(forumUsers.map { ForumUserBd(it) })
-            }
+    fun saveUsers(forumUsers: List<ForumUser>) = Realm.getDefaultInstance().use {
+        it.executeTransaction { realm ->
+            realm.insertOrUpdate(forumUsers.map { ForumUserBd(it) })
         }
     }
+
 
     fun getUserById(id: Int): ForumUser? = Realm.getDefaultInstance().use {
         it.where(ForumUserBd::class.java).equalTo("id", id).findFirst()?.let { ForumUser(it) }

@@ -1,5 +1,6 @@
 package forpdateam.ru.forpda.presentation.theme
 
+import android.util.Log
 import forpdateam.ru.forpda.App
 import forpdateam.ru.forpda.R
 import forpdateam.ru.forpda.client.ClientHelper
@@ -75,8 +76,7 @@ class ThemeTemplate(
 
                 letterMatcher = letterMatcher?.reset(post.nick) ?: firstLetter.matcher(post.nick)
                 val letter: String = letterMatcher?.run {
-                    find()
-                    group(1)
+                    if (find()) group(1) else null
                 } ?: post.nick.substring(0, 1)
 
                 setVariableOpt("nick_letter", letter)

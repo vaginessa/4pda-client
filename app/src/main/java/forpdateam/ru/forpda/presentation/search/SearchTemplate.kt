@@ -64,8 +64,7 @@ class SearchTemplate(
 
                 letterMatcher = letterMatcher?.reset(post.nick) ?: firstLetter.matcher(post.nick)
                 val letter: String = letterMatcher?.run {
-                    find()
-                    group(1)
+                    if (find()) group(1) else null
                 } ?: post.nick.substring(0, 1)
 
                 setVariableOpt("nick_letter", letter)

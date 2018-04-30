@@ -61,7 +61,6 @@ import forpdateam.ru.forpda.presentation.theme.ThemeView;
 import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import forpdateam.ru.forpda.ui.fragments.favorites.FavoritesFragment;
-import forpdateam.ru.forpda.ui.fragments.history.HistoryFragment;
 import forpdateam.ru.forpda.ui.fragments.notes.NotesAddPopup;
 import forpdateam.ru.forpda.ui.fragments.topics.TopicsFragment;
 import forpdateam.ru.forpda.ui.views.FabOnScroll;
@@ -403,7 +402,6 @@ public abstract class ThemeFragment extends TabFragment implements ThemeView {
         });
 
         updateFavorites(newPage);
-        updateMainHistory(newPage);
         updateView(newPage);
     }
 
@@ -442,13 +440,6 @@ public abstract class ThemeFragment extends TabFragment implements ThemeView {
             ((TopicsFragment) parentTab).markRead(topicId);
         }
     }
-
-    protected void updateMainHistory(ThemePage themePage) {
-        long time = System.currentTimeMillis();
-        HistoryFragment.addToHistory(themePage.getId(), themePage.getUrl(), themePage.getTitle());
-        Log.d("SUKA", "ADD TO HISTORY " + (System.currentTimeMillis() - time));
-    }
-
 
     private void toggleMessagePanel() {
         if (messagePanel.getVisibility() == View.VISIBLE) {

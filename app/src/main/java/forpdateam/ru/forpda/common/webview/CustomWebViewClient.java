@@ -63,6 +63,7 @@ public class CustomWebViewClient extends WebViewClient {
                         avatarUrl = value;
                         break;
                 }
+                Log.d("lalala", "shouldInterceptRequest: avatar: " + avatarUrl + " : value: " + value);
 
                 Bitmap bitmap = ImageLoader.getInstance().loadImageSync(avatarUrl);
                 String base64Bitmap = convert(bitmap);

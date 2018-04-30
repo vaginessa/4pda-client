@@ -4,6 +4,7 @@ import forpdateam.ru.forpda.entity.remote.others.user.ForumUser
 import forpdateam.ru.forpda.entity.remote.theme.ThemePage
 import forpdateam.ru.forpda.model.SchedulersProvider
 import forpdateam.ru.forpda.model.data.cache.forumuser.ForumUsersCache
+import forpdateam.ru.forpda.model.data.cache.history.HistoryCache
 import forpdateam.ru.forpda.model.data.remote.api.theme.ThemeApi
 import io.reactivex.Observable
 
@@ -14,12 +15,16 @@ import io.reactivex.Observable
 class ThemeRepository(
         private val schedulers: SchedulersProvider,
         private val themeApi: ThemeApi,
+        private val historyCache: HistoryCache,
         private val forumUsersCache: ForumUsersCache
 ) {
 
     fun getTheme(url: String, withHtml: Boolean, hatOpen: Boolean, pollOpen: Boolean): Observable<ThemePage> = Observable
             .fromCallable { themeApi.getTheme(url, hatOpen, pollOpen) }
-            .doOnNext { saveUsers(it) }
+            .doOnNext {
+                saveUsers(it)
+                historyCache.add(it.id, it.url, it.title)
+            }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 

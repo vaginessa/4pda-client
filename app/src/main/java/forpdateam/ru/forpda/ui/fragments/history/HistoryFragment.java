@@ -11,24 +11,18 @@ import com.arellomobile.mvp.presenter.ProvidePresenter;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.entity.app.history.HistoryItem;
-import forpdateam.ru.forpda.entity.db.history.HistoryItemBd;
 import forpdateam.ru.forpda.presentation.history.HistoryPresenter;
 import forpdateam.ru.forpda.presentation.history.HistoryView;
-import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.RecyclerFragment;
 import forpdateam.ru.forpda.ui.views.ContentController;
 import forpdateam.ru.forpda.ui.views.DynamicDialogMenu;
 import forpdateam.ru.forpda.ui.views.FunnyContent;
 import forpdateam.ru.forpda.ui.views.adapters.BaseAdapter;
-import io.realm.Realm;
 
 /**
  * Created by radiationx on 06.09.17.
@@ -36,7 +30,6 @@ import io.realm.Realm;
 
 public class HistoryFragment extends RecyclerFragment implements HistoryView {
 
-    private final static SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yy, HH:mm", Locale.getDefault());
 
     private HistoryAdapter adapter;
     private DynamicDialogMenu<HistoryFragment, HistoryItem> dialogMenu;
@@ -118,33 +111,4 @@ public class HistoryFragment extends RecyclerFragment implements HistoryView {
         }
     };
 
-    public static void addToHistory(int id, String url, String title) {
-        final Realm realm = Realm.getDefaultInstance();
-        realm.executeTransactionAsync(realm1 -> {
-            HistoryItemBd item = realm1
-                    .where(HistoryItemBd.class)
-                    .equalTo("id", id)
-                    .findFirst();
-            if (item == null) {
-                HistoryItemBd newItem = new HistoryItemBd();
-                newItem.setTitle(title);
-                newItem.setId(id);
-                newItem.setUrl(url);
-                newItem.setUnixTime(System.currentTimeMillis());
-                newItem.setDate(dateFormat.format(new Date(newItem.getUnixTime())));
-                realm1.insert(newItem);
-            } else {
-                item.setUrl(url);
-                item.setUnixTime(System.currentTimeMillis());
-                item.setDate(dateFormat.format(new Date(item.getUnixTime())));
-                realm1.insertOrUpdate(item);
-            }
-        }, () -> {
-            realm.close();
-            HistoryFragment historyFragment = (HistoryFragment) TabManager.get().getByClass(HistoryFragment.class);
-            if (historyFragment != null) {
-                historyFragment.presenter.getHistory();
-            }
-        });
-    }
 }

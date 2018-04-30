@@ -20,7 +20,6 @@ import org.jetbrains.annotations.NotNull;
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.client.ClientHelper;
-import forpdateam.ru.forpda.entity.db.forum.ForumItemFlatBd;
 import forpdateam.ru.forpda.entity.remote.forum.ForumItemTree;
 import forpdateam.ru.forpda.model.data.remote.api.favorites.FavoritesApi;
 import forpdateam.ru.forpda.presentation.forum.ForumPresenter;
@@ -30,7 +29,6 @@ import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import forpdateam.ru.forpda.ui.fragments.favorites.FavoritesFragment;
 import forpdateam.ru.forpda.ui.fragments.topics.TopicsFragment;
 import forpdateam.ru.forpda.ui.views.DynamicDialogMenu;
-import io.realm.RealmResults;
 
 /**
  * Created by radiationx on 15.02.17.
@@ -44,7 +42,6 @@ public class ForumFragment extends TabFragment implements ForumView {
     private int forumId = -1;
 
     private NestedScrollView treeContainer;
-    private RealmResults<ForumItemFlatBd> results;
     private DynamicDialogMenu<ForumFragment, ForumItemTree> dialogMenu;
     private TreeNode.TreeNodeClickListener nodeClickListener = (node, value) -> {
         ForumItemTree item = (ForumItemTree) value;
