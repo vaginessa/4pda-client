@@ -4,7 +4,7 @@ import com.arellomobile.mvp.InjectViewState
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.remote.news.Comment
 import forpdateam.ru.forpda.model.interactors.news.ArticleInteractor
-import java.util.ArrayList
+import java.util.*
 
 /**
  * Created by radiationx on 11.11.17.

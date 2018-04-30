@@ -36,7 +36,6 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.webkit.WebSettings;
-import android.widget.Toast;
 
 import com.evernote.android.job.JobConfig;
 import com.evernote.android.job.JobManager;
@@ -53,12 +52,10 @@ import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -68,8 +65,6 @@ import java.util.Observer;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-import biz.source_code.miniTemplator.MiniTemplator;
-import forpdateam.ru.forpda.client.Client;
 import forpdateam.ru.forpda.common.LocaleHelper;
 import forpdateam.ru.forpda.common.Preferences;
 import forpdateam.ru.forpda.common.realm.DbMigration;

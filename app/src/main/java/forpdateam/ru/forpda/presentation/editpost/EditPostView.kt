@@ -3,8 +3,6 @@ package forpdateam.ru.forpda.presentation.editpost
 import forpdateam.ru.forpda.common.mvp.IBaseView
 import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem
 import forpdateam.ru.forpda.entity.remote.editpost.EditPostForm
-import forpdateam.ru.forpda.entity.remote.mentions.MentionItem
-import forpdateam.ru.forpda.entity.remote.mentions.MentionsData
 import forpdateam.ru.forpda.entity.remote.theme.ThemePage
 
 /**

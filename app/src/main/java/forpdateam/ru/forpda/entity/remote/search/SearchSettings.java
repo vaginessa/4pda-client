@@ -1,7 +1,6 @@
 package forpdateam.ru.forpda.entity.remote.search;
 
 import android.net.Uri;
-import android.os.Bundle;
 import android.util.Pair;
 
 import java.io.UnsupportedEncodingException;
@@ -11,8 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import forpdateam.ru.forpda.ui.fragments.TabFragment;
 
 /**
  * Created by radiationx on 01.02.17.

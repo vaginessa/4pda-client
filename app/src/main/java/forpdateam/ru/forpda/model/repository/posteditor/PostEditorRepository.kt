@@ -8,7 +8,6 @@ import forpdateam.ru.forpda.model.SchedulersProvider
 import forpdateam.ru.forpda.model.data.cache.forumuser.ForumUsersCache
 import forpdateam.ru.forpda.model.data.remote.api.RequestFile
 import forpdateam.ru.forpda.model.data.remote.api.editpost.EditPostApi
-import forpdateam.ru.forpda.model.repository.temp.TempHelper
 import io.reactivex.Observable
 
 /**

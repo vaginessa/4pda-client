@@ -21,9 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import forpdateam.ru.forpda.App;
-import forpdateam.ru.forpda.model.data.cache.forumuser.ForumUsersCache;
 import forpdateam.ru.forpda.common.IntentHandler;
-import forpdateam.ru.forpda.entity.remote.others.user.ForumUser;
 import forpdateam.ru.forpda.model.repository.avatar.AvatarRepository;
 
 /**

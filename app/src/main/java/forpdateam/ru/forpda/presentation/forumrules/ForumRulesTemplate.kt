@@ -1,6 +1,5 @@
 package forpdateam.ru.forpda.presentation.forumrules
 
-import forpdateam.ru.forpda.App
 import forpdateam.ru.forpda.entity.remote.forum.ForumRules
 import forpdateam.ru.forpda.ui.TemplateManager
 

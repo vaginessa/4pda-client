@@ -3,10 +3,8 @@ package forpdateam.ru.forpda.ui.fragments.devdb
 import android.graphics.Color
 import android.graphics.ColorFilter
 import android.graphics.PorterDuff
-import android.graphics.Color.parseColor
 import android.graphics.PorterDuffColorFilter
 import android.util.SparseArray
-
 
 
 object DevDbHelper {

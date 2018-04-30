@@ -1,13 +1,10 @@
 package forpdateam.ru.forpda.model.repository.theme
 
-import forpdateam.ru.forpda.entity.remote.editpost.EditPostForm
 import forpdateam.ru.forpda.entity.remote.others.user.ForumUser
 import forpdateam.ru.forpda.entity.remote.theme.ThemePage
 import forpdateam.ru.forpda.model.SchedulersProvider
 import forpdateam.ru.forpda.model.data.cache.forumuser.ForumUsersCache
-import forpdateam.ru.forpda.model.data.remote.api.editpost.EditPostApi
 import forpdateam.ru.forpda.model.data.remote.api.theme.ThemeApi
-import forpdateam.ru.forpda.model.repository.temp.TempHelper
 import io.reactivex.Observable
 
 /**

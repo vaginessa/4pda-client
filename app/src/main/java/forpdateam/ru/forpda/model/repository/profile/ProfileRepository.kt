@@ -1,8 +1,5 @@
 package forpdateam.ru.forpda.model.repository.profile
 
-import android.support.annotation.DrawableRes
-import android.support.annotation.StringRes
-import forpdateam.ru.forpda.R
 import forpdateam.ru.forpda.entity.remote.profile.ProfileModel
 import forpdateam.ru.forpda.model.SchedulersProvider
 import forpdateam.ru.forpda.model.data.remote.api.profile.ProfileApi

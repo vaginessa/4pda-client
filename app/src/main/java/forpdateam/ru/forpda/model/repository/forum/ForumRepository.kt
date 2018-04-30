@@ -1,6 +1,5 @@
 package forpdateam.ru.forpda.model.repository.forum
 
-import forpdateam.ru.forpda.App
 import forpdateam.ru.forpda.entity.db.forum.ForumItemFlatBd
 import forpdateam.ru.forpda.entity.remote.forum.Announce
 import forpdateam.ru.forpda.entity.remote.forum.ForumItemFlat

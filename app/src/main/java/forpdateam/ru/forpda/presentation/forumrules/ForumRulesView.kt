@@ -1,7 +1,6 @@
 package forpdateam.ru.forpda.presentation.forumrules
 
 import forpdateam.ru.forpda.common.mvp.IBaseView
-import forpdateam.ru.forpda.entity.remote.forum.Announce
 import forpdateam.ru.forpda.entity.remote.forum.ForumRules
 
 /**

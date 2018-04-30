@@ -4,7 +4,6 @@ import android.content.Context
 import biz.source_code.miniTemplator.MiniTemplator
 import java.io.ByteArrayInputStream
 import java.nio.charset.Charset
-import java.util.HashMap
 
 class TemplateManager(
         private val context: Context,

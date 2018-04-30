@@ -1,11 +1,7 @@
 package forpdateam.ru.forpda.model.repository.avatar
 
-import forpdateam.ru.forpda.entity.remote.others.user.ForumUser
-import forpdateam.ru.forpda.entity.remote.search.SearchResult
-import forpdateam.ru.forpda.entity.remote.search.SearchSettings
 import forpdateam.ru.forpda.model.SchedulersProvider
 import forpdateam.ru.forpda.model.data.cache.forumuser.ForumUsersCache
-import forpdateam.ru.forpda.model.data.remote.api.search.SearchApi
 import io.reactivex.Observable
 
 /**

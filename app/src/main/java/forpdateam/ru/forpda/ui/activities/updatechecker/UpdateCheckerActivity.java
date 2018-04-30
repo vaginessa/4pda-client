@@ -22,7 +22,6 @@ import org.json.JSONObject;
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.BuildConfig;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.client.Client;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.common.LocaleHelper;
