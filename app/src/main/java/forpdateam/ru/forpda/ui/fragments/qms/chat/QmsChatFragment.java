@@ -94,16 +94,10 @@ public class QmsChatFragment extends TabFragment implements ChatThemeCreator.The
         return new QmsChatPresenter(
                 App.get().Di().getQmsRepository(),
                 App.get().Di().getQmsChatTemplate(),
-                App.get().Di().getAvatarRepository()
+                App.get().Di().getAvatarRepository(),
+                App.get().Di().getEventsRepository()
         );
     }
-
-    private Observer notification = (observable, o) -> {
-        if (o == null) return;
-        TabNotification event = (TabNotification) o;
-        runInUiThread(() -> presenter.handleEvent(event));
-    };
-
 
     public QmsChatFragment() {
         configuration.setDefaultTitle(App.get().getString(R.string.fragment_title_chat));
@@ -272,7 +266,6 @@ public class QmsChatFragment extends TabFragment implements ChatThemeCreator.The
 
     @Override
     public void showChat(@NotNull QmsChatModel data) {
-        App.get().subscribeQms(notification);
         progressBar.setVisibility(View.GONE);
         refreshToolbarMenuItems(true);
         setTitles(data.getTitle(), data.getNick());
@@ -407,7 +400,6 @@ public class QmsChatFragment extends TabFragment implements ChatThemeCreator.The
     public void onResume() {
         super.onResume();
         messagePanel.onResume();
-        App.get().subscribeQms(notification);
         presenter.checkNewMessages();
     }
 
@@ -415,7 +407,6 @@ public class QmsChatFragment extends TabFragment implements ChatThemeCreator.The
     public void onDestroy() {
         super.onDestroy();
         App.get().removePreferenceChangeObserver(chatPreferenceObserver);
-        App.get().unSubscribeQms(notification);
         messagePanel.onDestroy();
         unregisterForContextMenu(webView);
         webView.removeJavascriptInterface(JS_INTERFACE);
@@ -427,7 +418,6 @@ public class QmsChatFragment extends TabFragment implements ChatThemeCreator.The
     @Override
     public void onPause() {
         super.onPause();
-        App.get().unSubscribeQms(notification);
         messagePanel.onPause();
     }
 

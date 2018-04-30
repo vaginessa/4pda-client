@@ -128,8 +128,6 @@ public class App extends android.app.Application {
     };
     private SimpleObservable statusBarSizeObservables = new SimpleObservable();
 
-    private SimpleObservable favoriteEvents = new SimpleObservable();
-    private SimpleObservable qmsEvents = new SimpleObservable();
     private SimpleObservable networkForbidden = new SimpleObservable();
     private Boolean webViewFound = null;
     private Messenger mBoundService = null;
@@ -383,31 +381,6 @@ public class App extends android.app.Application {
         int toolBarHeight = ta.getDimensionPixelSize(0, -1);
         ta.recycle();
         return toolBarHeight;
-    }
-
-
-    public void subscribeFavorites(Observer observer) {
-        favoriteEvents.addObserver(observer);
-    }
-
-    public void unSubscribeFavorites(Observer observer) {
-        favoriteEvents.deleteObserver(observer);
-    }
-
-    public void notifyFavorites(TabNotification event) {
-        favoriteEvents.notifyObservers(event);
-    }
-
-    public void subscribeQms(Observer observer) {
-        qmsEvents.addObserver(observer);
-    }
-
-    public void unSubscribeQms(Observer observer) {
-        qmsEvents.deleteObserver(observer);
-    }
-
-    public void notifyQms(TabNotification event) {
-        qmsEvents.notifyObservers(event);
     }
 
     public void subscribeForbidden(Observer observer) {

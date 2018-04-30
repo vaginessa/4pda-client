@@ -71,12 +71,6 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
     private Spinner orderSpinner;
     private Button sortApply;
 
-    private Observer notification = (observable, o) -> {
-        if (o == null) return;
-        TabNotification event = (TabNotification) o;
-        runInUiThread(() -> handleEvent(event));
-    };
-
     @InjectPresenter
     FavoritesPresenter presenter;
 
@@ -84,7 +78,8 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
     FavoritesPresenter providePresenter() {
         return new FavoritesPresenter(
                 App.get().Di().getFavoritesRepository(),
-                App.get().Di().getForumRepository()
+                App.get().Di().getForumRepository(),
+                App.get().Di().getEventsRepository()
         );
     }
 
@@ -207,7 +202,6 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
 
         presenter.showFavorites();
         App.get().addPreferenceChangeObserver(favoritesPreferenceObserver);
-        App.get().subscribeFavorites(notification);
     }
 
     @Override
@@ -343,11 +337,6 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
         spinner.setSelection(0);
     }
 
-    private void handleEvent(TabNotification event) {
-        if (!Preferences.Notifications.Favorites.isLiveTab(getContext())) return;
-        presenter.handleEvent(event, ClientHelper.getFavoritesCount());
-    }
-
     public void markRead(int topicId) {
         presenter.markRead(topicId);
     }
@@ -356,7 +345,6 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
     public void onDestroy() {
         super.onDestroy();
         App.get().removePreferenceChangeObserver(favoritesPreferenceObserver);
-        App.get().unSubscribeFavorites(notification);
         if (paginationHelper != null)
             paginationHelper.destroy();
     }

@@ -10,6 +10,8 @@ import forpdateam.ru.forpda.entity.db.qms.QmsContactBd;
 import forpdateam.ru.forpda.entity.db.qms.QmsThemeBd;
 import forpdateam.ru.forpda.entity.db.qms.QmsThemesBd;
 import forpdateam.ru.forpda.entity.remote.events.NotificationEvent;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
@@ -36,14 +38,10 @@ public class QmsHelper {
     }
 
     public QmsHelper() {
-        Observer notification = (observable, o) -> {
-            if (o == null) return;
-            TabNotification event = (TabNotification) o;
-            handleEvent(event);
-        };
-        App.get().subscribeQms(notification);
+        Disposable disposable = App.get().Di().getEventsRepository()
+                .observeEventsTab()
+                .subscribe(this::handleEvent);
     }
-
 
     private void handleEvent(TabNotification event) {
         Realm realm = Realm.getDefaultInstance();

@@ -2,12 +2,16 @@ package forpdateam.ru.forpda.presentation.favorites
 
 import android.os.Bundle
 import com.arellomobile.mvp.InjectViewState
+import forpdateam.ru.forpda.App
+import forpdateam.ru.forpda.client.ClientHelper
 import forpdateam.ru.forpda.common.IntentHandler
+import forpdateam.ru.forpda.common.Preferences
 import forpdateam.ru.forpda.common.Utils
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.app.TabNotification
 import forpdateam.ru.forpda.entity.remote.favorites.FavItem
 import forpdateam.ru.forpda.model.data.remote.api.favorites.Sorting
+import forpdateam.ru.forpda.model.repository.events.EventsRepository
 import forpdateam.ru.forpda.model.repository.faviorites.FavoritesRepository
 import forpdateam.ru.forpda.model.repository.forum.ForumRepository
 import forpdateam.ru.forpda.ui.fragments.TabFragment
@@ -19,7 +23,8 @@ import forpdateam.ru.forpda.ui.fragments.TabFragment
 @InjectViewState
 class FavoritesPresenter(
         private val favoritesRepository: FavoritesRepository,
-        private val forumRepository: ForumRepository
+        private val forumRepository: ForumRepository,
+        private val eventsRepository: EventsRepository
 ) : BasePresenter<FavoritesView>() {
 
 
@@ -29,6 +34,12 @@ class FavoritesPresenter(
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
+        eventsRepository
+                .observeEventsTab()
+                .subscribe {
+                    handleEvent(it)
+                }
+                .addToDisposable()
         loadFavorites()
     }
 
@@ -72,10 +83,11 @@ class FavoritesPresenter(
                 .addToDisposable()
     }
 
-    fun handleEvent(event: TabNotification, count: Int) {
+    fun handleEvent(event: TabNotification) {
+        if (!Preferences.Notifications.Favorites.isLiveTab(App.getContext())) return
         if (event.isWebSocket && event.event.isNew) return
         favoritesRepository
-                .handleEvent(event, sorting, count)
+                .handleEvent(event, sorting, ClientHelper.getFavoritesCount())
                 .subscribe({
                     viewState.onHandleEvent(it)
                 }, {

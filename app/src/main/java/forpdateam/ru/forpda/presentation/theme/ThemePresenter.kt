@@ -8,14 +8,17 @@ import forpdateam.ru.forpda.R
 import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.Utils
 import forpdateam.ru.forpda.common.mvp.BasePresenter
+import forpdateam.ru.forpda.entity.app.TabNotification
 import forpdateam.ru.forpda.entity.remote.IBaseForumPost
 import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem
 import forpdateam.ru.forpda.entity.remote.editpost.EditPostForm
+import forpdateam.ru.forpda.entity.remote.events.NotificationEvent
 import forpdateam.ru.forpda.entity.remote.search.SearchSettings
 import forpdateam.ru.forpda.entity.remote.theme.ThemePage
 import forpdateam.ru.forpda.model.data.remote.api.RequestFile
 import forpdateam.ru.forpda.model.data.remote.api.favorites.FavoritesApi
 import forpdateam.ru.forpda.model.data.remote.api.theme.ThemeApi
+import forpdateam.ru.forpda.model.repository.events.EventsRepository
 import forpdateam.ru.forpda.model.repository.faviorites.FavoritesRepository
 import forpdateam.ru.forpda.model.repository.posteditor.PostEditorRepository
 import forpdateam.ru.forpda.model.repository.reputation.ReputationRepository
@@ -39,9 +42,9 @@ class ThemePresenter(
         private val reputationRepository: ReputationRepository,
         private val editorRepository: PostEditorRepository,
         private val favoritesRepository: FavoritesRepository,
+        private val eventsRepository: EventsRepository,
         private val themeTemplate: ThemeTemplate
 ) : BasePresenter<ThemeView>(), IThemePresenter {
-
 
     var loadAction = ActionState.NORMAL
     var currentPage: ThemePage? = null
@@ -50,7 +53,35 @@ class ThemePresenter(
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
+        eventsRepository
+                .observeEventsTab()
+                .subscribe {
+                    handleEvent(it)
+                }
+                .addToDisposable()
         loadUrl(themeUrl)
+    }
+
+    private fun handleEvent(event: TabNotification) {
+        Log.e("SUKAT", "handleEvent " + event.isWebSocket + " : " + event.source + " : " + event.type)
+        if (!event.isWebSocket)
+            return
+        if (!isPageLoaded())
+            return
+        Log.e("SUKAT", "handleEvent " + event.event.sourceId + " : " + getId())
+        if (event.event.sourceId != getId())
+            return
+
+        if (event.source == NotificationEvent.Source.THEME) {
+            when (event.type) {
+                NotificationEvent.Type.NEW -> viewState.onEventNew(event)
+                NotificationEvent.Type.READ -> viewState.onEventRead(event)
+                NotificationEvent.Type.MENTION -> {
+                }
+                else -> {
+                }
+            }
+        }
     }
 
     fun getPageScrollY() = currentPage?.scrollY ?: 0
@@ -101,7 +132,7 @@ class ThemePresenter(
         favoritesRepository
                 .editFavorites(FavoritesApi.ACTION_ADD, -1, topicId, subType)
                 .subscribe({
-                    if(it){
+                    if (it) {
                         currentPage?.isInFavorite = true
                     }
                     viewState.onAddToFavorite(it)

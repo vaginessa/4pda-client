@@ -11,6 +11,7 @@ import forpdateam.ru.forpda.entity.remote.qms.QmsChatModel
 import forpdateam.ru.forpda.entity.remote.qms.QmsMessage
 import forpdateam.ru.forpda.model.data.remote.api.RequestFile
 import forpdateam.ru.forpda.model.repository.avatar.AvatarRepository
+import forpdateam.ru.forpda.model.repository.events.EventsRepository
 import forpdateam.ru.forpda.model.repository.qms.QmsRepository
 import forpdateam.ru.forpda.ui.TabManager
 import forpdateam.ru.forpda.ui.fragments.TabFragment
@@ -24,7 +25,8 @@ import forpdateam.ru.forpda.ui.fragments.qms.QmsThemesFragment
 class QmsChatPresenter(
         private val qmsRepository: QmsRepository,
         private val qmsChatTemplate: QmsChatTemplate,
-        private val avatarRepository: AvatarRepository
+        private val avatarRepository: AvatarRepository,
+        private val eventsRepository: EventsRepository
 ) : BasePresenter<QmsChatView>(), IQmsChatPresenter {
 
     var themeId = 0
@@ -37,6 +39,12 @@ class QmsChatPresenter(
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
+        eventsRepository
+                .observeEventsTab()
+                .subscribe {
+                    handleEvent(it)
+                }
+                .addToDisposable()
         nick?.let { nick -> title?.let { title -> viewState.setTitles(title, nick) } }
         tryShowAvatar()
         loadChat()

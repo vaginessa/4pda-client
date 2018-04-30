@@ -132,13 +132,6 @@ public abstract class ThemeFragment extends TabFragment implements ThemeView {
         }
     };
 
-    private Observer notification = (observable, o) -> {
-        if (o == null) return;
-        TabNotification event = (TabNotification) o;
-        runInUiThread(() -> handleEvent(event));
-    };
-
-
     @InjectPresenter
     ThemePresenter presenter;
 
@@ -149,48 +142,23 @@ public abstract class ThemeFragment extends TabFragment implements ThemeView {
                 App.get().Di().getReputationRepository(),
                 App.get().Di().getEditPostRepository(),
                 App.get().Di().getFavoritesRepository(),
+                App.get().Di().getEventsRepository(),
                 App.get().Di().getThemeTemplate()
         );
     }
 
-
-    private void handleEvent(TabNotification event) {
-        Log.e("SUKAT", "handleEvent " + event.isWebSocket() + " : " + event.getSource() + " : " + event.getType());
-        if (!event.isWebSocket())
-            return;
-        if (!presenter.isPageLoaded())
-            return;
-        Log.e("SUKAT", "handleEvent " + event.getEvent().getSourceId() + " : " + presenter.getId());
-        if (event.getEvent().getSourceId() != presenter.getId())
-            return;
-
-        if (event.getSource() == NotificationEvent.Source.THEME) {
-            switch (event.getType()) {
-                case NEW:
-                    onEventNew(event);
-                    break;
-                case READ:
-                    onEventRead(event);
-                    break;
-                case MENTION:
-
-                    break;
-            }
-        }
-    }
-
-    private void onEventNew(TabNotification event) {
+    @Override
+    public void onEventNew(@NotNull TabNotification event) {
         Log.d("SUKAT", "onEventNew");
         notificationHandler.postDelayed(notifyRunnable, 2000);
-
     }
 
-    private void onEventRead(TabNotification event) {
+    @Override
+    public void onEventRead(@NotNull TabNotification event) {
         Log.d("SUKAT", "onEventRead");
         notificationHandler.removeCallbacks(notifyRunnable);
         notificationView.setVisibility(View.GONE);
     }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -320,7 +288,6 @@ public abstract class ThemeFragment extends TabFragment implements ThemeView {
         } else {
             showMessagePanel(false);
         }
-        App.get().subscribeFavorites(notification);
     }
 
     @Override
@@ -339,7 +306,7 @@ public abstract class ThemeFragment extends TabFragment implements ThemeView {
     public void onDestroy() {
         super.onDestroy();
         App.get().removePreferenceChangeObserver(themePreferenceObserver);
-        App.get().unSubscribeFavorites(notification);
+        notificationHandler.removeCallbacks(notifyRunnable);
         messagePanel.onDestroy();
         if (paginationHelper != null)
             paginationHelper.destroy();

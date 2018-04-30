@@ -1,5 +1,7 @@
 package forpdateam.ru.forpda.presentation.theme
 
+import forpdateam.ru.forpda.entity.app.TabNotification
+
 /**
  * Created by radiationx on 17.03.18.
  */
