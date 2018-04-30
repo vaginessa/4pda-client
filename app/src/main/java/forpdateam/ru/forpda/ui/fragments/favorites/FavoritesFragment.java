@@ -249,7 +249,6 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
 
     @Override
     public void onLoadFavorites(@NotNull FavData data) {
-        presenter.saveFavorites(data.getItems());
         selectSpinners(data.getSorting());
         paginationHelper.updatePagination(data.getPagination());
         setSubtitle(paginationHelper.getTitle());

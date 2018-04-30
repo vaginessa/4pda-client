@@ -52,17 +52,6 @@ class FavoritesPresenter(
                 .addToDisposable()
     }
 
-    fun saveFavorites(items: List<FavItem>) {
-        favoritesRepository
-                .saveFavorites(items)
-                .subscribe({
-                    this.showFavorites()
-                }, {
-                    this.handleErrorRx(it)
-                })
-                .addToDisposable()
-    }
-
     fun showFavorites() {
         favoritesRepository
                 .cache

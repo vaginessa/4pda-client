@@ -4,6 +4,7 @@ import android.content.Context
 import forpdateam.ru.forpda.client.Client
 import forpdateam.ru.forpda.model.NetworkStateProvider
 import forpdateam.ru.forpda.model.SchedulersProvider
+import forpdateam.ru.forpda.model.data.cache.favorites.FavoritesCache
 import forpdateam.ru.forpda.model.data.cache.forumuser.ForumUsersCache
 import forpdateam.ru.forpda.model.data.providers.UserSourceProvider
 import forpdateam.ru.forpda.model.data.remote.IWebClient
@@ -87,9 +88,10 @@ class Dependencies internal constructor(
 
     val userSource = UserSourceProvider(qmsApi)
     val forumUsersCache = ForumUsersCache(userSource)
-    val avatarRepository = AvatarRepository(forumUsersCache, schedulers)
+    val favoritesCache = FavoritesCache()
 
-    val favoritesRepository = FavoritesRepository(schedulers, favoritesApi)
+    val avatarRepository = AvatarRepository(forumUsersCache, schedulers)
+    val favoritesRepository = FavoritesRepository(schedulers, favoritesApi, favoritesCache)
     val historyRepository = HistoryRepository(schedulers)
     val mentionsRepository = MentionsRepository(schedulers, mentionsApi)
     val authRepository = AuthRepository(schedulers, authApi)
