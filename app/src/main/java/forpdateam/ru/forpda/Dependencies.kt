@@ -30,6 +30,7 @@ import forpdateam.ru.forpda.model.data.storage.ExternalStorageProvider
 import forpdateam.ru.forpda.model.repository.auth.AuthRepository
 import forpdateam.ru.forpda.model.repository.avatar.AvatarRepository
 import forpdateam.ru.forpda.model.repository.devdb.DevDbRepository
+import forpdateam.ru.forpda.model.repository.events.EventsRepository
 import forpdateam.ru.forpda.model.repository.faviorites.FavoritesRepository
 import forpdateam.ru.forpda.model.repository.forum.ForumRepository
 import forpdateam.ru.forpda.model.repository.history.HistoryRepository
@@ -119,4 +120,5 @@ class Dependencies internal constructor(
     val devDbRepository = DevDbRepository(schedulers, devDbApi)
     val editPostRepository = PostEditorRepository(schedulers, editPostApi, forumUsersCache)
     val notesRepository = NotesRepository(schedulers, notesCache, externalStorage)
+    val eventsRepository = EventsRepository(context, webClient, eventsApi, schedulers, networkState)
 }
