@@ -57,6 +57,7 @@ class FavoritesPresenter(
                 .doAfterTerminate { viewState.setRefreshing(false) }
                 .subscribe({
                     viewState.onLoadFavorites(it)
+                    showFavorites()
                 }, {
                     this.handleErrorRx(it)
                 })
