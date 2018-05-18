@@ -36,7 +36,14 @@ class LinkHandler(
         systemLinkHandler.handle(url)
     }
 
-    override fun handle(inputUrl: String?, router: Router?, doNavigate: Boolean): Boolean {
+    private fun navigateTo(screen: Screen, router: IRouter?, args: Map<String, String>) {
+        router?.navigateTo(screen.apply {
+            args[Screen.ARG_TITLE]?.let { screen.screenTitle = it }
+            args[Screen.ARG_SUBTITLE]?.let { screen.screenSubTitle = it }
+        })
+    }
+
+    override fun handle(inputUrl: String?, router: IRouter?, args: Map<String, String>): Boolean {
         var url = inputUrl.orEmpty()
         if (url.isBlank() || url == "#") {
             return false
@@ -50,7 +57,7 @@ class LinkHandler(
         Log.d(LOG_TAG, "Corrected url $url")
 
 
-        if (handleMedia(url, router)) {
+        if (handleMedia(url, router, args)) {
             return true
         }
         url = normalizeForumUrl(url)
@@ -61,21 +68,21 @@ class LinkHandler(
 
             if (!uri.pathSegments.isEmpty()) {
                 when (uri.pathSegments[0]) {
-                    "pages" -> if (handlePages(uri, router)) {
+                    "pages" -> if (handlePages(uri, router, args)) {
                         return true
                     }
-                    "forum" -> if (handleForum(uri, router)) {
+                    "forum" -> if (handleForum(uri, router, args)) {
                         return true
                     }
-                    "devdb" -> if (handleDevDb(uri, router)) {
+                    "devdb" -> if (handleDevDb(uri, router, args)) {
                         return true
                     }
-                    else -> if (handleSite(uri, router)) {
+                    else -> if (handleSite(uri, router, args)) {
                         return true
                     }
                 }
             } else {
-                if (handleSite(uri, router)) {
+                if (handleSite(uri, router, args)) {
                     return true
                 }
             }
@@ -91,91 +98,91 @@ class LinkHandler(
         return null
     }
 
-    private fun handleForum(uri: Uri, router: Router?): Boolean {
+    private fun handleForum(uri: Uri, router: IRouter?, args: Map<String, String>): Boolean {
         uri.getQueryParameter("showuser")?.also { param ->
-            router?.navigateTo(Screen.Profile().apply {
+            navigateTo(Screen.Profile().apply {
                 profileUrl = uri.toString()
-            })
+            }, router, args)
             return true
         }
         uri.getQueryParameter("showtopic")?.also { param ->
-            router?.navigateTo(Screen.Theme().apply {
+            navigateTo(Screen.Theme().apply {
                 themeUrl = uri.toString()
-            })
+            }, router, args)
             return true
         }
 
         uri.getQueryParameter("showforum")?.also { param ->
-            router?.navigateTo(Screen.Topics().apply {
+            navigateTo(Screen.Topics().apply {
                 forumId = param.toInt()
-            })
+            }, router, args)
             return true
         }
 
         uri.getQueryParameter("act")?.also { param ->
             when (param) {
                 "idx" -> {
-                    router?.navigateTo(Screen.Forum())
+                    navigateTo(Screen.Forum(), router, args)
                 }
                 "qms" -> {
                     val qmsUserId = uri.getQueryParameter("mid")
                     val qmsThemeId = uri.getQueryParameter("t")
 
                     if (qmsUserId == null) {
-                        router?.navigateTo(Screen.QmsContacts())
+                        navigateTo(Screen.QmsContacts(), router, args)
                     } else {
                         if (qmsThemeId != null) {
-                            router?.navigateTo(Screen.QmsChat().apply {
+                            navigateTo(Screen.QmsChat().apply {
                                 userId = qmsUserId.toInt()
                                 themeId = qmsThemeId.toInt()
-                            })
+                            }, router, args)
                         } else {
-                            router?.navigateTo(Screen.QmsThemes().apply {
+                            navigateTo(Screen.QmsThemes().apply {
                                 userId = qmsUserId.toInt()
-                            })
+                            }, router, args)
                         }
                     }
                     return true
                 }
                 "boardrules" -> {
-                    router?.navigateTo(Screen.ForumRules())
+                    navigateTo(Screen.ForumRules(), router, args)
                     return true
                 }
                 "announce" -> {
-                    router?.navigateTo(Screen.Announce().apply {
+                    navigateTo(Screen.Announce().apply {
                         uri.getQueryParameter("st")?.also {
                             announceId = it.toInt()
                         }
                         uri.getQueryParameter("f")?.also {
                             forumId = it.toInt()
                         }
-                    })
+                    }, router, args)
                     return true
                 }
                 "search" -> {
-                    router?.navigateTo(Screen.Search().apply {
+                    navigateTo(Screen.Search().apply {
                         searchUrl = uri.toString()
-                    })
+                    }, router, args)
                     return true
                 }
                 "rep" -> {
-                    router?.navigateTo(Screen.Reputation().apply {
+                    navigateTo(Screen.Reputation().apply {
                         reputationUrl = uri.toString()
-                    })
+                    }, router, args)
                     return true
                 }
                 "findpost" -> {
-                    router?.navigateTo(Screen.Theme().apply {
+                    navigateTo(Screen.Theme().apply {
                         themeUrl = uri.toString()
-                    })
+                    }, router, args)
                     return true
                 }
                 "fav" -> {
-                    router?.navigateTo(Screen.Favorites())
+                    navigateTo(Screen.Favorites(), router, args)
                     return true
                 }
                 "mentions" -> {
-                    router?.navigateTo(Screen.Mentions())
+                    navigateTo(Screen.Mentions(), router, args)
                     return true
                 }
             }
@@ -183,10 +190,10 @@ class LinkHandler(
         return false
     }
 
-    private fun handleSite(uri: Uri, router: Router?): Boolean {
+    private fun handleSite(uri: Uri, router: IRouter?, args: Map<String, String>): Boolean {
         val matcher = sitePattern.matcher(uri.toString())
         if (matcher.find()) {
-            router?.navigateTo(Screen.ArticleDetail().apply {
+            navigateTo(Screen.ArticleDetail().apply {
                 matcher.group(2)?.also {
                     articleId = it.toInt()
                 }
@@ -194,24 +201,24 @@ class LinkHandler(
                     commentId = it.toInt()
                 }
                 articleUrl = uri.toString()
-            })
+            }, router, args)
             return true
         }
         if (!uri.pathSegments.isEmpty() && uri.pathSegments[0].contains("special")) {
             return false
         }
         if (uri.pathSegments.isEmpty()) {
-            router?.navigateTo(Screen.ArticleList())
+            navigateTo(Screen.ArticleList(), router, args)
             return true
         } else if (uri.pathSegments[0].matches("news|articles|reviews|tag|software|games|review".toRegex())) {
-            router?.navigateTo(Screen.ArticleList())
+            navigateTo(Screen.ArticleList(), router, args)
             return true
         }
 
         return false
     }
 
-    private fun handlePages(uri: Uri, router: Router?): Boolean {
+    private fun handlePages(uri: Uri, router: IRouter?, args: Map<String, String>): Boolean {
         if (uri.pathSegments.size > 1 && uri.pathSegments[1].equals("go", ignoreCase = true)) {
             uri.getQueryParameter("u")?.let {
                 try {
@@ -227,33 +234,33 @@ class LinkHandler(
         return false
     }
 
-    private fun handleDevDb(uri: Uri, router: Router?): Boolean {
+    private fun handleDevDb(uri: Uri, router: IRouter?, args: Map<String, String>): Boolean {
         if (uri.pathSegments.size > 1) {
             if (uri.pathSegments[1].matches("phones|pad|ebook|smartwatch".toRegex())) {
                 if (uri.pathSegments.size > 2 && !uri.pathSegments[2].matches("new|select".toRegex())) {
-                    router?.navigateTo(Screen.DevDbDevices().apply {
+                    navigateTo(Screen.DevDbDevices().apply {
                         categoryId = uri.pathSegments[1]
                         brandId = uri.pathSegments[2]
-                    })
+                    }, router, args)
                     return true
                 }
-                router?.navigateTo(Screen.DevDbBrands().apply {
+                navigateTo(Screen.DevDbBrands().apply {
                     categoryId = uri.pathSegments[1]
-                })
+                }, router, args)
                 return true
             } else {
-                router?.navigateTo(Screen.DevDbDevice().apply {
+                navigateTo(Screen.DevDbDevice().apply {
                     deviceId = uri.pathSegments[1]
-                })
+                }, router, args)
                 return true
             }
         } else {
-            router?.navigateTo(Screen.DevDbBrands())
+            navigateTo(Screen.DevDbBrands(), router, args)
             return true
         }
     }
 
-    private fun handleMedia(url: String, router: Router?): Boolean {
+    private fun handleMedia(url: String, router: IRouter?, args: Map<String, String>): Boolean {
         val matcher = forumMediaPattern.matcher(url)
         if (matcher.find()) {
             var fullName = matcher.group(1)
@@ -265,17 +272,17 @@ class LinkHandler(
             val extension = matcher.group(2)
             val isImage = MimeTypeUtil.isImage(extension)
             if (isImage) {
-                router?.navigateTo(Screen.ImageViewer().apply {
+                navigateTo(Screen.ImageViewer().apply {
                     urls.add(url)
-                })
+                }, router, args)
             } else {
                 handleDownload(fullName, url)
             }
             return true
         } else if (supportImagePattern.matcher(url).find()) {
-            router?.navigateTo(Screen.ImageViewer().apply {
+            navigateTo(Screen.ImageViewer().apply {
                 urls.add(url)
-            })
+            }, router, args)
             return true
         }
         return false

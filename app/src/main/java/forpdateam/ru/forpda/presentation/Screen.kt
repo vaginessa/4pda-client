@@ -4,8 +4,38 @@ import forpdateam.ru.forpda.entity.remote.editpost.EditPostForm
 
 sealed class Screen {
     companion object {
+        const val ARG_TITLE = "arg_title"
+        const val ARG_SUBTITLE = "arg_subtitle"
         private val NO_ID = -1
     }
+
+    class Suka(
+            val lal:Int,
+            private val router: IRouter,
+            private val linkHandler: ILinkHandler
+
+    )
+
+/*
+    ,
+    private val linkHandler: ILinkHandler
+
+    */
+
+
+/*
+    ,
+    private val router: IRouter
+
+    */
+
+
+    /*
+    ,
+    private val router: IRouter,
+    private val linkHandler: ILinkHandler
+
+    */
 
     var screenTitle: String? = null
     var screenSubTitle: String? = null

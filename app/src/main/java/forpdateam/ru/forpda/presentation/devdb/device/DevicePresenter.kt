@@ -1,11 +1,11 @@
 package forpdateam.ru.forpda.presentation.devdb.device
 
 import com.arellomobile.mvp.InjectViewState
-import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.Utils
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.remote.devdb.Device
 import forpdateam.ru.forpda.model.repository.devdb.DevDbRepository
+import forpdateam.ru.forpda.presentation.ILinkHandler
 import forpdateam.ru.forpda.presentation.IRouter
 import forpdateam.ru.forpda.presentation.Screen
 
@@ -16,7 +16,8 @@ import forpdateam.ru.forpda.presentation.Screen
 @InjectViewState
 class DevicePresenter(
         private val devDbRepository: DevDbRepository,
-        private val router: IRouter
+        private val router: IRouter,
+        private val linkHandler: ILinkHandler
 ) : BasePresenter<DeviceView>() {
 
     var deviceId: String? = null
@@ -68,13 +69,13 @@ class DevicePresenter(
 
     fun openDevices() {
         currentData?.let {
-            IntentHandler.handle("https://4pda.ru/devdb/${it.catId}/${it.brandId}")
+            linkHandler.handle("https://4pda.ru/devdb/${it.catId}/${it.brandId}", router)
         }
     }
 
     fun openBrands() {
         currentData?.let {
-            IntentHandler.handle("https://4pda.ru/devdb/${it.catId}")
+            linkHandler.handle("https://4pda.ru/devdb/${it.catId}", router)
         }
     }
 }

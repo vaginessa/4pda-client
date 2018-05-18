@@ -1,10 +1,8 @@
 package forpdateam.ru.forpda.presentation.favorites
 
-import android.os.Bundle
 import com.arellomobile.mvp.InjectViewState
 import forpdateam.ru.forpda.App
 import forpdateam.ru.forpda.client.ClientHelper
-import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.Preferences
 import forpdateam.ru.forpda.common.Utils
 import forpdateam.ru.forpda.common.mvp.BasePresenter
@@ -14,7 +12,9 @@ import forpdateam.ru.forpda.model.data.remote.api.favorites.Sorting
 import forpdateam.ru.forpda.model.repository.events.EventsRepository
 import forpdateam.ru.forpda.model.repository.faviorites.FavoritesRepository
 import forpdateam.ru.forpda.model.repository.forum.ForumRepository
-import forpdateam.ru.forpda.ui.fragments.TabFragment
+import forpdateam.ru.forpda.presentation.ILinkHandler
+import forpdateam.ru.forpda.presentation.IRouter
+import forpdateam.ru.forpda.presentation.Screen
 
 /**
  * Created by radiationx on 11.11.17.
@@ -24,7 +24,9 @@ import forpdateam.ru.forpda.ui.fragments.TabFragment
 class FavoritesPresenter(
         private val favoritesRepository: FavoritesRepository,
         private val forumRepository: ForumRepository,
-        private val eventsRepository: EventsRepository
+        private val eventsRepository: EventsRepository,
+        private val router: IRouter,
+        private val linkHandler: ILinkHandler
 ) : BasePresenter<FavoritesView>() {
 
 
@@ -109,12 +111,13 @@ class FavoritesPresenter(
     }
 
     fun onItemClick(item: FavItem) {
-        val args = Bundle()
-        args.putString(TabFragment.ARG_TITLE, item.topicTitle)
+        val args = mapOf<String, String>(
+                Screen.ARG_TITLE to item.topicTitle
+        )
         if (item.isForum) {
-            IntentHandler.handle("https://4pda.ru/forum/index.php?showforum=" + item.forumId, args)
+            linkHandler.handle("https://4pda.ru/forum/index.php?showforum=" + item.forumId, router, args)
         } else {
-            IntentHandler.handle("https://4pda.ru/forum/index.php?showtopic=" + item.topicId + "&view=getnewpost", args)
+            linkHandler.handle("https://4pda.ru/forum/index.php?showtopic=" + item.topicId + "&view=getnewpost", router, args)
         }
     }
 
@@ -131,11 +134,11 @@ class FavoritesPresenter(
     }
 
     fun openAttachments(item: FavItem) {
-        IntentHandler.handle("https://4pda.ru/forum/index.php?act=attach&code=showtopic&tid=" + item.topicId)
+        linkHandler.handle("https://4pda.ru/forum/index.php?act=attach&code=showtopic&tid=" + item.topicId, router)
     }
 
     fun openForum(item: FavItem) {
-        IntentHandler.handle("https://4pda.ru/forum/index.php?showforum=" + item.forumId)
+        linkHandler.handle("https://4pda.ru/forum/index.php?showforum=" + item.forumId, router)
     }
 
     fun changeFav(action: Int, type: String?, favId: Int) {

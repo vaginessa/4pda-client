@@ -46,7 +46,9 @@ public class MentionsFragment extends RecyclerFragment implements MentionsView {
     MentionsPresenter providePresenter() {
         return new MentionsPresenter(
                 App.get().Di().getMentionsRepository(),
-                App.get().Di().getFavoritesRepository()
+                App.get().Di().getFavoritesRepository(),
+                App.get().Di().getRouter(),
+                App.get().Di().getLinkHandler()
         );
     }
 

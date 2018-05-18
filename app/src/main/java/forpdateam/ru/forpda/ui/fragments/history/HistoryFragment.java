@@ -39,7 +39,11 @@ public class HistoryFragment extends RecyclerFragment implements HistoryView {
 
     @ProvidePresenter
     HistoryPresenter providePresenter() {
-        return new HistoryPresenter(App.get().Di().getHistoryRepository());
+        return new HistoryPresenter(
+                App.get().Di().getHistoryRepository(),
+                App.get().Di().getRouter(),
+                App.get().Di().getLinkHandler()
+        );
     }
 
     public HistoryFragment() {

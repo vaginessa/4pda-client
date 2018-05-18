@@ -143,7 +143,8 @@ public abstract class ThemeFragment extends TabFragment implements ThemeView {
                 App.get().Di().getFavoritesRepository(),
                 App.get().Di().getEventsRepository(),
                 App.get().Di().getThemeTemplate(),
-                App.get().Di().getRouter()
+                App.get().Di().getRouter(),
+                App.get().Di().getLinkHandler()
         );
     }
 

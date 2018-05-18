@@ -1,11 +1,12 @@
 package forpdateam.ru.forpda.presentation.profile
 
 import com.arellomobile.mvp.InjectViewState
-import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.Utils
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.remote.profile.ProfileModel
 import forpdateam.ru.forpda.model.repository.profile.ProfileRepository
+import forpdateam.ru.forpda.presentation.ILinkHandler
+import forpdateam.ru.forpda.presentation.IRouter
 
 /**
  * Created by radiationx on 02.01.18.
@@ -13,7 +14,9 @@ import forpdateam.ru.forpda.model.repository.profile.ProfileRepository
 
 @InjectViewState
 class ProfilePresenter(
-        private val profileRepository: ProfileRepository
+        private val profileRepository: ProfileRepository,
+        private val router: IRouter,
+        private val linkHandler: ILinkHandler
 ) : BasePresenter<ProfileView>() {
 
     var profileUrl: String? = null
@@ -57,7 +60,7 @@ class ProfilePresenter(
 
     fun navigateToQms() {
         currentData?.let {
-            IntentHandler.handle(it.contacts[0].url)
+            linkHandler.handle(it.contacts[0].url, router)
         }
     }
 }

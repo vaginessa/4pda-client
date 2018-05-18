@@ -1,13 +1,14 @@
 package forpdateam.ru.forpda.presentation.reputation
 
 import com.arellomobile.mvp.InjectViewState
-import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.remote.reputation.RepData
 import forpdateam.ru.forpda.entity.remote.reputation.RepItem
 import forpdateam.ru.forpda.model.data.remote.api.reputation.ReputationApi
 import forpdateam.ru.forpda.model.repository.avatar.AvatarRepository
 import forpdateam.ru.forpda.model.repository.reputation.ReputationRepository
+import forpdateam.ru.forpda.presentation.ILinkHandler
+import forpdateam.ru.forpda.presentation.IRouter
 
 /**
  * Created by radiationx on 03.01.18.
@@ -16,7 +17,9 @@ import forpdateam.ru.forpda.model.repository.reputation.ReputationRepository
 @InjectViewState
 class ReputationPresenter(
         private val reputationRepository: ReputationRepository,
-        private val avatarRepository: AvatarRepository
+        private val avatarRepository: AvatarRepository,
+        private val router: IRouter,
+        private val linkHandler: ILinkHandler
 ) : BasePresenter<ReputationView>() {
 
     var currentData = RepData()
@@ -89,10 +92,10 @@ class ReputationPresenter(
     }
 
     fun navigateToProfile(userId: Int) {
-        IntentHandler.handle("https://4pda.ru/forum/index.php?showuser=$userId")
+        linkHandler.handle("https://4pda.ru/forum/index.php?showuser=$userId", router)
     }
 
     fun navigateToMessage(item: RepItem) {
-        IntentHandler.handle(item.sourceUrl)
+        linkHandler.handle(item.sourceUrl, router)
     }
 }

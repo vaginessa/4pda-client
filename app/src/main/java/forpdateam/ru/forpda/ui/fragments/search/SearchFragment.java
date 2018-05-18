@@ -159,7 +159,8 @@ public class SearchFragment extends TabFragment implements SearchSiteView, Exten
                 App.get().Di().getThemeRepository(),
                 App.get().Di().getReputationRepository(),
                 App.get().Di().getSearchTemplate(),
-                App.get().Di().getRouter()
+                App.get().Di().getRouter(),
+                App.get().Di().getLinkHandler()
         );
     }
 

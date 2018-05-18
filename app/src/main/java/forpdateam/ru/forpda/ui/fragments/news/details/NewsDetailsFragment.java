@@ -78,7 +78,11 @@ public class NewsDetailsFragment extends TabFragment implements ArticleDetailVie
 
     @ProvidePresenter
     ArticleDetailPresenter providePresenter() {
-        return new ArticleDetailPresenter(interactor);
+        return new ArticleDetailPresenter(
+                interactor,
+                App.get().Di().getRouter(),
+                App.get().Di().getLinkHandler()
+        );
     }
 
     public NewsDetailsFragment() {

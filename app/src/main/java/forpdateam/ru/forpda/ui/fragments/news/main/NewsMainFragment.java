@@ -41,7 +41,8 @@ public class NewsMainFragment extends RecyclerFragment implements NewsListAdapte
     ArticlesListPresenter providePresenter() {
         return new ArticlesListPresenter(
                 App.get().Di().getNewsRepository(),
-                App.get().Di().getRouter()
+                App.get().Di().getRouter(),
+                App.get().Di().getLinkHandler()
         );
     }
 

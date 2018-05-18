@@ -51,7 +51,8 @@ public class TopicsFragment extends RecyclerFragment implements TopicsView {
                 App.get().Di().getTopicsRepository(),
                 App.get().Di().getForumRepository(),
                 App.get().Di().getFavoritesRepository(),
-                App.get().Di().getRouter()
+                App.get().Di().getRouter(),
+                App.get().Di().getLinkHandler()
         );
     }
 

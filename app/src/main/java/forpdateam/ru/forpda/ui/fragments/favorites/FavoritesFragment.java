@@ -78,7 +78,9 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
         return new FavoritesPresenter(
                 App.get().Di().getFavoritesRepository(),
                 App.get().Di().getForumRepository(),
-                App.get().Di().getEventsRepository()
+                App.get().Di().getEventsRepository(),
+                App.get().Di().getRouter(),
+                App.get().Di().getLinkHandler()
         );
     }
 

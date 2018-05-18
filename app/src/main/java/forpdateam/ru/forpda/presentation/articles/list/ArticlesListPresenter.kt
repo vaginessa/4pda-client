@@ -1,12 +1,12 @@
 package forpdateam.ru.forpda.presentation.articles.list
 
 import com.arellomobile.mvp.InjectViewState
-import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.Utils
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.remote.news.NewsItem
 import forpdateam.ru.forpda.model.data.remote.api.news.Constants
 import forpdateam.ru.forpda.model.repository.news.NewsRepository
+import forpdateam.ru.forpda.presentation.ILinkHandler
 import forpdateam.ru.forpda.presentation.IRouter
 import forpdateam.ru.forpda.presentation.Screen
 
@@ -17,7 +17,8 @@ import forpdateam.ru.forpda.presentation.Screen
 @InjectViewState
 class ArticlesListPresenter(
         private val newsRepository: NewsRepository,
-        private val router: IRouter
+        private val router: IRouter,
+        private val linkHandler: ILinkHandler
 ) : BasePresenter<ArticlesListView>() {
     private val category = Constants.NEWS_CATEGORY_ROOT
     private var currentPage = 1
@@ -73,7 +74,7 @@ class ArticlesListPresenter(
     }
 
     fun openProfile(item: NewsItem) {
-        IntentHandler.handle("https://4pda.ru/forum/index.php?showuser=${item.authorId}")
+        linkHandler.handle("https://4pda.ru/forum/index.php?showuser=${item.authorId}", router)
     }
 
     fun createNote(item: NewsItem) {

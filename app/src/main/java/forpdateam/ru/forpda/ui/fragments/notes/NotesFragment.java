@@ -48,7 +48,9 @@ public class NotesFragment extends RecyclerFragment implements NotesView, NotesA
     @ProvidePresenter
     NotesPresenter providePresenter() {
         return new NotesPresenter(
-                App.get().Di().getNotesRepository()
+                App.get().Di().getNotesRepository(),
+                App.get().Di().getRouter(),
+                App.get().Di().getLinkHandler()
         );
     }
 

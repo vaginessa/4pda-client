@@ -1,15 +1,15 @@
 package forpdateam.ru.forpda.presentation.mentions
 
-import android.os.Bundle
 import com.arellomobile.mvp.InjectViewState
-import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.Utils
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.remote.mentions.MentionItem
 import forpdateam.ru.forpda.model.data.remote.api.favorites.FavoritesApi
 import forpdateam.ru.forpda.model.repository.faviorites.FavoritesRepository
 import forpdateam.ru.forpda.model.repository.mentions.MentionsRepository
-import forpdateam.ru.forpda.ui.fragments.TabFragment
+import forpdateam.ru.forpda.presentation.ILinkHandler
+import forpdateam.ru.forpda.presentation.IRouter
+import forpdateam.ru.forpda.presentation.Screen
 import java.util.regex.Pattern
 
 /**
@@ -19,7 +19,9 @@ import java.util.regex.Pattern
 @InjectViewState
 class MentionsPresenter(
         private val mentionsRepository: MentionsRepository,
-        private val favoritesRepository: FavoritesRepository
+        private val favoritesRepository: FavoritesRepository,
+        private val router: IRouter,
+        private val linkHandler: ILinkHandler
 ) : BasePresenter<MentionsView>() {
 
     var currentSt: Int = 0
@@ -54,9 +56,9 @@ class MentionsPresenter(
     }
 
     fun onItemClick(item: MentionItem) {
-        val args = Bundle()
-        args.putString(TabFragment.ARG_TITLE, item.title)
-        IntentHandler.handle(item.link, args)
+        linkHandler.handle(item.link, router, mapOf(
+                Screen.ARG_TITLE to item.title
+        ))
     }
 
     fun onItemLongClick(item: MentionItem) {

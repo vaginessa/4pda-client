@@ -61,7 +61,9 @@ public class ReputationFragment extends RecyclerFragment implements ReputationVi
     ReputationPresenter providePresenter() {
         return new ReputationPresenter(
                 App.get().Di().getReputationRepository(),
-                App.get().Di().getAvatarRepository()
+                App.get().Di().getAvatarRepository(),
+                App.get().Di().getRouter(),
+                App.get().Di().getLinkHandler()
         );
     }
 

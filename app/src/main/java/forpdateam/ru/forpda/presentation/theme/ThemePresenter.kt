@@ -5,7 +5,6 @@ import android.util.Log
 import com.arellomobile.mvp.InjectViewState
 import forpdateam.ru.forpda.App
 import forpdateam.ru.forpda.R
-import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.Utils
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.app.TabNotification
@@ -23,6 +22,7 @@ import forpdateam.ru.forpda.model.repository.faviorites.FavoritesRepository
 import forpdateam.ru.forpda.model.repository.posteditor.PostEditorRepository
 import forpdateam.ru.forpda.model.repository.reputation.ReputationRepository
 import forpdateam.ru.forpda.model.repository.theme.ThemeRepository
+import forpdateam.ru.forpda.presentation.ILinkHandler
 import forpdateam.ru.forpda.presentation.IRouter
 import forpdateam.ru.forpda.presentation.Screen
 import forpdateam.ru.forpda.ui.activities.imageviewer.ImageViewerActivity
@@ -44,7 +44,8 @@ class ThemePresenter(
         private val favoritesRepository: FavoritesRepository,
         private val eventsRepository: EventsRepository,
         private val themeTemplate: ThemeTemplate,
-        private val router: IRouter
+        private val router: IRouter,
+        private val linkHandler: ILinkHandler
 ) : BasePresenter<ThemeView>(), IThemePresenter {
 
     var loadAction = ActionState.NORMAL
@@ -318,7 +319,7 @@ class ThemePresenter(
 
     fun openSearch() {
         currentPage?.let {
-            IntentHandler.handle("https://4pda.ru/forum/index.php?forums=${it.forumId}&topics=${it.id}&act=search&source=pst&result=posts")
+            linkHandler.handle("https://4pda.ru/forum/index.php?forums=${it.forumId}&topics=${it.id}&act=search&source=pst&result=posts", router)
         }
     }
 
@@ -332,13 +333,13 @@ class ThemePresenter(
                 e.printStackTrace()
             }
 
-            IntentHandler.handle(url)
+            linkHandler.handle(url, router)
         }
     }
 
     fun openForum() {
         currentPage?.let {
-            IntentHandler.handle("https://4pda.ru/forum/index.php?showforum=${it.forumId}")
+            linkHandler.handle("https://4pda.ru/forum/index.php?showforum=${it.forumId}", router)
         }
     }
 
@@ -506,7 +507,7 @@ class ThemePresenter(
         } catch (ex: Exception) {
             ACRA.getErrorReporter().handleException(ex)
         }
-        IntentHandler.handle(url)
+        linkHandler.handle(url, router)
     }
 
     private fun checkIsPoll(url: String): Boolean {
@@ -554,47 +555,47 @@ class ThemePresenter(
 
     override fun openProfile(postId: Int) {
         getPostById(postId)?.let {
-            IntentHandler.handle("https://4pda.ru/forum/index.php?showuser=${it.userId}")
+            linkHandler.handle("https://4pda.ru/forum/index.php?showuser=${it.userId}", router)
         }
     }
 
     override fun openQms(postId: Int) {
         getPostById(postId)?.let {
-            IntentHandler.handle("https://4pda.ru/forum/index.php?act=qms&amp;mid=${it.userId}")
+            linkHandler.handle("https://4pda.ru/forum/index.php?act=qms&amp;mid=${it.userId}", router)
         }
     }
 
     override fun openSearchUserTopic(postId: Int) {
         getPostById(postId)?.let {
-            IntentHandler.handle(SearchSettings().apply {
+            linkHandler.handle(SearchSettings().apply {
                 source = SearchSettings.SOURCE_ALL.first
                 nick = it.nick
                 result = SearchSettings.RESULT_TOPICS.first
-            }.toUrl())
+            }.toUrl(), router)
         }
     }
 
     override fun openSearchInTopic(postId: Int) {
         getPostById(postId)?.let {
-            IntentHandler.handle(SearchSettings().apply {
+            linkHandler.handle(SearchSettings().apply {
                 addForum(Integer.toString(it.forumId))
                 addTopic(Integer.toString(it.topicId))
                 source = SearchSettings.SOURCE_CONTENT.first
                 nick = it.nick
                 result = SearchSettings.RESULT_POSTS.first
                 subforums = SearchSettings.SUB_FORUMS_FALSE
-            }.toUrl())
+            }.toUrl(), router)
         }
     }
 
     override fun openSearchUserMessages(postId: Int) {
         getPostById(postId)?.let {
-            IntentHandler.handle(SearchSettings().apply {
+            linkHandler.handle(SearchSettings().apply {
                 source = SearchSettings.SOURCE_CONTENT.first
                 nick = it.getNick()
                 result = SearchSettings.RESULT_POSTS.first
                 subforums = SearchSettings.SUB_FORUMS_FALSE
-            }.toUrl())
+            }.toUrl(), router)
         }
     }
 
@@ -630,7 +631,7 @@ class ThemePresenter(
 
     override fun openReputationHistory(postId: Int) {
         getPostById(postId)?.let {
-            IntentHandler.handle("https://4pda.ru/forum/index.php?act=rep&view=history&amp;mid=${it.userId}")
+            linkHandler.handle("https://4pda.ru/forum/index.php?act=rep&view=history&amp;mid=${it.userId}", router)
         }
     }
 

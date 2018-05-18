@@ -1,7 +1,6 @@
 package forpdateam.ru.forpda.presentation.qms.chat
 
 import com.arellomobile.mvp.InjectViewState
-import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.app.TabNotification
 import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem
@@ -12,6 +11,7 @@ import forpdateam.ru.forpda.model.data.remote.api.RequestFile
 import forpdateam.ru.forpda.model.repository.avatar.AvatarRepository
 import forpdateam.ru.forpda.model.repository.events.EventsRepository
 import forpdateam.ru.forpda.model.repository.qms.QmsRepository
+import forpdateam.ru.forpda.presentation.ILinkHandler
 import forpdateam.ru.forpda.presentation.IRouter
 import forpdateam.ru.forpda.presentation.Screen
 
@@ -25,7 +25,8 @@ class QmsChatPresenter(
         private val qmsChatTemplate: QmsChatTemplate,
         private val avatarRepository: AvatarRepository,
         private val eventsRepository: EventsRepository,
-        private val router: IRouter
+        private val router: IRouter,
+        private val linkHandler: ILinkHandler
 ) : BasePresenter<QmsChatView>(), IQmsChatPresenter {
 
     var themeId = 0
@@ -231,7 +232,7 @@ class QmsChatPresenter(
 
     fun openProfile() {
         currentData?.let {
-            IntentHandler.handle("https://4pda.ru/forum/index.php?showuser=${it.userId}")
+            linkHandler.handle("https://4pda.ru/forum/index.php?showuser=${it.userId}", router)
         }
     }
 

@@ -1,11 +1,12 @@
 package forpdateam.ru.forpda.presentation.notes
 
 import com.arellomobile.mvp.InjectViewState
-import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.Utils
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.app.notes.NoteItem
 import forpdateam.ru.forpda.model.repository.note.NotesRepository
+import forpdateam.ru.forpda.presentation.ILinkHandler
+import forpdateam.ru.forpda.presentation.IRouter
 
 /**
  * Created by radiationx on 11.11.17.
@@ -13,7 +14,9 @@ import forpdateam.ru.forpda.model.repository.note.NotesRepository
 
 @InjectViewState
 class NotesPresenter(
-        private val notesRepository: NotesRepository
+        private val notesRepository: NotesRepository,
+        private val router: IRouter,
+        private val linkHandler: ILinkHandler
 ) : BasePresenter<NotesView>() {
 
 
@@ -73,7 +76,7 @@ class NotesPresenter(
                 .exportNotes()
                 .subscribe({
                     viewState.onExportNotes(it)
-                },{
+                }, {
                     it.printStackTrace()
                 })
                 .addToDisposable()
@@ -85,7 +88,7 @@ class NotesPresenter(
                 .subscribe({
                     viewState.onImportNotes()
                     loadNotes()
-                },{
+                }, {
                     it.printStackTrace()
                 })
                 .addToDisposable()
@@ -93,7 +96,7 @@ class NotesPresenter(
 
 
     fun onItemClick(item: NoteItem) {
-        IntentHandler.handle(item.link)
+        linkHandler.handle(item.link, router)
     }
 
     fun copyLink(item: NoteItem) {

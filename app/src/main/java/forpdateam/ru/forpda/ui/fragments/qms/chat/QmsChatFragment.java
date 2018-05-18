@@ -95,7 +95,8 @@ public class QmsChatFragment extends TabFragment implements ChatThemeCreator.The
                 App.get().Di().getQmsChatTemplate(),
                 App.get().Di().getAvatarRepository(),
                 App.get().Di().getEventsRepository(),
-                App.get().Di().getRouter()
+                App.get().Di().getRouter(),
+                App.get().Di().getLinkHandler()
         );
     }
 

@@ -57,7 +57,8 @@ public class QmsContactsFragment extends RecyclerFragment implements QmsContacts
     QmsContactsPresenter providePresenter() {
         return new QmsContactsPresenter(
                 App.get().Di().getQmsRepository(),
-                App.get().Di().getRouter()
+                App.get().Di().getRouter(),
+                App.get().Di().getLinkHandler()
         );
     }
 

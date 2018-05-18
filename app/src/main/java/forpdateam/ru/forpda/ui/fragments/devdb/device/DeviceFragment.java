@@ -81,7 +81,8 @@ public class DeviceFragment extends TabFragment implements DeviceView {
     DevicePresenter providePresenter() {
         return new DevicePresenter(
                 App.get().Di().getDevDbRepository(),
-                App.get().Di().getRouter()
+                App.get().Di().getRouter(),
+                App.get().Di().getLinkHandler()
         );
     }
 

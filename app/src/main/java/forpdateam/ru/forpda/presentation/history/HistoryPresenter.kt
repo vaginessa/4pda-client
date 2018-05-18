@@ -1,13 +1,13 @@
 package forpdateam.ru.forpda.presentation.history
 
-import android.os.Bundle
 import com.arellomobile.mvp.InjectViewState
-import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.Utils
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.app.history.HistoryItem
 import forpdateam.ru.forpda.model.repository.history.HistoryRepository
-import forpdateam.ru.forpda.ui.fragments.TabFragment
+import forpdateam.ru.forpda.presentation.ILinkHandler
+import forpdateam.ru.forpda.presentation.IRouter
+import forpdateam.ru.forpda.presentation.Screen
 
 /**
  * Created by radiationx on 11.11.17.
@@ -15,7 +15,9 @@ import forpdateam.ru.forpda.ui.fragments.TabFragment
 
 @InjectViewState
 class HistoryPresenter(
-        private val historyRepository: HistoryRepository
+        private val historyRepository: HistoryRepository,
+        private val router: IRouter,
+        private val linkHandler: ILinkHandler
 ) : BasePresenter<HistoryView>() {
 
     override fun onFirstViewAttach() {
@@ -67,9 +69,9 @@ class HistoryPresenter(
     }
 
     fun onItemClick(item: HistoryItem) {
-        val args = Bundle()
-        args.putString(TabFragment.ARG_TITLE, item.title)
-        IntentHandler.handle(item.url, args)
+        linkHandler.handle(item.url, router, mapOf(
+                Screen.ARG_TITLE to  item.title
+        ))
     }
 
     fun onItemLongClick(item: HistoryItem) {

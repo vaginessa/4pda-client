@@ -1,8 +1,6 @@
 package forpdateam.ru.forpda.presentation.topics
 
-import android.os.Bundle
 import com.arellomobile.mvp.InjectViewState
-import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.remote.topics.TopicItem
 import forpdateam.ru.forpda.entity.remote.topics.TopicsData
@@ -10,9 +8,9 @@ import forpdateam.ru.forpda.model.data.remote.api.favorites.FavoritesApi
 import forpdateam.ru.forpda.model.repository.faviorites.FavoritesRepository
 import forpdateam.ru.forpda.model.repository.forum.ForumRepository
 import forpdateam.ru.forpda.model.repository.topics.TopicsRepository
+import forpdateam.ru.forpda.presentation.ILinkHandler
 import forpdateam.ru.forpda.presentation.IRouter
 import forpdateam.ru.forpda.presentation.Screen
-import forpdateam.ru.forpda.ui.fragments.TabFragment
 
 /**
  * Created by radiationx on 03.01.18.
@@ -23,7 +21,8 @@ class TopicsPresenter(
         private val topicsRepository: TopicsRepository,
         private val forumRepository: ForumRepository,
         private val favoritesRepository: FavoritesRepository,
-        private val router: IRouter
+        private val router: IRouter,
+        private val linkHandler: ILinkHandler
 ) : BasePresenter<TopicsView>() {
 
     var id = 0
@@ -100,18 +99,18 @@ class TopicsPresenter(
 
     fun onItemClick(item: TopicItem) {
         if (item.isAnnounce) {
-            val args = Bundle()
-            args.putString(TabFragment.ARG_TITLE, item.title)
-            IntentHandler.handle(item.announceUrl, args)
+            linkHandler.handle(item.announceUrl, router, mapOf(
+                    Screen.ARG_TITLE to item.title
+            ))
             return
         }
         if (item.isForum) {
-            IntentHandler.handle("https://4pda.ru/forum/index.php?showforum=" + item.id)
+            linkHandler.handle("https://4pda.ru/forum/index.php?showforum=${item.id}", router)
             return
         }
-        val args = Bundle()
-        args.putString(TabFragment.ARG_TITLE, item.title)
-        IntentHandler.handle("https://4pda.ru/forum/index.php?showtopic=" + item.id + "&view=getnewpost", args)
+        linkHandler.handle("https://4pda.ru/forum/index.php?showtopic=${item.id}&view=getnewpost", router, mapOf(
+                Screen.ARG_TITLE to item.title
+        ))
     }
 
     fun onItemLongClick(item: TopicItem) {

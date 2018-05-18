@@ -4,7 +4,6 @@ import android.util.Pair
 import com.arellomobile.mvp.InjectViewState
 import forpdateam.ru.forpda.App
 import forpdateam.ru.forpda.R
-import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.Utils
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.remote.IBaseForumPost
@@ -16,6 +15,7 @@ import forpdateam.ru.forpda.model.repository.faviorites.FavoritesRepository
 import forpdateam.ru.forpda.model.repository.reputation.ReputationRepository
 import forpdateam.ru.forpda.model.repository.search.SearchRepository
 import forpdateam.ru.forpda.model.repository.theme.ThemeRepository
+import forpdateam.ru.forpda.presentation.ILinkHandler
 import forpdateam.ru.forpda.presentation.IRouter
 import forpdateam.ru.forpda.presentation.Screen
 import forpdateam.ru.forpda.presentation.theme.IThemePresenter
@@ -27,7 +27,8 @@ class SearchPresenter(
         private val themeRepository: ThemeRepository,
         private val reputationRepository: ReputationRepository,
         private val searchTemplate: SearchTemplate,
-        private val router: IRouter
+        private val router: IRouter,
+        private val linkHandler: ILinkHandler
 ) : BasePresenter<SearchSiteView>(), IThemePresenter {
 
     companion object {
@@ -166,7 +167,7 @@ class SearchPresenter(
                 url += "&view=findpost&p=${item.id}"
             }
         }
-        IntentHandler.handle(url)
+        linkHandler.handle(url, router)
     }
 
     fun onItemLongClick(item: SearchItem) {
@@ -191,19 +192,19 @@ class SearchPresenter(
     }
 
     fun openTopicBegin(item: IBaseForumPost) {
-        IntentHandler.handle("https://4pda.ru/forum/index.php?showtopic=${item.topicId}")
+        linkHandler.handle("https://4pda.ru/forum/index.php?showtopic=${item.topicId}", router)
     }
 
     fun openTopicNew(item: IBaseForumPost) {
-        IntentHandler.handle("https://4pda.ru/forum/index.php?showtopic=${item.topicId}&view=getnewpost")
+        linkHandler.handle("https://4pda.ru/forum/index.php?showtopic=${item.topicId}&view=getnewpost", router)
     }
 
     fun openTopicLast(item: IBaseForumPost) {
-        IntentHandler.handle("https://4pda.ru/forum/index.php?showtopic=${item.topicId}&view=getlastpost")
+        linkHandler.handle("https://4pda.ru/forum/index.php?showtopic=${item.topicId}&view=getlastpost", router)
     }
 
     fun openForum(item: IBaseForumPost) {
-        IntentHandler.handle("https://4pda.ru/forum/index.php?showforum=${item.forumId}")
+        linkHandler.handle("https://4pda.ru/forum/index.php?showforum=${item.forumId}", router)
     }
 
     fun onClickAddInFav(item: IBaseForumPost) {
@@ -313,47 +314,47 @@ class SearchPresenter(
 
     override fun openProfile(postId: Int) {
         getPostById(postId)?.let {
-            IntentHandler.handle("https://4pda.ru/forum/index.php?showuser=${it.userId}")
+            linkHandler.handle("https://4pda.ru/forum/index.php?showuser=${it.userId}", router)
         }
     }
 
     override fun openQms(postId: Int) {
         getPostById(postId)?.let {
-            IntentHandler.handle("https://4pda.ru/forum/index.php?act=qms&amp;mid=${it.userId}")
+            linkHandler.handle("https://4pda.ru/forum/index.php?act=qms&amp;mid=${it.userId}", router)
         }
     }
 
     override fun openSearchUserTopic(postId: Int) {
         getPostById(postId)?.let {
-            IntentHandler.handle(SearchSettings().apply {
+            linkHandler.handle(SearchSettings().apply {
                 source = SearchSettings.SOURCE_ALL.first
                 nick = it.nick
                 result = SearchSettings.RESULT_TOPICS.first
-            }.toUrl())
+            }.toUrl(), router)
         }
     }
 
     override fun openSearchInTopic(postId: Int) {
         getPostById(postId)?.let {
-            IntentHandler.handle(SearchSettings().apply {
+            linkHandler.handle(SearchSettings().apply {
                 addForum(Integer.toString(it.forumId))
                 addTopic(Integer.toString(it.topicId))
                 source = SearchSettings.SOURCE_CONTENT.first
                 nick = it.nick
                 result = SearchSettings.RESULT_POSTS.first
                 subforums = SearchSettings.SUB_FORUMS_FALSE
-            }.toUrl())
+            }.toUrl(), router)
         }
     }
 
     override fun openSearchUserMessages(postId: Int) {
         getPostById(postId)?.let {
-            IntentHandler.handle(SearchSettings().apply {
+            linkHandler.handle(SearchSettings().apply {
                 source = SearchSettings.SOURCE_CONTENT.first
                 nick = it.getNick()
                 result = SearchSettings.RESULT_POSTS.first
                 subforums = SearchSettings.SUB_FORUMS_FALSE
-            }.toUrl())
+            }.toUrl(), router)
         }
     }
 
@@ -389,7 +390,7 @@ class SearchPresenter(
 
     override fun openReputationHistory(postId: Int) {
         getPostById(postId)?.let {
-            IntentHandler.handle("https://4pda.ru/forum/index.php?act=rep&view=history&amp;mid=${it.userId}")
+            linkHandler.handle("https://4pda.ru/forum/index.php?act=rep&view=history&amp;mid=${it.userId}", router)
         }
     }
 

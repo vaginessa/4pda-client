@@ -66,7 +66,11 @@ public class ProfileFragment extends TabFragment implements ProfileAdapter.Click
 
     @ProvidePresenter
     ProfilePresenter providePresenter() {
-        return new ProfilePresenter(App.get().Di().getProfileRepository());
+        return new ProfilePresenter(
+                App.get().Di().getProfileRepository(),
+                App.get().Di().getRouter(),
+                App.get().Di().getLinkHandler()
+        );
     }
 
     public ProfileFragment() {

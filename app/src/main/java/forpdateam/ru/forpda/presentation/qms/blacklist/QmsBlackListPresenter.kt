@@ -1,10 +1,10 @@
 package forpdateam.ru.forpda.presentation.qms.blacklist
 
 import com.arellomobile.mvp.InjectViewState
-import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.remote.qms.QmsContact
 import forpdateam.ru.forpda.model.repository.qms.QmsRepository
+import forpdateam.ru.forpda.presentation.ILinkHandler
 import forpdateam.ru.forpda.presentation.IRouter
 import forpdateam.ru.forpda.presentation.Screen
 
@@ -15,7 +15,8 @@ import forpdateam.ru.forpda.presentation.Screen
 @InjectViewState
 class QmsBlackListPresenter(
         private val qmsRepository: QmsRepository,
-        private val router: IRouter
+        private val router: IRouter,
+        private val linkHandler: ILinkHandler
 ) : BasePresenter<QmsBlackListView>() {
 
 
@@ -78,7 +79,7 @@ class QmsBlackListPresenter(
     }
 
     fun openProfile(item: QmsContact) {
-        IntentHandler.handle("https://4pda.ru/forum/index.php?showuser=${item.id}")
+        linkHandler.handle("https://4pda.ru/forum/index.php?showuser=${item.id}", router)
     }
 
     fun openDialogs(item: QmsContact) {
