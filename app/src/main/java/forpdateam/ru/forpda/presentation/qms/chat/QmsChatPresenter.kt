@@ -1,6 +1,5 @@
 package forpdateam.ru.forpda.presentation.qms.chat
 
-import android.os.Bundle
 import com.arellomobile.mvp.InjectViewState
 import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.mvp.BasePresenter
@@ -13,9 +12,8 @@ import forpdateam.ru.forpda.model.data.remote.api.RequestFile
 import forpdateam.ru.forpda.model.repository.avatar.AvatarRepository
 import forpdateam.ru.forpda.model.repository.events.EventsRepository
 import forpdateam.ru.forpda.model.repository.qms.QmsRepository
-import forpdateam.ru.forpda.ui.TabManager
-import forpdateam.ru.forpda.ui.fragments.TabFragment
-import forpdateam.ru.forpda.ui.fragments.qms.QmsThemesFragment
+import forpdateam.ru.forpda.presentation.IRouter
+import forpdateam.ru.forpda.presentation.Screen
 
 /**
  * Created by radiationx on 11.11.17.
@@ -26,7 +24,8 @@ class QmsChatPresenter(
         private val qmsRepository: QmsRepository,
         private val qmsChatTemplate: QmsChatTemplate,
         private val avatarRepository: AvatarRepository,
-        private val eventsRepository: EventsRepository
+        private val eventsRepository: EventsRepository,
+        private val router: IRouter
 ) : BasePresenter<QmsChatView>(), IQmsChatPresenter {
 
     var themeId = 0
@@ -238,11 +237,11 @@ class QmsChatPresenter(
 
     fun openDialogs() {
         currentData?.let {
-            val args = Bundle()
-            args.putString(TabFragment.ARG_TITLE, it.nick)
-            args.putInt(QmsThemesFragment.USER_ID_ARG, it.userId)
-            args.putString(QmsThemesFragment.USER_AVATAR_ARG, it.avatarUrl)
-            TabManager.get().add(QmsThemesFragment::class.java, args)
+            router.navigateTo(Screen.QmsThemes().apply {
+                screenTitle = it.nick
+                userId = it.userId
+                avatarUrl = it.avatarUrl
+            })
         }
     }
 

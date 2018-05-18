@@ -16,6 +16,8 @@ import forpdateam.ru.forpda.model.repository.faviorites.FavoritesRepository
 import forpdateam.ru.forpda.model.repository.reputation.ReputationRepository
 import forpdateam.ru.forpda.model.repository.search.SearchRepository
 import forpdateam.ru.forpda.model.repository.theme.ThemeRepository
+import forpdateam.ru.forpda.presentation.IRouter
+import forpdateam.ru.forpda.presentation.Screen
 import forpdateam.ru.forpda.presentation.theme.IThemePresenter
 import forpdateam.ru.forpda.ui.TabManager
 import forpdateam.ru.forpda.ui.fragments.editpost.EditPostFragment
@@ -26,7 +28,8 @@ class SearchPresenter(
         private val favoritesRepository: FavoritesRepository,
         private val themeRepository: ThemeRepository,
         private val reputationRepository: ReputationRepository,
-        private val searchTemplate: SearchTemplate
+        private val searchTemplate: SearchTemplate,
+        private val router: IRouter
 ) : BasePresenter<SearchSiteView>(), IThemePresenter {
 
     companion object {
@@ -444,7 +447,13 @@ class SearchPresenter(
             } else {
                 "пост из поиска_";
             }
-            TabManager.get().add(EditPostFragment.newInstance(postId, it.topicId, it.forumId, settings.st, title))
+            router.navigateTo(Screen.EditPost().apply {
+                this.postId = postId
+                topicId = it.topicId
+                forumId = it.forumId
+                st = settings.st
+                themeName = title
+            })
         }
     }
 

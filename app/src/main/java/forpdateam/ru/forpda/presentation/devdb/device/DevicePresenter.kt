@@ -6,6 +6,8 @@ import forpdateam.ru.forpda.common.Utils
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.remote.devdb.Device
 import forpdateam.ru.forpda.model.repository.devdb.DevDbRepository
+import forpdateam.ru.forpda.presentation.IRouter
+import forpdateam.ru.forpda.presentation.Screen
 import forpdateam.ru.forpda.ui.TabManager
 import forpdateam.ru.forpda.ui.fragments.devdb.search.DevDbSearchFragment
 
@@ -15,7 +17,8 @@ import forpdateam.ru.forpda.ui.fragments.devdb.search.DevDbSearchFragment
 
 @InjectViewState
 class DevicePresenter(
-        private val devDbRepository: DevDbRepository
+        private val devDbRepository: DevDbRepository,
+        private val router: IRouter
 ) : BasePresenter<DeviceView>() {
 
     var deviceId: String? = null
@@ -42,7 +45,7 @@ class DevicePresenter(
 
 
     fun openSearch() {
-        TabManager.get().add(DevDbSearchFragment::class.java)
+        router.navigateTo(Screen.DevDbSearch())
     }
 
     fun copyLink() {

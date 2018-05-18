@@ -1,15 +1,13 @@
 package forpdateam.ru.forpda.presentation.qms.themes
 
-import android.os.Bundle
 import com.arellomobile.mvp.InjectViewState
 import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.remote.qms.QmsTheme
 import forpdateam.ru.forpda.entity.remote.qms.QmsThemes
 import forpdateam.ru.forpda.model.repository.qms.QmsRepository
-import forpdateam.ru.forpda.ui.TabManager
-import forpdateam.ru.forpda.ui.fragments.TabFragment
-import forpdateam.ru.forpda.ui.fragments.qms.chat.QmsChatFragment
+import forpdateam.ru.forpda.presentation.IRouter
+import forpdateam.ru.forpda.presentation.Screen
 
 /**
  * Created by radiationx on 11.11.17.
@@ -17,7 +15,8 @@ import forpdateam.ru.forpda.ui.fragments.qms.chat.QmsChatFragment
 
 @InjectViewState
 class QmsThemesPresenter(
-        private val qmsRepository: QmsRepository
+        private val qmsRepository: QmsRepository,
+        private val router: IRouter
 ) : BasePresenter<QmsThemesView>() {
 
     var themesId: Int = 0
@@ -90,11 +89,11 @@ class QmsThemesPresenter(
 
     fun openChat() {
         currentData?.let {
-            val args = Bundle()
-            args.putInt(QmsChatFragment.USER_ID_ARG, it.userId)
-            args.putString(QmsChatFragment.USER_NICK_ARG, it.nick)
-            args.putString(QmsChatFragment.USER_AVATAR_ARG, avatarUrl)
-            TabManager.get().add(QmsChatFragment::class.java, args)
+            router.navigateTo(Screen.QmsChat().apply {
+                userId = it.userId
+                userNick = it.nick
+                avatarUrl = this@QmsThemesPresenter.avatarUrl
+            })
         }
     }
 
@@ -114,14 +113,14 @@ class QmsThemesPresenter(
 
     fun onItemClick(item: QmsTheme) {
         currentData?.let {
-            val args = Bundle()
-            args.putString(TabFragment.ARG_TITLE, item.name)
-            args.putString(TabFragment.TAB_SUBTITLE, it.nick)
-            args.putInt(QmsChatFragment.USER_ID_ARG, it.userId)
-            args.putString(QmsChatFragment.USER_AVATAR_ARG, avatarUrl)
-            args.putInt(QmsChatFragment.THEME_ID_ARG, item.id)
-            args.putString(QmsChatFragment.THEME_TITLE_ARG, item.name)
-            TabManager.get().add(QmsChatFragment::class.java, args)
+            router.navigateTo(Screen.QmsChat().apply {
+                screenTitle = item.name
+                screenSubTitle = it.nick
+                userId = it.userId
+                avatarUrl = this@QmsThemesPresenter.avatarUrl
+                themeId = item.id
+                themeTitle = item.name
+            })
         }
     }
 

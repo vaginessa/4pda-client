@@ -8,6 +8,8 @@ import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.remote.news.NewsItem
 import forpdateam.ru.forpda.model.data.remote.api.news.Constants
 import forpdateam.ru.forpda.model.repository.news.NewsRepository
+import forpdateam.ru.forpda.presentation.IRouter
+import forpdateam.ru.forpda.presentation.Screen
 import forpdateam.ru.forpda.ui.TabManager
 import forpdateam.ru.forpda.ui.fragments.TabFragment
 import forpdateam.ru.forpda.ui.fragments.news.details.NewsDetailsFragment
@@ -19,7 +21,8 @@ import forpdateam.ru.forpda.ui.fragments.search.SearchFragment
 
 @InjectViewState
 class ArticlesListPresenter(
-        private val newsRepository: NewsRepository
+        private val newsRepository: NewsRepository,
+        private val router: IRouter
 ) : BasePresenter<ArticlesListView>() {
     private val category = Constants.NEWS_CATEGORY_ROOT
     private var currentPage = 1
@@ -52,15 +55,14 @@ class ArticlesListPresenter(
     }
 
     fun onItemClick(item: NewsItem) {
-        val args = Bundle()
-        args.putInt(NewsDetailsFragment.ARG_NEWS_ID, item.id)
-        args.putString(NewsDetailsFragment.ARG_NEWS_TITLE, item.title)
-        args.putString(NewsDetailsFragment.ARG_NEWS_AUTHOR_NICK, item.author)
-        args.putString(NewsDetailsFragment.ARG_NEWS_DATE, item.date)
-        args.putString(NewsDetailsFragment.ARG_NEWS_IMAGE, item.imgUrl)
-        args.putInt(NewsDetailsFragment.ARG_NEWS_COMMENTS_COUNT, item.commentsCount)
-        args.putBoolean(NewsDetailsFragment.OTHER_CASE, true)
-        TabManager.get().add(NewsDetailsFragment::class.java, args)
+        router.navigateTo(Screen.ArticleDetail().apply {
+            articleId = item.id
+            articleTitle = item.title
+            articleAuthorNick = item.author
+            articleDate = item.date
+            articleImageUrl = item.imgUrl
+            articleCommentsCount = item.commentsCount
+        })
     }
 
     fun onItemLongClick(item: NewsItem) {
@@ -84,10 +86,9 @@ class ArticlesListPresenter(
         viewState.showCreateNote(item.title, url)
     }
 
-    fun openSearch(){
-        val url = "https://4pda.ru/?s="
-        val args = Bundle()
-        args.putString(TabFragment.ARG_TAB, url)
-        TabManager.get().add(SearchFragment::class.java, args)
+    fun openSearch() {
+        router.navigateTo(Screen.Search().apply {
+            searchUrl = "https://4pda.ru/?s="
+        })
     }
 }

@@ -74,7 +74,8 @@ public class ForumFragment extends TabFragment implements ForumView {
     ForumPresenter providePresenter() {
         return new ForumPresenter(
                 App.get().Di().getForumRepository(),
-                App.get().Di().getFavoritesRepository()
+                App.get().Di().getFavoritesRepository(),
+                App.get().Di().getRouter()
         );
     }
 

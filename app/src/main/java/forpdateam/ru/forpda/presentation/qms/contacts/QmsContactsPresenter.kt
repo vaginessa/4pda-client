@@ -1,15 +1,12 @@
 package forpdateam.ru.forpda.presentation.qms.contacts
 
-import android.os.Bundle
 import com.arellomobile.mvp.InjectViewState
 import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.remote.qms.QmsContact
 import forpdateam.ru.forpda.model.repository.qms.QmsRepository
-import forpdateam.ru.forpda.ui.TabManager
-import forpdateam.ru.forpda.ui.fragments.TabFragment
-import forpdateam.ru.forpda.ui.fragments.qms.QmsBlackListFragment
-import forpdateam.ru.forpda.ui.fragments.qms.QmsThemesFragment
+import forpdateam.ru.forpda.presentation.IRouter
+import forpdateam.ru.forpda.presentation.Screen
 
 /**
  * Created by radiationx on 11.11.17.
@@ -17,7 +14,8 @@ import forpdateam.ru.forpda.ui.fragments.qms.QmsThemesFragment
 
 @InjectViewState
 class QmsContactsPresenter(
-        private val qmsRepository: QmsRepository
+        private val qmsRepository: QmsRepository,
+        private val router: IRouter
 ) : BasePresenter<QmsContactsView>() {
 
     private val localItems = mutableListOf<QmsContact>()
@@ -93,11 +91,11 @@ class QmsContactsPresenter(
     }
 
     fun onItemClick(item: QmsContact) {
-        val args = Bundle()
-        args.putString(TabFragment.ARG_TITLE, item.nick)
-        args.putInt(QmsThemesFragment.USER_ID_ARG, item.id)
-        args.putString(QmsThemesFragment.USER_AVATAR_ARG, item.avatar)
-        TabManager.get().add(QmsThemesFragment::class.java, args)
+        router.navigateTo(Screen.QmsThemes().apply {
+            screenTitle = item.nick
+            userId = item.id
+            avatarUrl = item.avatar
+        })
     }
 
     fun onItemLongClick(item: QmsContact) {
@@ -113,7 +111,7 @@ class QmsContactsPresenter(
         IntentHandler.handle("https://4pda.ru/forum/index.php?showuser=${item.id}")
     }
 
-    fun openBlackList(){
-        TabManager.get().add(QmsBlackListFragment::class.java)
+    fun openBlackList() {
+        router.navigateTo(Screen.QmsBlackList())
     }
 }

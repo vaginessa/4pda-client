@@ -5,6 +5,8 @@ import com.arellomobile.mvp.InjectViewState
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.remote.devdb.Brands
 import forpdateam.ru.forpda.model.repository.devdb.DevDbRepository
+import forpdateam.ru.forpda.presentation.IRouter
+import forpdateam.ru.forpda.presentation.Screen
 import forpdateam.ru.forpda.ui.TabManager
 import forpdateam.ru.forpda.ui.fragments.devdb.brand.DevicesFragment
 import forpdateam.ru.forpda.ui.fragments.devdb.search.DevDbSearchFragment
@@ -15,7 +17,8 @@ import forpdateam.ru.forpda.ui.fragments.devdb.search.DevDbSearchFragment
 
 @InjectViewState
 class BrandsPresenter(
-        private val devDbRepository: DevDbRepository
+        private val devDbRepository: DevDbRepository,
+        private val router: IRouter
 ) : BasePresenter<BrandsView>() {
 
     companion object {
@@ -66,15 +69,15 @@ class BrandsPresenter(
 
     fun openBrand(item: Brands.Item) {
         currentData?.let {
-            val args = Bundle()
-            args.putString(DevicesFragment.ARG_CATEGORY_ID, it.catId)
-            args.putString(DevicesFragment.ARG_BRAND_ID, item.id)
-            TabManager.get().add(DevicesFragment::class.java, args)
+            router.navigateTo(Screen.DevDbDevices().apply {
+                categoryId = it.catId
+                brandId = item.id
+            })
         }
     }
 
     fun openSearch() {
-        TabManager.get().add(DevDbSearchFragment::class.java)
+        router.navigateTo(Screen.DevDbSearch())
     }
 
 }

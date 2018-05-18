@@ -23,6 +23,8 @@ import forpdateam.ru.forpda.model.repository.faviorites.FavoritesRepository
 import forpdateam.ru.forpda.model.repository.posteditor.PostEditorRepository
 import forpdateam.ru.forpda.model.repository.reputation.ReputationRepository
 import forpdateam.ru.forpda.model.repository.theme.ThemeRepository
+import forpdateam.ru.forpda.presentation.IRouter
+import forpdateam.ru.forpda.presentation.Screen
 import forpdateam.ru.forpda.ui.TabManager
 import forpdateam.ru.forpda.ui.activities.imageviewer.ImageViewerActivity
 import forpdateam.ru.forpda.ui.fragments.editpost.EditPostFragment
@@ -43,7 +45,8 @@ class ThemePresenter(
         private val editorRepository: PostEditorRepository,
         private val favoritesRepository: FavoritesRepository,
         private val eventsRepository: EventsRepository,
-        private val themeTemplate: ThemeTemplate
+        private val themeTemplate: ThemeTemplate,
+        private val router: IRouter
 ) : BasePresenter<ThemeView>(), IThemePresenter {
 
     var loadAction = ActionState.NORMAL
@@ -169,14 +172,23 @@ class ThemePresenter(
     fun openEditPostForm(message: String, attachments: MutableList<AttachmentItem>) {
         currentPage?.let { page ->
             createEditPostForm(message, attachments)?.let {
-                TabManager.get().add(EditPostFragment.newInstance(it, page.title))
+                router.navigateTo(Screen.EditPost().apply {
+                    editPostForm = it
+                    themeName = page.title
+                })
             }
         }
     }
 
     fun openEditPostForm(postId: Int) {
         currentPage?.let {
-            TabManager.get().add(EditPostFragment.newInstance(postId, it.id, it.forumId, it.st, it.title))
+            router.navigateTo(Screen.EditPost().apply {
+                this.postId = postId
+                topicId = it.id
+                forumId = it.forumId
+                st = it.st
+                themeName = it.title
+            })
         }
     }
 

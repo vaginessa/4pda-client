@@ -51,7 +51,10 @@ public class QmsThemesFragment extends RecyclerFragment implements QmsThemesAdap
 
     @ProvidePresenter
     QmsThemesPresenter providePresenter() {
-        return new QmsThemesPresenter(App.get().Di().getQmsRepository());
+        return new QmsThemesPresenter(
+                App.get().Di().getQmsRepository(),
+                App.get().Di().getRouter()
+        );
     }
 
     public QmsThemesFragment() {

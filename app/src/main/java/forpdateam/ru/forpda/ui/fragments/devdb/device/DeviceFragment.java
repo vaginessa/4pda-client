@@ -79,7 +79,10 @@ public class DeviceFragment extends TabFragment implements DeviceView {
 
     @ProvidePresenter
     DevicePresenter providePresenter() {
-        return new DevicePresenter(App.get().Di().getDevDbRepository());
+        return new DevicePresenter(
+                App.get().Di().getDevDbRepository(),
+                App.get().Di().getRouter()
+        );
     }
 
     public DeviceFragment() {

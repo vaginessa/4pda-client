@@ -1,5 +1,7 @@
 package forpdateam.ru.forpda.presentation
 
+import forpdateam.ru.forpda.entity.remote.editpost.EditPostForm
+
 sealed class Screen {
     companion object {
         const val ARG_TITLE = "arg_title"
@@ -7,14 +9,15 @@ sealed class Screen {
         private val NO_ID = -1
     }
 
-    var title: String? = null
-    var subTitle: String? = null
+    var screenTitle: String? = null
+    var screenSubTitle: String? = null
 
     /* Activities */
 
-    class Main : Screen(){
+    class Main : Screen() {
         var checkWebView = true
     }
+
     class WebViewNotFound : Screen()
     class UpdateChecker : Screen() {
         var jsonSource: String? = null
@@ -47,11 +50,20 @@ sealed class Screen {
 
     class DevDbSearch : Screen()
 
-    class EditPost : Screen()
+    class EditPost : Screen() {
+        var editPostForm: EditPostForm? = null
+        var postId: Int = NO_ID
+        var topicId: Int = NO_ID
+        var forumId: Int = NO_ID
+        var st: Int = 0
+        var themeName: String? = null
+    }
 
     class Favorites : Screen()
 
-    class Forum : Screen()
+    class Forum : Screen() {
+        var forumId: Int = NO_ID
+    }
 
     class History : Screen()
 
@@ -62,6 +74,11 @@ sealed class Screen {
         var articleId: Int = NO_ID
         var commentId: Int = NO_ID
         var articleUrl: String? = null
+        var articleTitle: String? = null
+        var articleAuthorNick: String? = null
+        var articleDate: String? = null
+        var articleImageUrl: String? = null
+        var articleCommentsCount: Int = 0
     }
 
     class Notes : Screen()
@@ -82,11 +99,15 @@ sealed class Screen {
     class QmsBlackList : Screen()
     class QmsThemes : Screen() {
         var userId: Int = NO_ID
+        var avatarUrl: String? = null
     }
 
     class QmsChat : Screen() {
         var userId: Int = NO_ID
         var themeId: Int = NO_ID
+        var userNick: String? = null
+        var themeTitle: String? = null
+        var avatarUrl: String? = null
     }
 
     class Reputation : Screen() {

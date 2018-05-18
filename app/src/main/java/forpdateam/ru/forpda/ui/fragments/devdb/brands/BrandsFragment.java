@@ -39,7 +39,10 @@ public class BrandsFragment extends RecyclerFragment implements BrandsView, Bran
 
     @ProvidePresenter
     BrandsPresenter providePresenter() {
-        return new BrandsPresenter(App.get().Di().getDevDbRepository());
+        return new BrandsPresenter(
+                App.get().Di().getDevDbRepository(),
+                App.get().Di().getRouter()
+        );
     }
 
     public BrandsFragment() {

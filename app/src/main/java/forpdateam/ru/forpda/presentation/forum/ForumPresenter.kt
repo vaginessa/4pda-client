@@ -8,6 +8,8 @@ import forpdateam.ru.forpda.entity.remote.forum.ForumItemTree
 import forpdateam.ru.forpda.model.data.remote.api.favorites.FavoritesApi
 import forpdateam.ru.forpda.model.repository.faviorites.FavoritesRepository
 import forpdateam.ru.forpda.model.repository.forum.ForumRepository
+import forpdateam.ru.forpda.presentation.IRouter
+import forpdateam.ru.forpda.presentation.Screen
 import forpdateam.ru.forpda.ui.TabManager
 import forpdateam.ru.forpda.ui.fragments.TabFragment
 import forpdateam.ru.forpda.ui.fragments.search.SearchFragment
@@ -20,7 +22,8 @@ import forpdateam.ru.forpda.ui.fragments.topics.TopicsFragment
 @InjectViewState
 class ForumPresenter(
         private val forumRepository: ForumRepository,
-        private val favoritesRepository: FavoritesRepository
+        private val favoritesRepository: FavoritesRepository,
+        private val router: IRouter
 ) : BasePresenter<ForumView>() {
 
     override fun onFirstViewAttach() {
@@ -107,19 +110,18 @@ class ForumPresenter(
     }
 
     fun copyLink(item: ForumItemTree) {
-        Utils.copyToClipBoard("https://4pda.ru/forum/index.php?showforum=" + item.id)
+        Utils.copyToClipBoard("https://4pda.ru/forum/index.php?showforum=${item.id}")
     }
 
     fun navigateToForum(item: ForumItemTree) {
-        val args = Bundle()
-        args.putInt(TopicsFragment.TOPICS_ID_ARG, item.id)
-        TabManager.get().add(TopicsFragment::class.java, args)
+        router.navigateTo(Screen.Topics().apply {
+            forumId = item.id
+        })
     }
 
     fun navigateToSearch(item: ForumItemTree) {
-        val url = "https://4pda.ru/forum/index.php?act=search&source=all&forums%5B%5D=" + item.id
-        val args = Bundle()
-        args.putString(TabFragment.ARG_TAB, url)
-        TabManager.get().add(SearchFragment::class.java, args)
+        router.navigateTo(Screen.Search().apply {
+            searchUrl = "https://4pda.ru/forum/index.php?act=search&source=all&forums%5B%5D=${item.id}"
+        })
     }
 }

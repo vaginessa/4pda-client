@@ -47,7 +47,10 @@ public class QmsBlackListFragment extends RecyclerFragment implements QmsContact
 
     @ProvidePresenter
     QmsBlackListPresenter providePresenter() {
-        return new QmsBlackListPresenter(App.get().Di().getQmsRepository());
+        return new QmsBlackListPresenter(
+                App.get().Di().getQmsRepository(),
+                App.get().Di().getRouter()
+        );
     }
 
     public QmsBlackListFragment() {

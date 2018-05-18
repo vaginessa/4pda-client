@@ -58,7 +58,7 @@ import io.reactivex.schedulers.Schedulers;
 public class TabFragment extends MvpAppCompatFragment {
     private final static String LOG_TAG = TabFragment.class.getSimpleName();
     public final static String ARG_TITLE = "TAB_TITLE";
-    public final static String TAB_SUBTITLE = "TAB_SUBTITLE";
+    public final static String ARG_SUBTITLE = "TAB_SUBTITLE";
     public final static String ARG_TAB = "TAB_URL";
     private final static String BUNDLE_PREFIX = "tab_fragment_";
     private final static String BUNDLE_TITLE = "title";
@@ -296,7 +296,7 @@ public class TabFragment extends MvpAppCompatFragment {
         }
         if (getArguments() != null) {
             title = getArguments().getString(ARG_TITLE);
-            subtitle = getArguments().getString(TAB_SUBTITLE);
+            subtitle = getArguments().getString(ARG_SUBTITLE);
         }
         setHasOptionsMenu(true);
     }

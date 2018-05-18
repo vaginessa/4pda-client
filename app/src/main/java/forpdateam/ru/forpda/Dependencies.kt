@@ -48,6 +48,7 @@ import forpdateam.ru.forpda.model.system.AppNetworkState
 import forpdateam.ru.forpda.model.system.AppSchedulers
 import forpdateam.ru.forpda.model.system.AppTheme
 import forpdateam.ru.forpda.model.system.ExternalStorage
+import forpdateam.ru.forpda.presentation.*
 import forpdateam.ru.forpda.presentation.announce.AnnounceTemplate
 import forpdateam.ru.forpda.presentation.articles.detail.ArticleTemplate
 import forpdateam.ru.forpda.presentation.forumrules.ForumRulesTemplate
@@ -55,6 +56,8 @@ import forpdateam.ru.forpda.presentation.qms.chat.QmsChatTemplate
 import forpdateam.ru.forpda.presentation.search.SearchTemplate
 import forpdateam.ru.forpda.presentation.theme.ThemeTemplate
 import forpdateam.ru.forpda.ui.AppThemeHolder
+import forpdateam.ru.forpda.ui.TabManager
+import forpdateam.ru.forpda.ui.TabManagerProvider
 import forpdateam.ru.forpda.ui.TemplateManager
 
 /**
@@ -64,6 +67,19 @@ import forpdateam.ru.forpda.ui.TemplateManager
 class Dependencies internal constructor(
         context: Context
 ) {
+
+
+    //Todo fix this shit
+    var tabManager: TabManager? = null
+    val router: IRouter = Router(context, object : TabManagerProvider {
+        override fun getTabManager(): TabManager {
+            return tabManager ?: throw NullPointerException("TabManager is null")
+        }
+    })
+
+    val systemLinkHandler: ISystemLinkHandler = SystemLinkHandler()
+    val linkHandler: ILinkHandler = LinkHandler(systemLinkHandler)
+
     val networkState: NetworkStateProvider = AppNetworkState(context)
 
     val schedulers: SchedulersProvider = AppSchedulers()

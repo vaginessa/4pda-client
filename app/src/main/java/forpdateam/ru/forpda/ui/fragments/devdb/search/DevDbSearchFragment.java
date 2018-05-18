@@ -51,7 +51,10 @@ public class DevDbSearchFragment extends TabFragment implements SearchDevicesVie
 
     @ProvidePresenter
     SearchDevicesPresenter providePresenter() {
-        return new SearchDevicesPresenter(App.get().Di().getDevDbRepository());
+        return new SearchDevicesPresenter(
+                App.get().Di().getDevDbRepository(),
+                App.get().Di().getRouter()
+        );
     }
 
     public DevDbSearchFragment() {

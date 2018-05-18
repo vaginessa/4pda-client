@@ -39,7 +39,10 @@ public class NewsMainFragment extends RecyclerFragment implements NewsListAdapte
 
     @ProvidePresenter
     ArticlesListPresenter providePresenter() {
-        return new ArticlesListPresenter(App.get().Di().getNewsRepository());
+        return new ArticlesListPresenter(
+                App.get().Di().getNewsRepository(),
+                App.get().Di().getRouter()
+        );
     }
 
     public NewsMainFragment() {

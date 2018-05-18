@@ -50,7 +50,8 @@ public class TopicsFragment extends RecyclerFragment implements TopicsView {
         return new TopicsPresenter(
                 App.get().Di().getTopicsRepository(),
                 App.get().Di().getForumRepository(),
-                App.get().Di().getFavoritesRepository()
+                App.get().Di().getFavoritesRepository(),
+                App.get().Di().getRouter()
         );
     }
 

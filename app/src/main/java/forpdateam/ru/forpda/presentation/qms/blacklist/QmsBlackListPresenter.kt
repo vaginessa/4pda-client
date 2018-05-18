@@ -1,14 +1,12 @@
 package forpdateam.ru.forpda.presentation.qms.blacklist
 
-import android.os.Bundle
 import com.arellomobile.mvp.InjectViewState
 import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.remote.qms.QmsContact
 import forpdateam.ru.forpda.model.repository.qms.QmsRepository
-import forpdateam.ru.forpda.ui.TabManager
-import forpdateam.ru.forpda.ui.fragments.TabFragment
-import forpdateam.ru.forpda.ui.fragments.qms.QmsThemesFragment
+import forpdateam.ru.forpda.presentation.IRouter
+import forpdateam.ru.forpda.presentation.Screen
 
 /**
  * Created by radiationx on 11.11.17.
@@ -16,7 +14,8 @@ import forpdateam.ru.forpda.ui.fragments.qms.QmsThemesFragment
 
 @InjectViewState
 class QmsBlackListPresenter(
-        private val qmsRepository: QmsRepository
+        private val qmsRepository: QmsRepository,
+        private val router: IRouter
 ) : BasePresenter<QmsBlackListView>() {
 
 
@@ -83,10 +82,10 @@ class QmsBlackListPresenter(
     }
 
     fun openDialogs(item: QmsContact) {
-        val args = Bundle()
-        args.putString(TabFragment.ARG_TITLE, item.nick)
-        args.putInt(QmsThemesFragment.USER_ID_ARG, item.id)
-        args.putString(QmsThemesFragment.USER_AVATAR_ARG, item.avatar)
-        TabManager.get().add(QmsThemesFragment::class.java, args)
+        router.navigateTo(Screen.QmsThemes().apply {
+            screenTitle = item.nick
+            userId = item.id
+            avatarUrl = item.avatar
+        })
     }
 }

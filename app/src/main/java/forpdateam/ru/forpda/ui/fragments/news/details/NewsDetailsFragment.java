@@ -55,7 +55,6 @@ public class NewsDetailsFragment extends TabFragment implements ArticleDetailVie
     public static final String ARG_NEWS_DATE = "ARG_NEWS_DATE";
     public static final String ARG_NEWS_IMAGE = "ARG_NEWS_IMAGE";
 
-    public static final String OTHER_CASE = "news.to.details.other";
 
     private FrameLayout webViewContainer;
     private ViewPager fragmentsPager;
