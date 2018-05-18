@@ -30,25 +30,6 @@ open class BasePresenter<V : MvpView> : MvpPresenter<V>() {
         compositeDisposable.add(this)
     }
 
-    fun <T> subscribe(observable: Observable<T>, onNext: Consumer<T>, onErrorReturn: T) {
-        subscribe(observable, onNext, onErrorReturn, null)
-    }
-
-    fun <T> subscribe(observable: Observable<T>, onNext: Consumer<T>, onErrorReturn: T, onErrorAction: View.OnClickListener?) {
-        observable
-                .onErrorReturn { throwable ->
-                    handleErrorRx(throwable, onErrorAction)
-                    onErrorReturn
-                }
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(onNext, Consumer<Throwable> {
-                    handleErrorRx(it, onErrorAction)
-                })
-                .addToDisposable()
-
-    }
-
     @JvmOverloads
     protected fun handleErrorRx(throwable: Throwable, listener: View.OnClickListener? = null) {
         Handler(Looper.getMainLooper()).post {

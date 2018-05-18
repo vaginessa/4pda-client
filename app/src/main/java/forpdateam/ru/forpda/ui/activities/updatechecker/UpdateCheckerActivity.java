@@ -40,7 +40,7 @@ import io.reactivex.schedulers.Schedulers;
 public class UpdateCheckerActivity extends AppCompatActivity {
     public final static String JSON_LINK = "https://raw.githubusercontent.com/RadiationX/ForPDA/master/check.json";
     public final static String GOOGLE_PLAY_LINK = "https://play.google.com/store/apps/details?id=ru.forpdateam.forpda";
-    public final static String JSON_SOURCE = "json_source";
+    public final static String ARG_JSON_SOURCE = "json_source";
     private Toolbar toolbar;
     private TextView currentInfo;
     private TextView updateInfo;
@@ -81,7 +81,7 @@ public class UpdateCheckerActivity extends AppCompatActivity {
                 .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
         String jsonSource = null;
         if (getIntent() != null) {
-            jsonSource = getIntent().getStringExtra(JSON_SOURCE);
+            jsonSource = getIntent().getStringExtra(ARG_JSON_SOURCE);
 
         }
 

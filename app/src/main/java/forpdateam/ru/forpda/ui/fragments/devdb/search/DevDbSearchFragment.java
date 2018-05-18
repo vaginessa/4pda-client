@@ -38,13 +38,13 @@ import forpdateam.ru.forpda.ui.views.messagepanel.AutoFitRecyclerView;
  * Created by radiationx on 09.11.17.
  */
 
-public class SearchFragment extends TabFragment implements SearchDevicesView, DevicesAdapter.OnItemClickListener<DeviceSearch.DeviceItem> {
+public class DevDbSearchFragment extends TabFragment implements SearchDevicesView, DevicesAdapter.OnItemClickListener<DeviceSearch.DeviceItem> {
     private DevicesAdapter adapter;
     private SwipeRefreshLayout refreshLayout;
     private AutoFitRecyclerView recyclerView;
     private SearchView searchView;
     private MenuItem searchMenuItem;
-    private DynamicDialogMenu<SearchFragment, DeviceSearch.DeviceItem> dialogMenu = new DynamicDialogMenu<>();
+    private DynamicDialogMenu<DevDbSearchFragment, DeviceSearch.DeviceItem> dialogMenu = new DynamicDialogMenu<>();
 
     @InjectPresenter
     SearchDevicesPresenter presenter;
@@ -54,7 +54,7 @@ public class SearchFragment extends TabFragment implements SearchDevicesView, De
         return new SearchDevicesPresenter(App.get().Di().getDevDbRepository());
     }
 
-    public SearchFragment() {
+    public DevDbSearchFragment() {
         configuration.setDefaultTitle("Поиск устройств");
     }
 
@@ -154,7 +154,7 @@ public class SearchFragment extends TabFragment implements SearchDevicesView, De
     public boolean onItemLongClick(DeviceSearch.DeviceItem item) {
         dialogMenu.disallowAll();
         dialogMenu.allowAll();
-        dialogMenu.show(getContext(), SearchFragment.this, item);
+        dialogMenu.show(getContext(), DevDbSearchFragment.this, item);
         return false;
     }
 

@@ -43,7 +43,7 @@ import io.reactivex.schedulers.Schedulers;
 public class MainActivity extends AppCompatActivity implements TabManager.TabListener {
     public final static String LOG_TAG = MainActivity.class.getSimpleName();
     public final static String DEF_TITLE = "ForPDA";
-    public final static String CHECK_WEBVIEW = "CHECK_WEBVIEW";
+    public final static String ARG_CHECK_WEBVIEW = "CHECK_WEBVIEW";
     private WebViewsProvider webViewsProvider;
     private Drawers drawers;
     private DrawerHeader drawerHeader;
@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements TabManager.TabLis
         }
         Intent intent = getIntent();
         if (intent != null) {
-            checkWebView = intent.getBooleanExtra(CHECK_WEBVIEW, checkWebView);
+            checkWebView = intent.getBooleanExtra(ARG_CHECK_WEBVIEW, checkWebView);
         }
         if (checkWebView) {
             Observable

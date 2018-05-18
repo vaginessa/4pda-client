@@ -49,7 +49,7 @@ public class WebVewNotFoundActivity extends AppCompatActivity {
 
         tryStart.setOnClickListener(v -> {
             Intent intent = new Intent(getApplicationContext(), MainActivity.class)
-                    .putExtra(MainActivity.CHECK_WEBVIEW, false);
+                    .putExtra(MainActivity.ARG_CHECK_WEBVIEW, false);
             startActivity(intent);
             finish();
         });

@@ -7,7 +7,7 @@ import forpdateam.ru.forpda.entity.remote.devdb.Brands
 import forpdateam.ru.forpda.model.repository.devdb.DevDbRepository
 import forpdateam.ru.forpda.ui.TabManager
 import forpdateam.ru.forpda.ui.fragments.devdb.brand.DevicesFragment
-import forpdateam.ru.forpda.ui.fragments.devdb.search.SearchFragment
+import forpdateam.ru.forpda.ui.fragments.devdb.search.DevDbSearchFragment
 
 /**
  * Created by radiationx on 11.11.17.
@@ -74,7 +74,7 @@ class BrandsPresenter(
     }
 
     fun openSearch() {
-        TabManager.get().add(SearchFragment::class.java)
+        TabManager.get().add(DevDbSearchFragment::class.java)
     }
 
 }

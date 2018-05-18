@@ -88,7 +88,7 @@ public class SimpleUpdateChecker {
 
             Intent notifyIntent = new Intent(context, UpdateCheckerActivity.class);
             //notifyIntent.setData(Uri.parse(createIntentUrl(notificationEvent)));
-            notifyIntent.putExtra(UpdateCheckerActivity.JSON_SOURCE, jsonSource);
+            notifyIntent.putExtra(UpdateCheckerActivity.ARG_JSON_SOURCE, jsonSource);
             notifyIntent.setAction(Intent.ACTION_VIEW);
             PendingIntent notifyPendingIntent = PendingIntent.getActivity(context, 0, notifyIntent, 0);
             mBuilder.setContentIntent(notifyPendingIntent);
