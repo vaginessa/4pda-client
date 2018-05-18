@@ -7,12 +7,8 @@ import com.arellomobile.mvp.MvpPresenter
 import com.arellomobile.mvp.MvpView
 import forpdateam.ru.forpda.common.ErrorHandler
 import forpdateam.ru.forpda.ui.TabManager
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import io.reactivex.functions.Consumer
-import io.reactivex.schedulers.Schedulers
 import org.acra.ACRA
 
 /**

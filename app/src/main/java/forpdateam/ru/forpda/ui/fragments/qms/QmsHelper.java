@@ -11,7 +11,6 @@ import forpdateam.ru.forpda.entity.db.qms.QmsThemeBd;
 import forpdateam.ru.forpda.entity.db.qms.QmsThemesBd;
 import forpdateam.ru.forpda.entity.remote.events.NotificationEvent;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 import io.realm.Realm;
 import io.realm.RealmResults;
 

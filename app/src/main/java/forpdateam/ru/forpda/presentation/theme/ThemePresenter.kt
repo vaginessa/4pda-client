@@ -25,9 +25,7 @@ import forpdateam.ru.forpda.model.repository.reputation.ReputationRepository
 import forpdateam.ru.forpda.model.repository.theme.ThemeRepository
 import forpdateam.ru.forpda.presentation.IRouter
 import forpdateam.ru.forpda.presentation.Screen
-import forpdateam.ru.forpda.ui.TabManager
 import forpdateam.ru.forpda.ui.activities.imageviewer.ImageViewerActivity
-import forpdateam.ru.forpda.ui.fragments.editpost.EditPostFragment
 import forpdateam.ru.forpda.ui.fragments.theme.ThemeFragmentWeb
 import org.acra.ACRA
 import java.io.UnsupportedEncodingException

@@ -3,7 +3,6 @@ package forpdateam.ru.forpda.presentation
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import forpdateam.ru.forpda.ui.TabManager
 import forpdateam.ru.forpda.ui.TabManagerProvider
 import forpdateam.ru.forpda.ui.activities.MainActivity
 import forpdateam.ru.forpda.ui.activities.SettingsActivity

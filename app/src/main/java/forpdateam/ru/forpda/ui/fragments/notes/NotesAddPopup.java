@@ -1,7 +1,6 @@
 package forpdateam.ru.forpda.ui.fragments.notes;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.support.design.widget.BottomSheetDialog;
 import android.view.View;
 import android.widget.EditText;

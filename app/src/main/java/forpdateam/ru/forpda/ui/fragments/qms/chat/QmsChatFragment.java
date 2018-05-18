@@ -34,7 +34,6 @@ import forpdateam.ru.forpda.common.FilePickHelper;
 import forpdateam.ru.forpda.common.Preferences;
 import forpdateam.ru.forpda.common.webview.CustomWebChromeClient;
 import forpdateam.ru.forpda.common.webview.CustomWebViewClient;
-import forpdateam.ru.forpda.entity.app.TabNotification;
 import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem;
 import forpdateam.ru.forpda.entity.remote.others.user.ForumUser;
 import forpdateam.ru.forpda.entity.remote.qms.QmsChatModel;

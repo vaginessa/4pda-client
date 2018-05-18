@@ -4,8 +4,6 @@ import forpdateam.ru.forpda.entity.remote.editpost.EditPostForm
 
 sealed class Screen {
     companion object {
-        const val ARG_TITLE = "arg_title"
-        const val ARG_SUBTITLE = "arg_subtitle"
         private val NO_ID = -1
     }
 

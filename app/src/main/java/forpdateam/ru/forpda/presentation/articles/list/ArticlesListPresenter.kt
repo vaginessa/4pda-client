@@ -1,6 +1,5 @@
 package forpdateam.ru.forpda.presentation.articles.list
 
-import android.os.Bundle
 import com.arellomobile.mvp.InjectViewState
 import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.Utils
@@ -10,10 +9,6 @@ import forpdateam.ru.forpda.model.data.remote.api.news.Constants
 import forpdateam.ru.forpda.model.repository.news.NewsRepository
 import forpdateam.ru.forpda.presentation.IRouter
 import forpdateam.ru.forpda.presentation.Screen
-import forpdateam.ru.forpda.ui.TabManager
-import forpdateam.ru.forpda.ui.fragments.TabFragment
-import forpdateam.ru.forpda.ui.fragments.news.details.NewsDetailsFragment
-import forpdateam.ru.forpda.ui.fragments.search.SearchFragment
 
 /**
  * Created by radiationx on 11.11.17.

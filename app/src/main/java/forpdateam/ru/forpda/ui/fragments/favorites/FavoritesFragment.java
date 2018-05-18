@@ -30,7 +30,6 @@ import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.Preferences;
-import forpdateam.ru.forpda.entity.app.TabNotification;
 import forpdateam.ru.forpda.entity.remote.favorites.FavData;
 import forpdateam.ru.forpda.entity.remote.favorites.FavItem;
 import forpdateam.ru.forpda.model.data.remote.api.favorites.FavoritesApi;

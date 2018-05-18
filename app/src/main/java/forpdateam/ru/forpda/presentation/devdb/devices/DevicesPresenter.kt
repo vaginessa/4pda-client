@@ -1,6 +1,5 @@
 package forpdateam.ru.forpda.presentation.devdb.devices
 
-import android.os.Bundle
 import com.arellomobile.mvp.InjectViewState
 import forpdateam.ru.forpda.common.Utils
 import forpdateam.ru.forpda.common.mvp.BasePresenter
@@ -8,9 +7,6 @@ import forpdateam.ru.forpda.entity.remote.devdb.Brand
 import forpdateam.ru.forpda.model.repository.devdb.DevDbRepository
 import forpdateam.ru.forpda.presentation.IRouter
 import forpdateam.ru.forpda.presentation.Screen
-import forpdateam.ru.forpda.ui.TabManager
-import forpdateam.ru.forpda.ui.fragments.devdb.device.DeviceFragment
-import forpdateam.ru.forpda.ui.fragments.devdb.search.DevDbSearchFragment
 
 /**
  * Created by radiationx on 11.11.17.

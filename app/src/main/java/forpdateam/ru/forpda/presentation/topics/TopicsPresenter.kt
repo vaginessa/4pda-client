@@ -12,10 +12,7 @@ import forpdateam.ru.forpda.model.repository.forum.ForumRepository
 import forpdateam.ru.forpda.model.repository.topics.TopicsRepository
 import forpdateam.ru.forpda.presentation.IRouter
 import forpdateam.ru.forpda.presentation.Screen
-import forpdateam.ru.forpda.ui.TabManager
 import forpdateam.ru.forpda.ui.fragments.TabFragment
-import forpdateam.ru.forpda.ui.fragments.forum.ForumFragment
-import forpdateam.ru.forpda.ui.fragments.search.SearchFragment
 
 /**
  * Created by radiationx on 03.01.18.

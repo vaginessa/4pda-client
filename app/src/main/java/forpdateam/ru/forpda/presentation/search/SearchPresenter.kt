@@ -19,8 +19,6 @@ import forpdateam.ru.forpda.model.repository.theme.ThemeRepository
 import forpdateam.ru.forpda.presentation.IRouter
 import forpdateam.ru.forpda.presentation.Screen
 import forpdateam.ru.forpda.presentation.theme.IThemePresenter
-import forpdateam.ru.forpda.ui.TabManager
-import forpdateam.ru.forpda.ui.fragments.editpost.EditPostFragment
 
 @InjectViewState
 class SearchPresenter(
