@@ -97,6 +97,12 @@ class TopicsPresenter(
         })
     }
 
+    fun openTopicForum() {
+        currentData?.let {
+            linkHandler.handle("https://4pda.ru/forum/index.php?showforum=${it.id}", router)
+        }
+    }
+
     fun onItemClick(item: TopicItem) {
         if (item.isAnnounce) {
             linkHandler.handle(item.announceUrl, router, mapOf(

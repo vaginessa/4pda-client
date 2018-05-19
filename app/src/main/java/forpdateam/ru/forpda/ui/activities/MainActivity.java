@@ -64,7 +64,8 @@ public class MainActivity extends AppCompatActivity implements TabManager.TabLis
 
     public MainActivity() {
         webViewsProvider = new WebViewsProvider();
-        TabManager.init(this, this);
+        TabManager tabManager = TabManager.init(this, this);
+        App.get().Di().setTabManager(tabManager);
     }
 
 
@@ -103,10 +104,10 @@ public class MainActivity extends AppCompatActivity implements TabManager.TabLis
         toggle.syncState();
 
         /*
-        * Т.к. 2 вьюхи, делаю цвет в 2 раза прозрачнее, чтобы компенсировать это.
-        * P.S. Чем больше вьюх в DrawerLayout находятся до NavigationView, тем сильнее будет затенение
-        * P.S.S. Первая вьюха - контейнер фрагментов, вторая - view_for_measure
-        * */
+         * Т.к. 2 вьюхи, делаю цвет в 2 раза прозрачнее, чтобы компенсировать это.
+         * P.S. Чем больше вьюх в DrawerLayout находятся до NavigationView, тем сильнее будет затенение
+         * P.S.S. Первая вьюха - контейнер фрагментов, вторая - view_for_measure
+         * */
         drawerLayout.setScrimColor(0x4C000000);
         drawers = new Drawers(this, drawerLayout);
         drawers.init(savedInstanceState);

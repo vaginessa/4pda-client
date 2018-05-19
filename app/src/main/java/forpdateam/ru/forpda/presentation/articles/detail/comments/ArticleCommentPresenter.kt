@@ -4,6 +4,8 @@ import com.arellomobile.mvp.InjectViewState
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.remote.news.Comment
 import forpdateam.ru.forpda.model.interactors.news.ArticleInteractor
+import forpdateam.ru.forpda.presentation.ILinkHandler
+import forpdateam.ru.forpda.presentation.IRouter
 import java.util.*
 
 /**
@@ -12,7 +14,9 @@ import java.util.*
 
 @InjectViewState
 class ArticleCommentPresenter(
-        private val articleInteractor: ArticleInteractor
+        private val articleInteractor: ArticleInteractor,
+        private val router: IRouter,
+        private val linkHandler: ILinkHandler
 ) : BasePresenter<ArticleCommentView>() {
 
     private var firstShow: Boolean = true
@@ -85,5 +89,8 @@ class ArticleCommentPresenter(
         }
     }
 
+    fun openProfile(comment: Comment) {
+        linkHandler.handle("https://4pda.ru/forum/index.php?showuser=${comment.userId}", router);
+    }
 
 }

@@ -43,6 +43,10 @@ class LinkHandler(
         })
     }
 
+    override fun handle(inputUrl: String?, router: IRouter?): Boolean {
+        return handle(inputUrl, router, emptyMap())
+    }
+
     override fun handle(inputUrl: String?, router: IRouter?, args: Map<String, String>): Boolean {
         var url = inputUrl.orEmpty()
         if (url.isBlank() || url == "#") {

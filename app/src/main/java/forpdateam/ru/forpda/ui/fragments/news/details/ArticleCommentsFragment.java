@@ -74,7 +74,11 @@ public class ArticleCommentsFragment extends MvpAppCompatFragment implements Art
 
     @ProvidePresenter
     ArticleCommentPresenter providePresenter() {
-        return new ArticleCommentPresenter(interactor);
+        return new ArticleCommentPresenter(
+                interactor,
+                App.get().Di().getRouter(),
+                App.get().Di().getLinkHandler()
+        );
     }
 
     public ArticleCommentsFragment setInteractor(ArticleInteractor interactor) {
@@ -146,7 +150,7 @@ public class ArticleCommentsFragment extends MvpAppCompatFragment implements Art
 
     @Override
     public void onNickClick(Comment comment, int position) {
-        IntentHandler.handle("https://4pda.ru/forum/index.php?showuser=" + comment.getUserId());
+        presenter.openProfile(comment);
     }
 
     @Override

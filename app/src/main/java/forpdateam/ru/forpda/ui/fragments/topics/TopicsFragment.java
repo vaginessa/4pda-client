@@ -16,6 +16,8 @@ import android.widget.Toast;
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.arellomobile.mvp.presenter.ProvidePresenter;
 
+import org.jetbrains.annotations.NotNull;
+
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.client.ClientHelper;
@@ -92,7 +94,7 @@ public class TopicsFragment extends RecyclerFragment implements TopicsView {
             Utils.copyToClipBoard(url);
         });
         dialogMenu.addItem(getString(R.string.open_theme_forum), (context, data1) -> {
-            IntentHandler.handle("https://4pda.ru/forum/index.php?showforum=" + presenter.getCurrentData().getId());
+            presenter.openTopicForum();
         });
         dialogMenu.addItem(getString(R.string.add_to_favorites), ((context, data1) -> {
             if (data1.isForum()) {
@@ -112,15 +114,8 @@ public class TopicsFragment extends RecyclerFragment implements TopicsView {
     }
 
     @Override
-    public void showTopics(TopicsData data) {
+    public void showTopics(@NotNull TopicsData data) {
         setTitle(data.getTitle());
-        refreshList(data);
-        paginationHelper.updatePagination(data.getPagination());
-        setSubtitle(paginationHelper.getTitle());
-        listScrollTop();
-    }
-
-    private void refreshList(TopicsData data) {
         adapter.clear();
         if (!data.getForumItems().isEmpty())
             adapter.addSection(getString(R.string.forum_section), data.getForumItems());
@@ -130,6 +125,9 @@ public class TopicsFragment extends RecyclerFragment implements TopicsView {
             adapter.addSection(getString(R.string.pinned_section), data.getPinnedItems());
         adapter.addSection(getString(R.string.themes_section), data.getTopicItems());
         adapter.notifyDataSetChanged();
+        paginationHelper.updatePagination(data.getPagination());
+        setSubtitle(paginationHelper.getTitle());
+        listScrollTop();
     }
 
     public void markRead(int topicId) {
