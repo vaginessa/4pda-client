@@ -36,18 +36,18 @@ class LinkHandler(
         systemLinkHandler.handle(url)
     }
 
-    private fun navigateTo(screen: Screen, router: IRouter?, args: Map<String, String>) {
+    private fun navigateTo(screen: Screen, router: TabRouter?, args: Map<String, String>) {
         router?.navigateTo(screen.apply {
             args[Screen.ARG_TITLE]?.let { screen.screenTitle = it }
             args[Screen.ARG_SUBTITLE]?.let { screen.screenSubTitle = it }
         })
     }
 
-    override fun handle(inputUrl: String?, router: IRouter?): Boolean {
+    override fun handle(inputUrl: String?, router: TabRouter?): Boolean {
         return handle(inputUrl, router, emptyMap())
     }
 
-    override fun handle(inputUrl: String?, router: IRouter?, args: Map<String, String>): Boolean {
+    override fun handle(inputUrl: String?, router: TabRouter?, args: Map<String, String>): Boolean {
         var url = inputUrl.orEmpty()
         if (url.isBlank() || url == "#") {
             return false
@@ -102,7 +102,7 @@ class LinkHandler(
         return null
     }
 
-    private fun handleForum(uri: Uri, router: IRouter?, args: Map<String, String>): Boolean {
+    private fun handleForum(uri: Uri, router: TabRouter?, args: Map<String, String>): Boolean {
         uri.getQueryParameter("showuser")?.also { param ->
             navigateTo(Screen.Profile().apply {
                 profileUrl = uri.toString()
@@ -194,7 +194,7 @@ class LinkHandler(
         return false
     }
 
-    private fun handleSite(uri: Uri, router: IRouter?, args: Map<String, String>): Boolean {
+    private fun handleSite(uri: Uri, router: TabRouter?, args: Map<String, String>): Boolean {
         val matcher = sitePattern.matcher(uri.toString())
         if (matcher.find()) {
             navigateTo(Screen.ArticleDetail().apply {
@@ -222,7 +222,7 @@ class LinkHandler(
         return false
     }
 
-    private fun handlePages(uri: Uri, router: IRouter?, args: Map<String, String>): Boolean {
+    private fun handlePages(uri: Uri, router: TabRouter?, args: Map<String, String>): Boolean {
         if (uri.pathSegments.size > 1 && uri.pathSegments[1].equals("go", ignoreCase = true)) {
             uri.getQueryParameter("u")?.let {
                 try {
@@ -238,7 +238,7 @@ class LinkHandler(
         return false
     }
 
-    private fun handleDevDb(uri: Uri, router: IRouter?, args: Map<String, String>): Boolean {
+    private fun handleDevDb(uri: Uri, router: TabRouter?, args: Map<String, String>): Boolean {
         if (uri.pathSegments.size > 1) {
             if (uri.pathSegments[1].matches("phones|pad|ebook|smartwatch".toRegex())) {
                 if (uri.pathSegments.size > 2 && !uri.pathSegments[2].matches("new|select".toRegex())) {
@@ -264,7 +264,7 @@ class LinkHandler(
         }
     }
 
-    private fun handleMedia(url: String, router: IRouter?, args: Map<String, String>): Boolean {
+    private fun handleMedia(url: String, router: TabRouter?, args: Map<String, String>): Boolean {
         val matcher = forumMediaPattern.matcher(url)
         if (matcher.find()) {
             var fullName = matcher.group(1)

@@ -16,8 +16,8 @@ import forpdateam.ru.forpda.model.repository.reputation.ReputationRepository
 import forpdateam.ru.forpda.model.repository.search.SearchRepository
 import forpdateam.ru.forpda.model.repository.theme.ThemeRepository
 import forpdateam.ru.forpda.presentation.ILinkHandler
-import forpdateam.ru.forpda.presentation.IRouter
 import forpdateam.ru.forpda.presentation.Screen
+import forpdateam.ru.forpda.presentation.TabRouter
 import forpdateam.ru.forpda.presentation.theme.IThemePresenter
 
 @InjectViewState
@@ -27,7 +27,7 @@ class SearchPresenter(
         private val themeRepository: ThemeRepository,
         private val reputationRepository: ReputationRepository,
         private val searchTemplate: SearchTemplate,
-        private val router: IRouter,
+        private val router: TabRouter,
         private val linkHandler: ILinkHandler
 ) : BasePresenter<SearchSiteView>(), IThemePresenter {
 

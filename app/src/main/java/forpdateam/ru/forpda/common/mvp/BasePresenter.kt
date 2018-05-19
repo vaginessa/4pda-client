@@ -3,8 +3,10 @@ package forpdateam.ru.forpda.common.mvp
 import android.os.Handler
 import android.os.Looper
 import android.view.View
+import android.widget.Toast
 import com.arellomobile.mvp.MvpPresenter
 import com.arellomobile.mvp.MvpView
+import forpdateam.ru.forpda.App
 import forpdateam.ru.forpda.common.ErrorHandler
 import forpdateam.ru.forpda.ui.TabManager
 import io.reactivex.disposables.CompositeDisposable
@@ -28,14 +30,7 @@ open class BasePresenter<V : MvpView> : MvpPresenter<V>() {
 
     @JvmOverloads
     protected fun handleErrorRx(throwable: Throwable, listener: View.OnClickListener? = null) {
-        Handler(Looper.getMainLooper()).post {
-            val tabFragment = TabManager.get().active
-            if (tabFragment == null) {
-                throwable.printStackTrace()
-                ACRA.getErrorReporter().handleException(throwable)
-            } else {
-                ErrorHandler.handle(tabFragment, throwable, listener)
-            }
-        }
+        throwable.printStackTrace()
+        Toast.makeText(App.getContext(), "HandleErrorRx: ${throwable.message}", Toast.LENGTH_SHORT).show()
     }
 }

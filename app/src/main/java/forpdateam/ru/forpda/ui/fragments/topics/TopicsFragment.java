@@ -21,7 +21,6 @@ import org.jetbrains.annotations.NotNull;
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.client.ClientHelper;
-import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.common.Utils;
 import forpdateam.ru.forpda.entity.remote.topics.TopicItem;
 import forpdateam.ru.forpda.entity.remote.topics.TopicsData;

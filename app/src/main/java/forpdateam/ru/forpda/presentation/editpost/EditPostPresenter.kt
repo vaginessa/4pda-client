@@ -2,10 +2,14 @@ package forpdateam.ru.forpda.presentation.editpost
 
 import com.arellomobile.mvp.InjectViewState
 import forpdateam.ru.forpda.common.mvp.BasePresenter
+import forpdateam.ru.forpda.entity.app.EditPostSyncData
 import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem
 import forpdateam.ru.forpda.entity.remote.editpost.EditPostForm
+import forpdateam.ru.forpda.entity.remote.theme.ThemePage
 import forpdateam.ru.forpda.model.data.remote.api.RequestFile
 import forpdateam.ru.forpda.model.repository.posteditor.PostEditorRepository
+import forpdateam.ru.forpda.presentation.Screen
+import forpdateam.ru.forpda.presentation.TabRouter
 import forpdateam.ru.forpda.presentation.theme.ThemeTemplate
 
 /**
@@ -15,7 +19,8 @@ import forpdateam.ru.forpda.presentation.theme.ThemeTemplate
 @InjectViewState
 class EditPostPresenter(
         private val editorRepository: PostEditorRepository,
-        private val themeTemplate: ThemeTemplate
+        private val themeTemplate: ThemeTemplate,
+        private val router: TabRouter
 ) : BasePresenter<EditPostView>() {
 
     private val postForm = EditPostForm()
@@ -110,4 +115,21 @@ class EditPostPresenter(
         viewState.sendMessage()
     }
 
+    fun exit() {
+        router.exit()
+    }
+
+    fun exitWithSync(message: String, intArray: IntArray, attachments: List<AttachmentItem>) {
+        router.exitWithResult(Screen.Theme.CODE_RESULT_SYNC, EditPostSyncData().also {
+            it.topicId = postForm.topicId
+            it.message = message
+            it.selectionStart = intArray[0]
+            it.selectionEnd = intArray[1]
+            it.attachments = attachments
+        })
+    }
+
+    fun exitWithPage(page: ThemePage) {
+        router.exitWithResult(Screen.Theme.CODE_RESULT_PAGE, page)
+    }
 }

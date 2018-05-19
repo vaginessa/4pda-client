@@ -8,11 +8,9 @@ import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.net.Uri
 import android.os.Environment
 import android.support.v7.app.AlertDialog
-import android.util.Log
 import android.widget.Toast
 import forpdateam.ru.forpda.App
 import forpdateam.ru.forpda.R
-import forpdateam.ru.forpda.common.IntentHandler
 import forpdateam.ru.forpda.common.MimeTypeUtil
 import forpdateam.ru.forpda.common.Preferences
 import forpdateam.ru.forpda.common.Utils

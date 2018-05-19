@@ -20,6 +20,7 @@ import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.Preferences;
+import forpdateam.ru.forpda.presentation.TabRouter;
 import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.activities.MainActivity;
 import forpdateam.ru.forpda.ui.activities.SettingsActivity;
@@ -58,6 +59,8 @@ public class Drawers {
     private Button tabCloseAllButton;
 
     boolean isFirstSelected = false;
+
+    private TabRouter router = App.get().Di().getRouter();
 
     private Observer loginObserver = (observable, o) -> {
         if (o == null) o = false;
@@ -421,17 +424,7 @@ public class Drawers {
                 .setMessage(R.string.ask_close_other_tabs)
                 .setPositiveButton(R.string.ok, (dialog, which) -> {
                     closeTabs();
-                    List<TabFragment> fragmentList = new ArrayList<>();
-
-                    for (TabFragment fragment : TabManager.get().getFragments()) {
-                        if (!fragment.getTag().equals(TabManager.getActiveTag())) {
-                            fragmentList.add(fragment);
-                        }
-                    }
-
-                    for (TabFragment fragment : fragmentList) {
-                        TabManager.get().remove(fragment);
-                    }
+                    router.exitOthers();
                 })
                 .setNegativeButton(R.string.no, null)
                 .show();

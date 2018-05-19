@@ -48,6 +48,7 @@ import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.FilePickHelper;
 import forpdateam.ru.forpda.common.Preferences;
+import forpdateam.ru.forpda.entity.app.EditPostSyncData;
 import forpdateam.ru.forpda.entity.app.TabNotification;
 import forpdateam.ru.forpda.entity.remote.IBaseForumPost;
 import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem;
@@ -343,9 +344,7 @@ public abstract class ThemeFragment extends TabFragment implements ThemeView {
         if ((messagePanel.getMessage() != null && !messagePanel.getMessage().isEmpty()) || !messagePanel.getAttachments().isEmpty()) {
             new AlertDialog.Builder(getContext())
                     .setMessage(R.string.editpost_lose_changes)
-                    .setPositiveButton(R.string.ok, (dialog, which) -> {
-                        TabManager.get().remove(ThemeFragment.this);
-                    })
+                    .setPositiveButton(R.string.ok, (dialog, which) -> presenter.exit())
                     .setNegativeButton(R.string.no, null)
                     .show();
             return true;
@@ -394,10 +393,13 @@ public abstract class ThemeFragment extends TabFragment implements ThemeView {
 
         int topicId = themePage.getId();
 
-        TabFragment parentTab = TabManager.get().get(getParentTag());
+        //todo add fav update mark
+        /*TabFragment parentTab = TabManager.get().get(getParentTag());
         if (parentTab == null) {
             parentTab = TabManager.get().getByClass(FavoritesFragment.class);
-        }
+        }*/
+
+        TabFragment parentTab = null == null ? null : null;
 
         if (parentTab == null)
             return;
@@ -655,6 +657,13 @@ public abstract class ThemeFragment extends TabFragment implements ThemeView {
      * EDIT POST FUNCTIONS
      *
      * */
+
+    @Override
+    public void syncEditPost(@NotNull EditPostSyncData data) {
+        getMessagePanel().setText(data.getMessage());
+        getMessagePanel().getMessageField().setSelection(data.getSelectionStart(), data.getSelectionEnd());
+        getAttachmentsPopup().setAttachments(data.getAttachments());
+    }
 
     public MessagePanel getMessagePanel() {
         return messagePanel;

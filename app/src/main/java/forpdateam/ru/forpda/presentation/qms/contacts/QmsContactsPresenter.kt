@@ -5,8 +5,8 @@ import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.remote.qms.QmsContact
 import forpdateam.ru.forpda.model.repository.qms.QmsRepository
 import forpdateam.ru.forpda.presentation.ILinkHandler
-import forpdateam.ru.forpda.presentation.IRouter
 import forpdateam.ru.forpda.presentation.Screen
+import forpdateam.ru.forpda.presentation.TabRouter
 
 /**
  * Created by radiationx on 11.11.17.
@@ -15,7 +15,7 @@ import forpdateam.ru.forpda.presentation.Screen
 @InjectViewState
 class QmsContactsPresenter(
         private val qmsRepository: QmsRepository,
-        private val router: IRouter,
+        private val router: TabRouter,
         private val linkHandler: ILinkHandler
 ) : BasePresenter<QmsContactsView>() {
 
@@ -114,5 +114,9 @@ class QmsContactsPresenter(
 
     fun openBlackList() {
         router.navigateTo(Screen.QmsBlackList())
+    }
+
+    fun openChatCreator(){
+        router.navigateTo(Screen.QmsChat())
     }
 }

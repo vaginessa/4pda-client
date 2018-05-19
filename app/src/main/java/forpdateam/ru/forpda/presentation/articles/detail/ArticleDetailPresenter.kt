@@ -6,7 +6,7 @@ import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.remote.news.DetailsPage
 import forpdateam.ru.forpda.model.interactors.news.ArticleInteractor
 import forpdateam.ru.forpda.presentation.ILinkHandler
-import forpdateam.ru.forpda.presentation.IRouter
+import forpdateam.ru.forpda.presentation.TabRouter
 
 /**
  * Created by radiationx on 11.11.17.
@@ -15,7 +15,7 @@ import forpdateam.ru.forpda.presentation.IRouter
 @InjectViewState
 class ArticleDetailPresenter(
         private val articleInteractor: ArticleInteractor,
-        private val router: IRouter,
+        private val router: TabRouter,
         private val linkHandler: ILinkHandler
 ) : BasePresenter<ArticleDetailView>() {
 

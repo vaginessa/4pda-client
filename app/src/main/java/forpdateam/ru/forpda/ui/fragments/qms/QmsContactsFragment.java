@@ -88,7 +88,7 @@ public class QmsContactsFragment extends RecyclerFragment implements QmsContacts
 
 
         fab.setImageDrawable(App.getVecDrawable(getContext(), R.drawable.ic_fab_create));
-        fab.setOnClickListener(view1 -> TabManager.get().add(QmsChatFragment.class));
+        fab.setOnClickListener(view1 -> presenter.openChatCreator());
         fab.setVisibility(View.VISIBLE);
 
 

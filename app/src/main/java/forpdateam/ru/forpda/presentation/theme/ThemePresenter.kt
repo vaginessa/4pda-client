@@ -7,6 +7,7 @@ import forpdateam.ru.forpda.App
 import forpdateam.ru.forpda.R
 import forpdateam.ru.forpda.common.Utils
 import forpdateam.ru.forpda.common.mvp.BasePresenter
+import forpdateam.ru.forpda.entity.app.EditPostSyncData
 import forpdateam.ru.forpda.entity.app.TabNotification
 import forpdateam.ru.forpda.entity.remote.IBaseForumPost
 import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem
@@ -23,8 +24,8 @@ import forpdateam.ru.forpda.model.repository.posteditor.PostEditorRepository
 import forpdateam.ru.forpda.model.repository.reputation.ReputationRepository
 import forpdateam.ru.forpda.model.repository.theme.ThemeRepository
 import forpdateam.ru.forpda.presentation.ILinkHandler
-import forpdateam.ru.forpda.presentation.IRouter
 import forpdateam.ru.forpda.presentation.Screen
+import forpdateam.ru.forpda.presentation.TabRouter
 import forpdateam.ru.forpda.ui.activities.imageviewer.ImageViewerActivity
 import forpdateam.ru.forpda.ui.fragments.theme.ThemeFragmentWeb
 import org.acra.ACRA
@@ -44,7 +45,7 @@ class ThemePresenter(
         private val favoritesRepository: FavoritesRepository,
         private val eventsRepository: EventsRepository,
         private val themeTemplate: ThemeTemplate,
-        private val router: IRouter,
+        private val router: TabRouter,
         private val linkHandler: ILinkHandler
 ) : BasePresenter<ThemeView>(), IThemePresenter {
 
@@ -62,6 +63,16 @@ class ThemePresenter(
                 }
                 .addToDisposable()
         loadUrl(themeUrl)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        router.removeResultListener(Screen.Theme.CODE_RESULT_SYNC)
+        router.removeResultListener(Screen.Theme.CODE_RESULT_PAGE)
+    }
+
+    fun exit() {
+        router.exit()
     }
 
     private fun handleEvent(event: TabNotification) {
@@ -175,6 +186,21 @@ class ThemePresenter(
                     editPostForm = it
                     themeName = page.title
                 })
+                router.setResultListener(Screen.Theme.CODE_RESULT_SYNC, {
+                    router.removeResultListener(Screen.Theme.CODE_RESULT_SYNC)
+                    (it as? EditPostSyncData?)?.let {
+                        if (it.topicId == page.id) {
+                            viewState.syncEditPost(it)
+                        }
+                    }
+                })
+                router.setResultListener(Screen.Theme.CODE_RESULT_PAGE, {
+                    router.removeResultListener(Screen.Theme.CODE_RESULT_PAGE)
+                    (it as? ThemePage?)?.let {
+                        viewState.onMessageSent()
+                        onLoadData(it)
+                    }
+                })
             }
         }
     }
@@ -187,6 +213,10 @@ class ThemePresenter(
                 forumId = it.forumId
                 st = it.st
                 themeName = it.title
+            })
+            router.setResultListener(Screen.Theme.CODE_RESULT_PAGE, {
+                router.removeResultListener(Screen.Theme.CODE_RESULT_PAGE)
+                (it as? ThemePage?)?.let { onLoadData(it) }
             })
         }
     }

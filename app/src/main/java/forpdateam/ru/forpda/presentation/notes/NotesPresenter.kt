@@ -6,7 +6,7 @@ import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.app.notes.NoteItem
 import forpdateam.ru.forpda.model.repository.note.NotesRepository
 import forpdateam.ru.forpda.presentation.ILinkHandler
-import forpdateam.ru.forpda.presentation.IRouter
+import forpdateam.ru.forpda.presentation.TabRouter
 
 /**
  * Created by radiationx on 11.11.17.
@@ -15,7 +15,7 @@ import forpdateam.ru.forpda.presentation.IRouter
 @InjectViewState
 class NotesPresenter(
         private val notesRepository: NotesRepository,
-        private val router: IRouter,
+        private val router: TabRouter,
         private val linkHandler: ILinkHandler
 ) : BasePresenter<NotesView>() {
 

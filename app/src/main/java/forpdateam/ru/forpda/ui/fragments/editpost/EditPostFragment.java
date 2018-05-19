@@ -59,7 +59,8 @@ public class EditPostFragment extends TabFragment implements EditPostView {
     EditPostPresenter providePresenter() {
         return new EditPostPresenter(
                 App.get().Di().getEditPostRepository(),
-                App.get().Di().getThemeTemplate()
+                App.get().Di().getThemeTemplate(),
+                App.get().Di().getRouter()
         );
     }
 
@@ -172,10 +173,8 @@ public class EditPostFragment extends TabFragment implements EditPostView {
         }
 
         //Синхронизация с полем в фрагменте темы
-        TabFragment fragment = TabManager.get().get(getParentTag());
-        if (fragment != null && fragment instanceof ThemeFragment) {
-            ThemeFragment themeFragment = (ThemeFragment) fragment;
-            showSyncDialog(themeFragment);
+        if (formType == EditPostForm.TYPE_NEW_POST) {
+            showSyncDialog();
             return true;
         }
         return false;
@@ -201,7 +200,7 @@ public class EditPostFragment extends TabFragment implements EditPostView {
     public void showForm(@NotNull EditPostForm form) {
         if (form.getErrorCode() != EditPostForm.ERROR_NONE) {
             Toast.makeText(getContext(), R.string.editpost_error_edit, Toast.LENGTH_SHORT).show();
-            TabManager.get().remove(EditPostFragment.this);
+            presenter.exit();
             return;
         }
 
@@ -238,16 +237,7 @@ public class EditPostFragment extends TabFragment implements EditPostView {
 
     @Override
     public void onPostSend(@NotNull ThemePage page, @NotNull EditPostForm form) {
-        TabFragment fragment = TabManager.get().get(getParentTag());
-        if (fragment != null && fragment instanceof ThemeFragment) {
-            ThemeFragment themeFragment = (ThemeFragment) fragment;
-            if (form.getType() == EditPostForm.TYPE_EDIT_POST) {
-                themeFragment.onEditPostCompleted(page);
-            } else {
-                themeFragment.onSendPostCompleted(page);
-            }
-        }
-        TabManager.get().remove(EditPostFragment.this);
+        presenter.exitWithPage(page);
     }
 
 
@@ -293,9 +283,7 @@ public class EditPostFragment extends TabFragment implements EditPostView {
         if (formType == EditPostForm.TYPE_EDIT_POST) {
             new AlertDialog.Builder(getContext())
                     .setMessage(R.string.editpost_lose_changes)
-                    .setPositiveButton(R.string.ok, (dialog, which) -> {
-                        TabManager.get().remove(EditPostFragment.this);
-                    })
+                    .setPositiveButton(R.string.ok, (dialog, which) -> presenter.exit())
                     .setNegativeButton(R.string.no, null)
                     .show();
             return true;
@@ -303,19 +291,20 @@ public class EditPostFragment extends TabFragment implements EditPostView {
         return false;
     }
 
-    private void showSyncDialog(ThemeFragment themeFragment) {
+    private void showSyncDialog() {
         new AlertDialog.Builder(getContext())
                 .setMessage(R.string.editpost_sync)
                 .setPositiveButton(R.string.ok, (dialog, which) -> {
-                    themeFragment.getMessagePanel().setText(messagePanel.getMessage());
                     int[] selectionRange = messagePanel.getSelectionRange();
-                    themeFragment.getMessagePanel().getMessageField().setSelection(selectionRange[0], selectionRange[1]);
-                    themeFragment.getAttachmentsPopup().setAttachments(messagePanel.getAttachments());
-                    TabManager.get().remove(EditPostFragment.this);
+                    presenter.exitWithSync(
+                            messagePanel.getMessage(),
+                            selectionRange,
+                            messagePanel.getAttachments()
+                    );
                 })
                 .setNegativeButton(R.string.no, ((dialog, which) -> {
                     if (!showExitDialog()) {
-                        TabManager.get().remove(EditPostFragment.this);
+                        presenter.exit();
                     }
                 }))
                 .show();

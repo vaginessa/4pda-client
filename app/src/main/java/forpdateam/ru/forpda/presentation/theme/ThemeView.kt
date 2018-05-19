@@ -1,6 +1,7 @@
 package forpdateam.ru.forpda.presentation.theme
 
 import forpdateam.ru.forpda.common.mvp.IBaseView
+import forpdateam.ru.forpda.entity.app.EditPostSyncData
 import forpdateam.ru.forpda.entity.app.TabNotification
 import forpdateam.ru.forpda.entity.remote.IBaseForumPost
 import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem
@@ -11,6 +12,8 @@ import forpdateam.ru.forpda.entity.remote.theme.ThemePage
  */
 
 interface ThemeView : IBaseView {
+
+    fun syncEditPost(data: EditPostSyncData)
 
     fun onEventNew(event: TabNotification)
     fun onEventRead(event: TabNotification)

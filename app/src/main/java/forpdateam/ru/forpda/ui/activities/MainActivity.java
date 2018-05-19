@@ -30,6 +30,7 @@ import forpdateam.ru.forpda.common.Preferences;
 import forpdateam.ru.forpda.common.webview.WebViewsProvider;
 import forpdateam.ru.forpda.notifications.NotificationsService;
 import forpdateam.ru.forpda.ui.TabManager;
+import forpdateam.ru.forpda.ui.TabNavigator;
 import forpdateam.ru.forpda.ui.activities.updatechecker.SimpleUpdateChecker;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import forpdateam.ru.forpda.ui.views.KeyboardUtil;
@@ -38,9 +39,10 @@ import forpdateam.ru.forpda.ui.views.drawers.Drawers;
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-public class MainActivity extends AppCompatActivity implements TabManager.TabListener {
+public class MainActivity extends AppCompatActivity {
     public final static String LOG_TAG = MainActivity.class.getSimpleName();
     public final static String DEF_TITLE = "ForPDA";
     public final static String ARG_CHECK_WEBVIEW = "CHECK_WEBVIEW";
@@ -53,6 +55,8 @@ public class MainActivity extends AppCompatActivity implements TabManager.TabLis
     private boolean currentThemeIsDark = App.get().isDarkTheme();
     private boolean checkWebView = true;
 
+    private TabNavigator tabNavigator = null;
+
 
     public View.OnClickListener getToggleListener() {
         return toggleListener;
@@ -64,14 +68,13 @@ public class MainActivity extends AppCompatActivity implements TabManager.TabLis
 
     public MainActivity() {
         webViewsProvider = new WebViewsProvider();
-        TabManager tabManager = TabManager.init(this, this);
-        App.get().Di().setTabManager(tabManager);
     }
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        tabNavigator = new TabNavigator(this, R.id.fragments_container);
         if (EmptyActivity.empty(App.get().getPreferences().getString("auth.user.nick", ""))) {
             startActivity(new Intent(this, EmptyActivity.class));
             finish();
@@ -82,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements TabManager.TabLis
             checkWebView = intent.getBooleanExtra(ARG_CHECK_WEBVIEW, checkWebView);
         }
         if (checkWebView) {
-            Observable
+            Disposable disposable = Observable
                     .fromCallable(() -> App.get().isWebViewFound(this))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -169,10 +172,7 @@ public class MainActivity extends AppCompatActivity implements TabManager.TabLis
             @Override
             public void onDrawerStateChanged(int newState) {
                 if (newState == DrawerLayout.STATE_DRAGGING) {
-                    TabFragment fragment = TabManager.get().getActive();
-                    if (fragment != null) {
-                        fragment.hidePopupWindows();
-                    }
+                    hideKeyboard();
                 }
             }
         });
@@ -226,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements TabManager.TabLis
 
     void checkIntent(Intent intent) {
         if (intent == null || intent.getData() == null) {
-            if (TabManager.get().isEmpty()) {
+            if (tabManager.isEmpty()) {
                 drawers.firstSelect();
             }
             return;
@@ -235,39 +235,11 @@ public class MainActivity extends AppCompatActivity implements TabManager.TabLis
         new Handler().post(() -> {
             Log.d(LOG_TAG, "Handler.post checkIntent: " + intent);
             boolean handled = IntentHandler.handle(intent.getData().toString());
-            if (!handled || TabManager.get().isEmpty()) {
+            if (!handled || tabManager.isEmpty()) {
                 drawers.firstSelect();
             }
             setIntent(null);
         });
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        TabManager.get().saveState(outState);
-    }
-
-    @Override
-    public void onAddTab(TabFragment fragment) {
-        Log.d(LOG_TAG, "TabManager callback onAddTab " + fragment);
-    }
-
-    @Override
-    public void onRemoveTab(TabFragment fragment) {
-        Log.d(LOG_TAG, "TabManager callback onRemoveTab " + fragment);
-    }
-
-    @Override
-    public void onSelectTab(TabFragment fragment) {
-        Log.d(LOG_TAG, "TabManager callback onSelectTab " + fragment);
-        drawers.setActiveMenu(fragment);
-    }
-
-    @Override
-    public void onChange() {
-        Log.d(LOG_TAG, "TabManager callback onChange");
-        drawers.notifyTabsChanged();
     }
 
     @Override
@@ -316,15 +288,15 @@ public class MainActivity extends AppCompatActivity implements TabManager.TabLis
             }
         }*/
 
-        TabFragment active = TabManager.get().getActive();
+        TabFragment active = tabManager.getActive();
         if (active == null) {
             finish();
             return;
         }
         if (fromToolbar || !active.onBackPressed()) {
             hideKeyboard();
-            TabManager.get().remove(active);
-            if (TabManager.get().getSize() < 1) {
+            tabManager.remove(active);
+            if (tabManager.getSize() < 1) {
                 finish();
             }
         }
@@ -338,6 +310,7 @@ public class MainActivity extends AppCompatActivity implements TabManager.TabLis
     protected void onResumeFragments() {
         super.onResumeFragments();
         Log.d(LOG_TAG, "onResumeFragments");
+        App.get().Di().getNavigatorHolder().setNavigator(tabNavigator);
     }
 
     @Override
@@ -352,7 +325,6 @@ public class MainActivity extends AppCompatActivity implements TabManager.TabLis
     protected void onResume() {
         super.onResume();
         Log.d(LOG_TAG, "onResume");
-        Log.d(LOG_TAG, "TabManager active tab: " + TabManager.getActiveIndex() + " : " + TabManager.getActiveTag());
         if (lang == null) {
             lang = LocaleHelper.getLanguage(this);
         }
@@ -384,6 +356,7 @@ public class MainActivity extends AppCompatActivity implements TabManager.TabLis
 
     @Override
     protected void onPause() {
+        App.get().Di().getNavigatorHolder().removeNavigator();
         super.onPause();
         Log.d(LOG_TAG, "onPause");
     }
@@ -392,6 +365,7 @@ public class MainActivity extends AppCompatActivity implements TabManager.TabLis
     protected void onDestroy() {
         Log.d(LOG_TAG, "onDestroy");
         super.onDestroy();
+
         if (drawers != null) {
             drawers.destroy();
         }

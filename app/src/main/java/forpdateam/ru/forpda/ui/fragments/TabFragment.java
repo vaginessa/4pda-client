@@ -160,7 +160,7 @@ public class TabFragment extends MvpAppCompatFragment {
     };
 
     public TabFragment() {
-        parentTag = TabManager.getActiveTag();
+        //parentTag = TabManager.getActiveTag();
     }
 
     public String getParentTag() {
@@ -178,8 +178,9 @@ public class TabFragment extends MvpAppCompatFragment {
 
     public final void setTitle(String newTitle) {
         this.title = newTitle;
-        if (tabTitle == null)
-            TabManager.get().notifyTabDataChanged();
+        if (tabTitle == null){
+            //TabManager.get().notifyTabDataChanged();
+        }
         toolbarTitleView.setText(getTitle());
     }
 
@@ -205,7 +206,7 @@ public class TabFragment extends MvpAppCompatFragment {
 
     public void setTabTitle(String tabTitle) {
         this.tabTitle = tabTitle;
-        TabManager.get().notifyTabDataChanged();
+        //TabManager.get().notifyTabDataChanged();
     }
 
     public Menu getMenu() {

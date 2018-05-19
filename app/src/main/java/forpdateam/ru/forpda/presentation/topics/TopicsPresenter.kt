@@ -9,8 +9,8 @@ import forpdateam.ru.forpda.model.repository.faviorites.FavoritesRepository
 import forpdateam.ru.forpda.model.repository.forum.ForumRepository
 import forpdateam.ru.forpda.model.repository.topics.TopicsRepository
 import forpdateam.ru.forpda.presentation.ILinkHandler
-import forpdateam.ru.forpda.presentation.IRouter
 import forpdateam.ru.forpda.presentation.Screen
+import forpdateam.ru.forpda.presentation.TabRouter
 
 /**
  * Created by radiationx on 03.01.18.
@@ -21,7 +21,7 @@ class TopicsPresenter(
         private val topicsRepository: TopicsRepository,
         private val forumRepository: ForumRepository,
         private val favoritesRepository: FavoritesRepository,
-        private val router: IRouter,
+        private val router: TabRouter,
         private val linkHandler: ILinkHandler
 ) : BasePresenter<TopicsView>() {
 

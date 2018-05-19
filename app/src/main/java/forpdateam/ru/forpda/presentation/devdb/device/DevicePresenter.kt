@@ -6,8 +6,8 @@ import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.remote.devdb.Device
 import forpdateam.ru.forpda.model.repository.devdb.DevDbRepository
 import forpdateam.ru.forpda.presentation.ILinkHandler
-import forpdateam.ru.forpda.presentation.IRouter
 import forpdateam.ru.forpda.presentation.Screen
+import forpdateam.ru.forpda.presentation.TabRouter
 
 /**
  * Created by radiationx on 11.11.17.
@@ -16,7 +16,7 @@ import forpdateam.ru.forpda.presentation.Screen
 @InjectViewState
 class DevicePresenter(
         private val devDbRepository: DevDbRepository,
-        private val router: IRouter,
+        private val router: TabRouter,
         private val linkHandler: ILinkHandler
 ) : BasePresenter<DeviceView>() {
 

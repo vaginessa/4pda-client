@@ -43,29 +43,6 @@ public class ForumFragment extends TabFragment implements ForumView {
 
     private NestedScrollView treeContainer;
     private DynamicDialogMenu<ForumFragment, ForumItemTree> dialogMenu;
-    private TreeNode.TreeNodeClickListener nodeClickListener = (node, value) -> {
-        ForumItemTree item = (ForumItemTree) value;
-        if (item.getForums() == null) {
-            Bundle args = new Bundle();
-            args.putInt(TopicsFragment.TOPICS_ID_ARG, item.getId());
-            TabManager.get().add(TopicsFragment.class, args);
-        }
-    };
-    private TreeNode.TreeNodeLongClickListener nodeLongClickListener = (node, value) -> {
-        ForumItemTree item = (ForumItemTree) value;
-        dialogMenu.disallowAll();
-        if (item.getLevel() > 0)
-            dialogMenu.allow(0);
-        dialogMenu.allow(1);
-        if (ClientHelper.getAuthState()) {
-            dialogMenu.allow(2);
-            dialogMenu.allow(3);
-        }
-        dialogMenu.allow(4);
-
-        dialogMenu.show(getContext(), ForumFragment.this, item);
-        return false;
-    };
 
     @InjectPresenter
     ForumPresenter presenter;
@@ -220,4 +197,26 @@ public class ForumFragment extends TabFragment implements ForumView {
         }
     }
 
+    private TreeNode.TreeNodeClickListener nodeClickListener = (node, value) -> {
+        ForumItemTree item = (ForumItemTree) value;
+        if (item.getForums() == null) {
+            presenter.navigateToForum(item);
+        }
+    };
+
+    private TreeNode.TreeNodeLongClickListener nodeLongClickListener = (node, value) -> {
+        ForumItemTree item = (ForumItemTree) value;
+        dialogMenu.disallowAll();
+        if (item.getLevel() > 0)
+            dialogMenu.allow(0);
+        dialogMenu.allow(1);
+        if (ClientHelper.getAuthState()) {
+            dialogMenu.allow(2);
+            dialogMenu.allow(3);
+        }
+        dialogMenu.allow(4);
+
+        dialogMenu.show(getContext(), ForumFragment.this, item);
+        return false;
+    };
 }

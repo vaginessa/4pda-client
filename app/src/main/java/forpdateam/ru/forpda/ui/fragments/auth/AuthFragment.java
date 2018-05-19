@@ -66,7 +66,8 @@ public class AuthFragment extends TabFragment implements AuthView {
     AuthPresenter providePresenter() {
         return new AuthPresenter(
                 App.get().Di().getAuthRepository(),
-                App.get().Di().getProfileRepository()
+                App.get().Di().getProfileRepository(),
+                App.get().Di().getRouter()
         );
     }
 
@@ -104,11 +105,7 @@ public class AuthFragment extends TabFragment implements AuthView {
         skipButton.setOnClickListener(v -> {
             new AlertDialog.Builder(getContext())
                     .setMessage("Без авторизации будут недоступны некоторые функции приложения.")
-                    .setPositiveButton(R.string.ok, (dialog, which) -> {
-                        Drawers drawers = getMainActivity().getDrawers();
-                        drawers.selectMenuItem(NewsMainFragment.class);
-                        TabManager.get().remove(AuthFragment.this);
-                    })
+                    .setPositiveButton(R.string.ok, (dialog, which) -> presenter.onClickSkip())
                     .setNegativeButton(R.string.cancel, null)
                     .show();
         });
@@ -234,13 +231,6 @@ public class AuthFragment extends TabFragment implements AuthView {
             }
         });
         progressView.startAnimation(animation1);
-        new Handler().postDelayed(() -> {
-            ClientHelper.get().notifyAuthChanged(ClientHelper.AUTH_STATE_LOGIN);
-            if (!isAdded()) return;
-            new Handler().postDelayed(() -> {
-                TabManager.get().remove(AuthFragment.this);
-            }, 500);
-        }, 2000);
     }
 
     private SimpleTextWatcher loginTextWatcher = new SimpleTextWatcher() {

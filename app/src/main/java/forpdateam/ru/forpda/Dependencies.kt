@@ -56,9 +56,9 @@ import forpdateam.ru.forpda.presentation.qms.chat.QmsChatTemplate
 import forpdateam.ru.forpda.presentation.search.SearchTemplate
 import forpdateam.ru.forpda.presentation.theme.ThemeTemplate
 import forpdateam.ru.forpda.ui.AppThemeHolder
-import forpdateam.ru.forpda.ui.TabManager
-import forpdateam.ru.forpda.ui.TabManagerProvider
 import forpdateam.ru.forpda.ui.TemplateManager
+import ru.terrakok.cicerone.Cicerone
+import ru.terrakok.cicerone.NavigatorHolder
 
 /**
  * Created by radiationx on 01.01.18.
@@ -68,14 +68,18 @@ class Dependencies internal constructor(
         context: Context
 ) {
 
+    private val cicerone: Cicerone<TabRouter> = Cicerone.create(TabRouter())
+    val router: TabRouter = cicerone.router
+    val navigatorHolder: NavigatorHolder = cicerone.navigatorHolder
 
-    //Todo fix this shit
+
+    /*//Todo fix this shit
     var tabManager: TabManager? = null
     val router: IRouter = Router(context, object : TabManagerProvider {
         override fun getTabManager(): TabManager {
             return tabManager ?: throw NullPointerException("TabManager is null")
         }
-    })
+    })*/
 
     val systemLinkHandler: ISystemLinkHandler = SystemLinkHandler()
     val linkHandler: ILinkHandler = LinkHandler(systemLinkHandler)

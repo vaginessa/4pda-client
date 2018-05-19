@@ -6,7 +6,7 @@ import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.remote.profile.ProfileModel
 import forpdateam.ru.forpda.model.repository.profile.ProfileRepository
 import forpdateam.ru.forpda.presentation.ILinkHandler
-import forpdateam.ru.forpda.presentation.IRouter
+import forpdateam.ru.forpda.presentation.TabRouter
 
 /**
  * Created by radiationx on 02.01.18.
@@ -15,7 +15,7 @@ import forpdateam.ru.forpda.presentation.IRouter
 @InjectViewState
 class ProfilePresenter(
         private val profileRepository: ProfileRepository,
-        private val router: IRouter,
+        private val router: TabRouter,
         private val linkHandler: ILinkHandler
 ) : BasePresenter<ProfileView>() {
 

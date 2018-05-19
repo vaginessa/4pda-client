@@ -9,36 +9,10 @@ sealed class Screen {
         private val NO_ID = -1
     }
 
-    class Suka(
-            val lal:Int,
-            private val router: IRouter,
-            private val linkHandler: ILinkHandler
-
-    )
-
-/*
-    ,
-    private val linkHandler: ILinkHandler
-
-    */
-
-
-/*
-    ,
-    private val router: IRouter
-
-    */
-
-
-    /*
-    ,
-    private val router: IRouter,
-    private val linkHandler: ILinkHandler
-
-    */
-
     var screenTitle: String? = null
     var screenSubTitle: String? = null
+
+    fun getKey(): String = this::class.java.simpleName
 
     /* Activities */
 
@@ -147,6 +121,10 @@ sealed class Screen {
     }
 
     class Theme : Screen() {
+        companion object {
+            const val CODE_RESULT_SYNC = 10
+            const val CODE_RESULT_PAGE = 11
+        }
         var themeUrl: String? = null
     }
 

@@ -1,14 +1,7 @@
-package forpdateam.ru.forpda.presentation
+package forpdateam.ru.forpda.ui
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
-import forpdateam.ru.forpda.ui.TabManagerProvider
-import forpdateam.ru.forpda.ui.activities.MainActivity
-import forpdateam.ru.forpda.ui.activities.SettingsActivity
-import forpdateam.ru.forpda.ui.activities.WebVewNotFoundActivity
-import forpdateam.ru.forpda.ui.activities.imageviewer.ImageViewerActivity
-import forpdateam.ru.forpda.ui.activities.updatechecker.UpdateCheckerActivity
+import forpdateam.ru.forpda.presentation.Screen
 import forpdateam.ru.forpda.ui.fragments.TabFragment
 import forpdateam.ru.forpda.ui.fragments.auth.AuthFragment
 import forpdateam.ru.forpda.ui.fragments.devdb.brand.DevicesFragment
@@ -36,14 +29,15 @@ import forpdateam.ru.forpda.ui.fragments.search.SearchFragment
 import forpdateam.ru.forpda.ui.fragments.theme.ThemeFragmentWeb
 import forpdateam.ru.forpda.ui.fragments.topics.TopicsFragment
 
-abstract class Router(
-        private val context: Context,
-        private var tabManagerProvider: TabManagerProvider
-) : IRouter {
+class TabHelper {
 
-    private fun getTabManager() = tabManagerProvider.getTabManager()
+    private fun createFragment(tabClass: Class<out TabFragment>, args: Bundle? = null): TabFragment {
+        return tabClass.newInstance().apply {
+            args?.let { arguments = it }
+        }
+    }
 
-    override fun navigateTo(screen: Screen) {
+    fun createTab(screen: Screen): TabFragment {
         val args = Bundle().apply {
             screen.screenTitle?.let {
                 putString(TabFragment.ARG_TITLE, it)
@@ -52,72 +46,49 @@ abstract class Router(
                 putString(TabFragment.ARG_SUBTITLE, it)
             }
         }
-        when (screen) {
-            is Screen.Main -> {
-                val intent = Intent(context, MainActivity::class.java).apply {
-                    putExtra(MainActivity.ARG_CHECK_WEBVIEW, screen.checkWebView)
-                }
-                context.startActivity(intent)
-            }
-            is Screen.UpdateChecker -> {
-                val intent = Intent(context, UpdateCheckerActivity::class.java).apply {
-                    putExtra(UpdateCheckerActivity.ARG_JSON_SOURCE, screen.jsonSource)
-                }
-                context.startActivity(intent)
-            }
-            is Screen.WebViewNotFound -> {
-                context.startActivity(Intent(context, WebVewNotFoundActivity::class.java))
-            }
-            is Screen.ImageViewer -> {
-                ImageViewerActivity.startActivity(context, ArrayList(screen.urls), screen.selected)
-            }
-            is Screen.Settings -> {
-                val intent = Intent(context, SettingsActivity::class.java)
-                intent.putExtra(SettingsActivity.ARG_NEW_PREFERENCE_SCREEN, screen.fragment)
-                context.startActivity(intent)
-            }
-            is Screen.Auth -> getTabManager().add(AuthFragment::class.java)
+        return when (screen) {
+            is Screen.Auth -> createFragment(AuthFragment::class.java, args)
             is Screen.DevDbDevices -> {
-                getTabManager().add(DevicesFragment::class.java, args.apply {
+                createFragment(DevicesFragment::class.java, args.apply {
                     putString(DevicesFragment.ARG_CATEGORY_ID, screen.categoryId)
                     putString(DevicesFragment.ARG_BRAND_ID, screen.brandId)
                 })
             }
-            is Screen.DevDbBrands -> getTabManager().add(BrandsFragment::class.java)
+            is Screen.DevDbBrands -> createFragment(BrandsFragment::class.java, args)
             is Screen.DevDbDevice -> {
-                getTabManager().add(DeviceFragment::class.java, args.apply {
+                createFragment(DeviceFragment::class.java, args.apply {
                     putString(DeviceFragment.ARG_DEVICE_ID, screen.deviceId)
                 })
             }
-            is Screen.DevDbSearch -> getTabManager().add(DevDbSearchFragment::class.java)
+            is Screen.DevDbSearch -> createFragment(DevDbSearchFragment::class.java, args)
             is Screen.EditPost -> {
                 if (screen.editPostForm == null) {
-                    getTabManager().add(EditPostFragment.newInstance(
+                    EditPostFragment.newInstance(
                             screen.postId,
                             screen.topicId,
                             screen.forumId,
                             screen.st,
                             screen.themeName
-                    ))
+                    )
                 } else {
-                    getTabManager().add(EditPostFragment.newInstance(
+                    EditPostFragment.newInstance(
                             screen.editPostForm,
                             screen.themeName
-                    ))
+                    )
                 }
-                getTabManager().add(EditPostFragment::class.java)
+                createFragment(EditPostFragment::class.java, args)
             }
-            is Screen.Favorites -> getTabManager().add(FavoritesFragment::class.java)
+            is Screen.Favorites -> createFragment(FavoritesFragment::class.java, args)
             is Screen.Forum -> {
-                getTabManager().add(ForumFragment::class.java, args.apply {
+                createFragment(ForumFragment::class.java, args.apply {
                     putInt(ForumFragment.ARG_FORUM_ID, screen.forumId)
                 })
             }
-            is Screen.History -> getTabManager().add(HistoryFragment::class.java)
-            is Screen.Mentions -> getTabManager().add(MentionsFragment::class.java)
-            is Screen.ArticleList -> getTabManager().add(NewsMainFragment::class.java)
+            is Screen.History -> createFragment(HistoryFragment::class.java, args)
+            is Screen.Mentions -> createFragment(MentionsFragment::class.java, args)
+            is Screen.ArticleList -> createFragment(NewsMainFragment::class.java, args)
             is Screen.ArticleDetail -> {
-                getTabManager().add(NewsDetailsFragment::class.java, args.apply {
+                createFragment(NewsDetailsFragment::class.java, args.apply {
                     putInt(NewsDetailsFragment.ARG_NEWS_ID, screen.articleId)
                     putInt(NewsDetailsFragment.ARG_NEWS_COMMENT_ID, screen.commentId)
                     putString(NewsDetailsFragment.ARG_NEWS_URL, screen.articleUrl)
@@ -128,30 +99,30 @@ abstract class Router(
                     putInt(NewsDetailsFragment.ARG_NEWS_COMMENTS_COUNT, screen.articleCommentsCount)
                 })
             }
-            is Screen.Notes -> getTabManager().add(NotesFragment::class.java)
+            is Screen.Notes -> createFragment(NotesFragment::class.java, args)
             is Screen.Announce -> {
-                getTabManager().add(AnnounceFragment::class.java, args.apply {
+                createFragment(AnnounceFragment::class.java, args.apply {
                     putInt(AnnounceFragment.ARG_ANNOUNCE_ID, screen.announceId)
                     putInt(AnnounceFragment.ARG_FORUM_ID, screen.forumId)
                 })
             }
-            is Screen.ForumRules -> getTabManager().add(ForumRulesFragment::class.java)
-            is Screen.GoogleCaptcha -> getTabManager().add(GoogleCaptchaFragment::class.java)
+            is Screen.ForumRules -> createFragment(ForumRulesFragment::class.java, args)
+            is Screen.GoogleCaptcha -> createFragment(GoogleCaptchaFragment::class.java, args)
             is Screen.Profile -> {
-                getTabManager().add(ProfileFragment::class.java, args.apply {
+                createFragment(ProfileFragment::class.java, args.apply {
                     putString(TabFragment.ARG_TAB, screen.profileUrl)
                 })
             }
-            is Screen.QmsContacts -> getTabManager().add(QmsContactsFragment::class.java)
-            is Screen.QmsBlackList -> getTabManager().add(QmsBlackListFragment::class.java)
+            is Screen.QmsContacts -> createFragment(QmsContactsFragment::class.java, args)
+            is Screen.QmsBlackList -> createFragment(QmsBlackListFragment::class.java, args)
             is Screen.QmsThemes -> {
-                getTabManager().add(QmsThemesFragment::class.java, args.apply {
+                createFragment(QmsThemesFragment::class.java, args.apply {
                     putInt(QmsThemesFragment.USER_ID_ARG, screen.userId)
                     putString(QmsThemesFragment.USER_AVATAR_ARG, screen.avatarUrl)
                 })
             }
             is Screen.QmsChat -> {
-                getTabManager().add(QmsChatFragment::class.java, args.apply {
+                createFragment(QmsChatFragment::class.java, args.apply {
                     putInt(QmsChatFragment.THEME_ID_ARG, screen.themeId)
                     putInt(QmsChatFragment.USER_ID_ARG, screen.userId)
                     putString(QmsChatFragment.USER_NICK_ARG, screen.userNick)
@@ -160,22 +131,22 @@ abstract class Router(
                 })
             }
             is Screen.Reputation -> {
-                getTabManager().add(ReputationFragment::class.java, args.apply {
+                createFragment(ReputationFragment::class.java, args.apply {
                     putString(TabFragment.ARG_TAB, screen.reputationUrl)
                 })
             }
             is Screen.Search -> {
-                getTabManager().add(SearchFragment::class.java, args.apply {
+                createFragment(SearchFragment::class.java, args.apply {
                     putString(TabFragment.ARG_TAB, screen.searchUrl)
                 })
             }
             is Screen.Theme -> {
-                getTabManager().add(ThemeFragmentWeb::class.java, args.apply {
+                createFragment(ThemeFragmentWeb::class.java, args.apply {
                     putString(TabFragment.ARG_TAB, screen.themeUrl)
                 })
             }
             is Screen.Topics -> {
-                getTabManager().add(TopicsFragment::class.java, args.apply {
+                createFragment(TopicsFragment::class.java, args.apply {
                     putInt(TopicsFragment.TOPICS_ID_ARG, screen.forumId)
                 })
             }

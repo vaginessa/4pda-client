@@ -273,18 +273,8 @@ public class Client implements IWebClient {
             if (!okHttpResponse.isSuccessful()) {
                 if (okHttpResponse.code() == 403) {
                     String content = okHttpResponse.body().string();
-                    //forpdateam.ru.forpda.utils.ApiUtils.longLog(content);
-                    new Handler(Looper.getMainLooper()).post(() -> {
-                        try {
-                            if (TabManager.get().getTagContainClass(GoogleCaptchaFragment.class) == null) {
-                                Bundle args = new Bundle();
-                                args.putString("content", content);
-                                TabManager.get().add(GoogleCaptchaFragment.class, args);
-                            }
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
-                    });
+                    //todo catch this is errorhandler
+                    throw new GoogleCaptchaException(content);
                 }
                 throw new OkHttpResponseException(okHttpResponse.code(), okHttpResponse.message(), request.getUrl());
             }

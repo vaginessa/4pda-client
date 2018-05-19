@@ -22,6 +22,8 @@ import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.common.Utils;
 import forpdateam.ru.forpda.entity.remote.profile.ProfileModel;
 import forpdateam.ru.forpda.model.NetworkStateProvider;
+import forpdateam.ru.forpda.presentation.Screen;
+import forpdateam.ru.forpda.presentation.TabRouter;
 import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.activities.MainActivity;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
@@ -44,6 +46,7 @@ public class DrawerHeader {
     private CompositeDisposable disposables = new CompositeDisposable();
 
     private NetworkStateProvider networkState = App.get().Di().getNetworkState();
+    private TabRouter router = App.get().Di().getRouter();
 
     private Consumer<Boolean> networkObserver = state -> {
         if (state) {
@@ -52,27 +55,7 @@ public class DrawerHeader {
     };
 
     private View.OnClickListener headerClickListener = v -> {
-        TabFragment tabFragment = null;
-        for (TabFragment fragment : TabManager.get().getFragments()) {
-            if (fragment.getClass().getSimpleName().equals(ProfileFragment.class.getSimpleName()) && fragment.getConfiguration().isMenu()) {
-                tabFragment = fragment;
-                break;
-            }
-        }
-        if (tabFragment == null) {
-            tabFragment = new TabFragment.Builder<>(ProfileFragment.class)
-                    .setIsMenu()
-                    .build();
-            TabManager.get().add(tabFragment);
-        } else {
-            TabManager.get().select(tabFragment);
-        }
-        /*TabFragment fragment = TabManager.get().get(TabManager.get().getTagContainClass(ProfileFragment.class));
-        if (fragment == null | (fragment != null && fragment.getConfiguration().isMenu())) {
-            TabManager.get().add(new TabFragment.Builder<>(ProfileFragment.class).setIsMenu().build());
-        } else {
-            TabManager.get().select(fragment);
-        }*/
+        router.navigateTo(new Screen.Profile());
         activity.getDrawers().closeMenu();
         activity.getDrawers().closeTabs();
     };

@@ -24,42 +24,11 @@ public class TabManager {
     private final static String BUNDLE_PREFIX = "tab_manager_";
     private final static String BUNDLE_ACTIVE_TAG = "active_tag";
     private final static String BUNDLE_ACTIVE_INDEX = "active_index";
-    private static TabManager instance;
     private FragmentManager fragmentManager;
     private TabListener tabListener;
-    private static String activeTag = "";
-    private static int activeIndex = 0;
+    private String activeTag = "";
+    private int activeIndex = 0;
     private List<TabFragment> existingFragments = new ArrayList<>();
-
-    public interface TabListener {
-        void onAddTab(TabFragment fragment);
-
-        void onRemoveTab(TabFragment fragment);
-
-        void onSelectTab(TabFragment fragment);
-
-        void onChange();
-    }
-
-    public static TabManager init(AppCompatActivity activity, TabListener listener) {
-        if (instance != null) {
-            instance.clear();
-            instance = null;
-        }
-        instance = new TabManager(activity, listener);
-        return instance;
-    }
-
-    private void clear() {
-        fragmentManager = null;
-        tabListener = null;
-        existingFragments.clear();
-        existingFragments = null;
-    }
-
-    public static TabManager get() {
-        return instance;
-    }
 
     public TabManager(AppCompatActivity activity, TabListener listener) {
         fragmentManager = activity.getSupportFragmentManager();
@@ -81,6 +50,13 @@ public class TabManager {
         Log.d(LOG_TAG, "loadState: " + activeTag + " : " + activeIndex);
     }
 
+    public void clear() {
+        fragmentManager = null;
+        tabListener = null;
+        existingFragments.clear();
+        existingFragments = null;
+    }
+
     public int getSize() {
         return existingFragments.size();
     }
@@ -89,11 +65,11 @@ public class TabManager {
         return getSize() == 0;
     }
 
-    public static String getActiveTag() {
+    public String getActiveTag() {
         return activeTag;
     }
 
-    public static int getActiveIndex() {
+    public int getActiveIndex() {
         return activeIndex;
     }
 
@@ -270,7 +246,7 @@ public class TabManager {
                 activeTag = "";
             }
         } else {
-            Log.e(LOG_TAG, "Compare " + activeTag + " : " +tabTag);
+            Log.e(LOG_TAG, "Compare " + activeTag + " : " + tabTag);
             if (activeTag.equals(tabTag)) {
                 activeTag = tabFragment.getParentTag();
                 activeIndex = existingFragments.indexOf(parent);
@@ -304,5 +280,15 @@ public class TabManager {
 
     public void notifyTabDataChanged() {
         tabListener.onChange();
+    }
+
+    public interface TabListener {
+        void onAddTab(TabFragment fragment);
+
+        void onRemoveTab(TabFragment fragment);
+
+        void onSelectTab(TabFragment fragment);
+
+        void onChange();
     }
 }

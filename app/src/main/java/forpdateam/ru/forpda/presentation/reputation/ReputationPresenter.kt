@@ -8,7 +8,7 @@ import forpdateam.ru.forpda.model.data.remote.api.reputation.ReputationApi
 import forpdateam.ru.forpda.model.repository.avatar.AvatarRepository
 import forpdateam.ru.forpda.model.repository.reputation.ReputationRepository
 import forpdateam.ru.forpda.presentation.ILinkHandler
-import forpdateam.ru.forpda.presentation.IRouter
+import forpdateam.ru.forpda.presentation.TabRouter
 
 /**
  * Created by radiationx on 03.01.18.
@@ -18,7 +18,7 @@ import forpdateam.ru.forpda.presentation.IRouter
 class ReputationPresenter(
         private val reputationRepository: ReputationRepository,
         private val avatarRepository: AvatarRepository,
-        private val router: IRouter,
+        private val router: TabRouter,
         private val linkHandler: ILinkHandler
 ) : BasePresenter<ReputationView>() {
 
