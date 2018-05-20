@@ -188,4 +188,37 @@ class TabHelper {
             }
         }
     }
+
+    fun findScreenByFragment(fragment: TabFragment): Class<out Screen> {
+        return when (fragment) {
+            is AuthFragment -> Screen.Auth::class.java
+            is DevicesFragment -> Screen.DevDbDevices::class.java
+            is BrandsFragment -> Screen.DevDbBrands::class.java
+            is DeviceFragment -> Screen.DevDbDevice::class.java
+            is DevDbSearchFragment -> Screen.DevDbSearch::class.java
+            is EditPostFragment -> Screen.EditPost::class.java
+            is FavoritesFragment -> Screen.Favorites::class.java
+            is ForumFragment -> Screen.Forum::class.java
+            is HistoryFragment -> Screen.History::class.java
+            is MentionsFragment -> Screen.Mentions::class.java
+            is NewsMainFragment -> Screen.ArticleList::class.java
+            is NewsDetailsFragment -> Screen.ArticleDetail::class.java
+            is NotesFragment -> Screen.Notes::class.java
+            is AnnounceFragment -> Screen.Announce::class.java
+            is ForumRulesFragment -> Screen.ForumRules::class.java
+            is GoogleCaptchaFragment -> Screen.GoogleCaptcha::class.java
+            is ProfileFragment -> Screen.Profile::class.java
+            is QmsContactsFragment -> Screen.QmsContacts::class.java
+            is QmsBlackListFragment -> Screen.QmsBlackList::class.java
+            is QmsThemesFragment -> Screen.QmsThemes::class.java
+            is QmsChatFragment -> Screen.QmsChat::class.java
+            is ReputationFragment -> Screen.Reputation::class.java
+            is SearchFragment -> Screen.Search::class.java
+            is ThemeFragmentWeb -> Screen.Theme::class.java
+            is TopicsFragment -> Screen.Topics::class.java
+            else -> {
+                throw Exception("Not found class by fragment: \"$fragment\"")
+            }
+        }
+    }
 }

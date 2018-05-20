@@ -56,7 +56,8 @@ public class SettingsFragment extends BaseSettingFragment {
             Preference fPref = findPreference("about.app_faq");
             fPref.setIcon(App.getAppVecDrawable(R.drawable.contact_site));
             fPref.setOnPreferenceClickListener(preference -> {
-                IntentHandler.externalIntent("http://4pda.ru/forum/index.php?s=&showtopic=820313&view=findpost&p=64077514");
+                //todo fix it
+                //IntentHandler.externalIntent("http://4pda.ru/forum/index.php?s=&showtopic=820313&view=findpost&p=64077514");
                 return false;
             });
         }
@@ -65,7 +66,8 @@ public class SettingsFragment extends BaseSettingFragment {
             Preference fPref = findPreference("about.app_topic");
             fPref.setIcon(App.getAppVecDrawable(R.drawable.contact_site));
             fPref.setOnPreferenceClickListener(preference -> {
-                IntentHandler.externalIntent("https://4pda.ru/forum/index.php?showtopic=820313");
+                //todo fix it
+                //IntentHandler.externalIntent("https://4pda.ru/forum/index.php?showtopic=820313");
                 return false;
             });
         }

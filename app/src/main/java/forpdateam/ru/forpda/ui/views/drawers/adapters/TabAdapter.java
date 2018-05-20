@@ -31,12 +31,16 @@ public class TabAdapter extends BaseAdapter<TabFragment, TabAdapter.TabHolder> {
     }
 
     public TabFragment getItem(int position) {
-        return TabManager.get().get(position);
+        //todo fix it
+        //return TabManager.get().get(position);
+        return null;
     }
 
     @Override
     public int getItemCount() {
-        return TabManager.get().getSize();
+        //todo fix it
+        //return TabManager.get().getSize();
+        return 0;
     }
 
     @Override
@@ -69,11 +73,13 @@ public class TabAdapter extends BaseAdapter<TabFragment, TabAdapter.TabHolder> {
 
         @Override
         public void bind(TabFragment item, int position) {
-            if (position == TabManager.getActiveIndex())
+            //todo fix it
+            /*if (position == TabManager.getActiveIndex())
                 itemView.setBackgroundColor(color);
             else
-                itemView.setBackgroundColor(Color.TRANSPARENT);
+                itemView.setBackgroundColor(Color.TRANSPARENT);*/
 
+            itemView.setBackgroundColor(Color.TRANSPARENT);
             text.setText(item.getTabTitle());
         }
 

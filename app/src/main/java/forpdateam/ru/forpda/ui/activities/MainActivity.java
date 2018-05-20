@@ -29,6 +29,8 @@ import forpdateam.ru.forpda.common.LocaleHelper;
 import forpdateam.ru.forpda.common.Preferences;
 import forpdateam.ru.forpda.common.webview.WebViewsProvider;
 import forpdateam.ru.forpda.notifications.NotificationsService;
+import forpdateam.ru.forpda.presentation.Screen;
+import forpdateam.ru.forpda.presentation.TabRouter;
 import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.TabNavigator;
 import forpdateam.ru.forpda.ui.activities.updatechecker.SimpleUpdateChecker;
@@ -189,6 +191,8 @@ public class MainActivity extends AppCompatActivity {
             new SimpleUpdateChecker().checkFromGitHub(this);
         }
         checkIntent(getIntent());
+        TabRouter router = App.get().Di().getRouter();
+        router.navigateTo(new Screen.ArticleList());
     }
 
     private void measureView(View v) {
@@ -225,7 +229,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void checkIntent(Intent intent) {
-        if (intent == null || intent.getData() == null) {
+        //todo fix it
+        /*if (intent == null || intent.getData() == null) {
             if (tabManager.isEmpty()) {
                 drawers.firstSelect();
             }
@@ -239,7 +244,7 @@ public class MainActivity extends AppCompatActivity {
                 drawers.firstSelect();
             }
             setIntent(null);
-        });
+        });*/
     }
 
     @Override
@@ -288,7 +293,8 @@ public class MainActivity extends AppCompatActivity {
             }
         }*/
 
-        TabFragment active = tabManager.getActive();
+        //todo fix it
+        /*TabFragment active = tabManager.getActive();
         if (active == null) {
             finish();
             return;
@@ -299,7 +305,8 @@ public class MainActivity extends AppCompatActivity {
             if (tabManager.getSize() < 1) {
                 finish();
             }
-        }
+        }*/
+        App.get().Di().getRouter().exit();
     }
 
     public WebViewsProvider getWebViewsProvider() {

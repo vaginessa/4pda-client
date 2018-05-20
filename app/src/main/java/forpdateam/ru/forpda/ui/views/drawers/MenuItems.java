@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
+import forpdateam.ru.forpda.presentation.Screen;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import forpdateam.ru.forpda.ui.fragments.auth.AuthFragment;
 import forpdateam.ru.forpda.ui.fragments.devdb.brands.BrandsFragment;
@@ -28,20 +29,20 @@ public class MenuItems {
     private ArrayList<MenuItem> createdMenuItems = new ArrayList<>();
 
     public MenuItems() {
-        createdMenuItems.add(new MenuItem(App.get().getString(R.string.fragment_title_auth), R.drawable.ic_person_add, AuthFragment.class));
+        createdMenuItems.add(new MenuItem(App.get().getString(R.string.fragment_title_auth), R.drawable.ic_person_add, new Screen.Auth()));
         //if (Objects.equals(BuildConfig.FLAVOR, "dev"))
-        createdMenuItems.add(new MenuItem(App.get().getString(R.string.fragment_title_news), R.drawable.ic_newspaper, NewsMainFragment.class));
-        createdMenuItems.add(new MenuItem(App.get().getString(R.string.fragment_title_favorite), R.drawable.ic_star, FavoritesFragment.class));
-        createdMenuItems.add(new MenuItem(App.get().getString(R.string.fragment_title_contacts), R.drawable.ic_contacts, QmsContactsFragment.class));
-        createdMenuItems.add(new MenuItem(App.get().getString(R.string.fragment_title_mentions), R.drawable.ic_notifications, MentionsFragment.class));
-        createdMenuItems.add(new MenuItem(App.get().getString(R.string.fragment_title_devdb), R.drawable.ic_devices_other, BrandsFragment.class));
+        createdMenuItems.add(new MenuItem(App.get().getString(R.string.fragment_title_news), R.drawable.ic_newspaper, new Screen.ArticleList()));
+        createdMenuItems.add(new MenuItem(App.get().getString(R.string.fragment_title_favorite), R.drawable.ic_star, new Screen.Favorites()));
+        createdMenuItems.add(new MenuItem(App.get().getString(R.string.fragment_title_contacts), R.drawable.ic_contacts, new Screen.QmsContacts()));
+        createdMenuItems.add(new MenuItem(App.get().getString(R.string.fragment_title_mentions), R.drawable.ic_notifications, new Screen.Mentions()));
+        createdMenuItems.add(new MenuItem(App.get().getString(R.string.fragment_title_devdb), R.drawable.ic_devices_other, new Screen.DevDbBrands()));
         //createdMenuItems.add(new MenuItem("DevDB dev", R.drawable.ic_devices_other, DeviceFragment.class));
-        createdMenuItems.add(new MenuItem(App.get().getString(R.string.fragment_title_forum), R.drawable.ic_forum, ForumFragment.class));
-        createdMenuItems.add(new MenuItem(App.get().getString(R.string.fragment_title_search), R.drawable.ic_search, SearchFragment.class));
-        createdMenuItems.add(new MenuItem(App.get().getString(R.string.fragment_title_history), R.drawable.ic_history, HistoryFragment.class));
-        createdMenuItems.add(new MenuItem(App.get().getString(R.string.fragment_title_notes), R.drawable.ic_bookmark, NotesFragment.class));
-        createdMenuItems.add(new MenuItem(App.get().getString(R.string.fragment_title_forum_rules), R.drawable.ic_book_open, ForumRulesFragment.class));
-        createdMenuItems.add(new MenuItem(App.get().getString(R.string.activity_title_settings), R.drawable.ic_settings, ACTION_APP_SETTINGS));
+        createdMenuItems.add(new MenuItem(App.get().getString(R.string.fragment_title_forum), R.drawable.ic_forum, new Screen.Forum()));
+        createdMenuItems.add(new MenuItem(App.get().getString(R.string.fragment_title_search), R.drawable.ic_search, new Screen.Search()));
+        createdMenuItems.add(new MenuItem(App.get().getString(R.string.fragment_title_history), R.drawable.ic_history, new Screen.History()));
+        createdMenuItems.add(new MenuItem(App.get().getString(R.string.fragment_title_notes), R.drawable.ic_bookmark, new Screen.Notes()));
+        createdMenuItems.add(new MenuItem(App.get().getString(R.string.fragment_title_forum_rules), R.drawable.ic_book_open, new Screen.ForumRules()));
+        createdMenuItems.add(new MenuItem(App.get().getString(R.string.activity_title_settings), R.drawable.ic_settings, new Screen.Settings()));
     }
 
     public ArrayList<MenuItem> getCreatedMenuItems() {
@@ -53,14 +54,14 @@ public class MenuItems {
         private int iconRes;
         private int notifyCount = 0;
         private String attachedTabTag = "";
-        private Class<? extends TabFragment> tabClass;
+        private Screen screen;
         private int action;
         private boolean active = false;
 
-        public MenuItem(String title, @DrawableRes int iconRes, Class<? extends TabFragment> tabClass) {
+        public MenuItem(String title, @DrawableRes int iconRes, Screen screen) {
             this.title = title;
             this.iconRes = iconRes;
-            this.tabClass = tabClass;
+            this.screen = screen;
         }
 
         public MenuItem(String title, @DrawableRes int iconRes, int action) {
@@ -89,10 +90,6 @@ public class MenuItems {
             return action;
         }
 
-        public Class<? extends TabFragment> getTabClass() {
-            return tabClass;
-        }
-
         public void setAttachedTabTag(String attachedTabTag) {
             this.attachedTabTag = attachedTabTag;
         }
@@ -107,6 +104,10 @@ public class MenuItems {
 
         public void setActive(boolean active) {
             this.active = active;
+        }
+
+        public Screen getScreen() {
+            return screen;
         }
     }
 }

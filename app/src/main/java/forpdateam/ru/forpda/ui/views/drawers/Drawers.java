@@ -20,6 +20,7 @@ import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.Preferences;
+import forpdateam.ru.forpda.presentation.Screen;
 import forpdateam.ru.forpda.presentation.TabRouter;
 import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.activities.MainActivity;
@@ -67,10 +68,11 @@ public class Drawers {
         menuItems.clear();
         fillMenuItems();
         menuAdapter.notifyDataSetChanged();
-        if ((boolean) o && TabManager.get().getSize() <= 1) {
+        //todo fix this
+        /*if ((boolean) o && TabManager.get().getSize() <= 1) {
             //select(findByClassName(NewsTimelineFragment.class.getSimpleName()));
-            selectMenuItem(findMenuItem(FavoritesFragment.class));
-        }
+            selectMenuItem(findMenuItem(Screen.Favorites.class));
+        }*/
         if (!(boolean) o) {
             ClientHelper.setQmsCount(0);
             ClientHelper.setFavoritesCount(0);
@@ -81,15 +83,15 @@ public class Drawers {
     };
 
     private Observer countsObserver = (observable1, o) -> {
-        MenuItems.MenuItem item = findMenuItem(QmsContactsFragment.class);
+        MenuItems.MenuItem item = findMenuItem(Screen.QmsContacts.class);
         if (item != null) {
             item.setNotifyCount(ClientHelper.getQmsCount());
         }
-        item = findMenuItem(MentionsFragment.class);
+        item = findMenuItem(Screen.Mentions.class);
         if (item != null) {
             item.setNotifyCount(ClientHelper.getMentionsCount());
         }
-        item = findMenuItem(FavoritesFragment.class);
+        item = findMenuItem(Screen.Favorites.class);
         if (item != null) {
             item.setNotifyCount(ClientHelper.getFavoritesCount());
         }
@@ -167,7 +169,7 @@ public class Drawers {
 
     public void init(Bundle savedInstanceState) {
         initMenu(savedInstanceState);
-        initTabs(savedInstanceState);
+        //initTabs(savedInstanceState);
         this.savedInstanceState = savedInstanceState;
         //firstSelect(savedInstanceState);
     }
@@ -176,41 +178,14 @@ public class Drawers {
         if (isFirstSelected)
             return;
         isFirstSelected = true;
-        String className = ClientHelper.getAuthState() == ClientHelper.AUTH_STATE_LOGIN ? FavoritesFragment.class.getSimpleName() : AuthFragment.class.getSimpleName();
-        String last = App.get().getPreferences().getString("menu_drawer_last", className);
-        last = ClientHelper.getAuthState() == ClientHelper.AUTH_STATE_LOGIN && last.equals(AuthFragment.class.getSimpleName()) ? FavoritesFragment.class.getSimpleName() : last;
-        Log.d(LOG_TAG, "Last item " + last);
-
-        MenuItems.MenuItem item = null;
-        if (this.savedInstanceState != null) {
-            TabFragment tabFragment = TabManager.get().get(TabManager.getActiveTag());
-            if (tabFragment != null) {
-                item = findMenuItem(tabFragment.getClass());
-            }
-
-            Log.d(LOG_TAG, "AAAA " + tabFragment + " : " + item);
-            if (item != null) {
-                item.setAttachedTabTag(tabFragment.getTag());
-                item.setActive(true);
-                lastActive = item;
-            } else {
-                item = findMenuItem(last);
-            }
+        MenuItems.MenuItem item;
+        if (ClientHelper.getAuthState() == ClientHelper.AUTH_STATE_LOGIN) {
+            item = findMenuItem(Screen.Favorites.class);
         } else {
-            item = findMenuItem(last);
+            item = findMenuItem(Screen.Auth.class);
         }
-        Log.d(LOG_TAG, "Final item " + item);
-        if (item == null) {
-            item = menuItems.get(0);
-        }
-        Log.d(LOG_TAG, "FinalFinal item " + item);
         selectMenuItem(item);
 
-        /*if (savedInstanceState == null) {
-            select(findByClassName(last));
-        } else {
-            setActive(last);
-        }*/
     }
 
     public void destroy() {
@@ -249,10 +224,11 @@ public class Drawers {
     private void fillMenuItems() {
         menuItems.clear();
         for (MenuItems.MenuItem item : allMenuItems.getCreatedMenuItems()) {
-            if (item.getTabClass() == AuthFragment.class && ClientHelper.getAuthState() == ClientHelper.AUTH_STATE_LOGIN) {
+            Class screen = item.getScreen().getClass();
+            if (screen == Screen.Auth.class && ClientHelper.getAuthState() == ClientHelper.AUTH_STATE_LOGIN) {
                 continue;
             } else if (ClientHelper.getAuthState() != ClientHelper.AUTH_STATE_LOGIN) {
-                if (item.getTabClass() == ProfileFragment.class || item.getTabClass() == QmsContactsFragment.class || item.getTabClass() == FavoritesFragment.class || item.getTabClass() == MentionsFragment.class) {
+                if (screen == Screen.Profile.class || screen == Screen.QmsContacts.class || screen == Screen.Favorites.class || screen == Screen.Mentions.class) {
                     continue;
                 }
             }
@@ -260,84 +236,24 @@ public class Drawers {
         }
     }
 
-    public void selectMenuItem(Class<? extends TabFragment> classObject) {
-        try {
-            MenuItems.MenuItem item = findMenuItem(classObject);
-            selectMenuItem(item);
-        } catch (Exception ignore) {
-        }
-    }
-
     private void selectMenuItem(MenuItems.MenuItem item) {
         Log.d(LOG_TAG, "selectMenuItem " + item);
         if (item == null) return;
-        try {
-            if (item.getTabClass() == null) {
-                switch (item.getAction()) {
-                    case MenuItems.ACTION_APP_SETTINGS: {
-                        activity.startActivity(new Intent(activity, SettingsActivity.class));
-                        break;
-                    }
-                }
-
-            } else {
-                TabFragment tabFragment = TabManager.get().get(item.getAttachedTabTag());
-                if (tabFragment == null) {
-                    for (TabFragment fragment : TabManager.get().getFragments()) {
-                        if (fragment.getClass() == item.getTabClass() && fragment.getConfiguration().isMenu()) {
-                            tabFragment = fragment;
-                            break;
-                        }
-                    }
-                }
-
-                if (tabFragment == null) {
-                    tabFragment = item.getTabClass().newInstance();
-                    tabFragment.getConfiguration().setMenu(true);
-                    TabManager.get().add(tabFragment);
-                    item.setAttachedTabTag(tabFragment.getTag());
-                } else {
-                    TabManager.get().select(tabFragment);
-                }
-
-                if (lastActive != null)
-                    lastActive.setActive(false);
-                item.setActive(true);
-                lastActive = item;
-                menuAdapter.notifyDataSetChanged();
-                App.get().getPreferences().edit().putString("menu_drawer_last", item.getTabClass().getSimpleName()).apply();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (item.getScreen().getClass() == Screen.Settings.class) {
+            activity.startActivity(new Intent(activity, SettingsActivity.class));
+        } else {
+            router.navigateTo(item.getScreen());
+            if (lastActive != null)
+                lastActive.setActive(false);
+            item.setActive(true);
+            lastActive = item;
+            menuAdapter.notifyDataSetChanged();
         }
     }
 
-    public void setActiveMenu(TabFragment fragment) {
+    private MenuItems.MenuItem findMenuItem(Class<? extends Screen> classObject) {
         for (MenuItems.MenuItem item : menuItems) {
-            if (item.getTabClass() == fragment.getClass()) {
-                if (lastActive != null)
-                    lastActive.setActive(false);
-                item.setActive(true);
-                item.setAttachedTabTag(fragment.getTag());
-                lastActive = item;
-                menuAdapter.notifyDataSetChanged();
-                App.get().getPreferences().edit().putString("menu_drawer_last", item.getTabClass().getSimpleName()).apply();
-                break;
-            }
-        }
-    }
-
-    private MenuItems.MenuItem findMenuItem(String className) {
-        for (MenuItems.MenuItem item : menuItems) {
-            if (item.getTabClass() != null && item.getTabClass().getSimpleName().equals(className))
-                return item;
-        }
-        return null;
-    }
-
-    private MenuItems.MenuItem findMenuItem(Class<? extends TabFragment> classObject) {
-        for (MenuItems.MenuItem item : menuItems) {
-            if (item.getTabClass() == classObject)
+            if (item.getScreen().getClass() == classObject)
                 return item;
         }
         return null;
@@ -364,10 +280,11 @@ public class Drawers {
     }
 
     private void initTabs(Bundle savedInstanceState) {
+        //todo fix it
         tabAdapter.setItemClickListener(new BaseAdapter.OnItemClickListener<TabFragment>() {
             @Override
             public void onItemClick(TabFragment item) {
-                TabManager.get().select(item);
+                //TabManager.get().select(item);
                 closeTabs();
             }
 
@@ -380,10 +297,10 @@ public class Drawers {
         tabAdapter.setCloseClickListener(new BaseAdapter.OnItemClickListener<TabFragment>() {
             @Override
             public void onItemClick(TabFragment item) {
-                TabManager.get().remove(item);
+                /*TabManager.get().remove(item);
                 if (TabManager.get().getSize() < 1) {
                     activity.finish();
-                }
+                }*/
             }
 
             @Override
@@ -391,8 +308,8 @@ public class Drawers {
                 return false;
             }
         });
-        TabManager.get().loadState(savedInstanceState);
-        TabManager.get().updateFragmentList();
+        //TabManager.get().loadState(savedInstanceState);
+        //TabManager.get().updateFragmentList();
     }
 
     public void notifyTabsChanged() {
