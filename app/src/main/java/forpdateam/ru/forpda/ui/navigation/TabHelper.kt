@@ -1,4 +1,4 @@
-package forpdateam.ru.forpda.ui
+package forpdateam.ru.forpda.ui.navigation
 
 import android.os.Bundle
 import forpdateam.ru.forpda.presentation.Screen
