@@ -179,7 +179,7 @@ public class TabFragment extends MvpAppCompatFragment {
     public final void setTitle(String newTitle) {
         this.title = newTitle;
         if (tabTitle == null){
-            //TabManager.get().notifyTabDataChanged();
+            getMainActivity().getTabNavigator().notifyUpdate(this);
         }
         toolbarTitleView.setText(getTitle());
     }
@@ -206,7 +206,7 @@ public class TabFragment extends MvpAppCompatFragment {
 
     public void setTabTitle(String tabTitle) {
         this.tabTitle = tabTitle;
-        //TabManager.get().notifyTabDataChanged();
+        getMainActivity().getTabNavigator().notifyUpdate(this);
     }
 
     public Menu getMenu() {
@@ -287,6 +287,7 @@ public class TabFragment extends MvpAppCompatFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getMainActivity().getTabNavigator().subscribe(this);
         mUiThread = Thread.currentThread();
         Log.d(LOG_TAG, "onCreate " + this);
         if (savedInstanceState != null) {
@@ -517,6 +518,7 @@ public class TabFragment extends MvpAppCompatFragment {
     @CallSuper
     public void onDestroy() {
         super.onDestroy();
+        getMainActivity().getTabNavigator().unsubscribe(this);
         attachedWebView = null;
         Log.d(LOG_TAG, "onDestroy " + this);
         if (!disposables.isDisposed())

@@ -31,9 +31,13 @@ import forpdateam.ru.forpda.ui.fragments.favorites.FavoritesFragment;
 import forpdateam.ru.forpda.ui.fragments.mentions.MentionsFragment;
 import forpdateam.ru.forpda.ui.fragments.profile.ProfileFragment;
 import forpdateam.ru.forpda.ui.fragments.qms.QmsContactsFragment;
+import forpdateam.ru.forpda.ui.navigation.TabNavigator;
 import forpdateam.ru.forpda.ui.views.adapters.BaseAdapter;
 import forpdateam.ru.forpda.ui.views.drawers.adapters.MenuAdapter;
 import forpdateam.ru.forpda.ui.views.drawers.adapters.TabAdapter;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 
 /**
  * Created by radiationx on 02.05.17.
@@ -58,6 +62,9 @@ public class Drawers {
     private LinearLayoutManager tabListLayoutManager;
     private TabAdapter tabAdapter;
     private Button tabCloseAllButton;
+
+    private TabNavigator tabNavigator;
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     boolean isFirstSelected = false;
 
@@ -126,6 +133,7 @@ public class Drawers {
     public Drawers(MainActivity activity, DrawerLayout drawerLayout) {
         this.activity = activity;
         this.drawerLayout = drawerLayout;
+        this.tabNavigator = activity.getTabNavigator();
         menuDrawer = (NavigationView) activity.findViewById(R.id.menu_drawer);
         tabDrawer = (NavigationView) activity.findViewById(R.id.tab_drawer);
 
@@ -155,6 +163,13 @@ public class Drawers {
         App.get().addPreferenceChangeObserver(preferenceObserver);
         App.get().addStatusBarSizeObserver(statusBarSizeObserver);
         App.get().subscribeForbidden(forbiddenObserver);
+
+        Disposable disposable = tabNavigator
+                .observeSubscribers()
+                .subscribe(tabFragments -> {
+                    tabAdapter.setItems(tabFragments);
+                });
+        compositeDisposable.add(disposable);
     }
 
     public NavigationView getMenuDrawer() {
@@ -169,7 +184,7 @@ public class Drawers {
 
     public void init(Bundle savedInstanceState) {
         initMenu(savedInstanceState);
-        //initTabs(savedInstanceState);
+        initTabs(savedInstanceState);
         this.savedInstanceState = savedInstanceState;
         //firstSelect(savedInstanceState);
     }
@@ -194,6 +209,7 @@ public class Drawers {
         App.get().unSubscribeForbidden(forbiddenObserver);
         ClientHelper.get().removeLoginObserver(loginObserver);
         ClientHelper.get().removeCountsObserver(countsObserver);
+        compositeDisposable.dispose();
         //menuAdapter.clear();
         //tabAdapter.clear();
     }
@@ -285,6 +301,7 @@ public class Drawers {
             @Override
             public void onItemClick(TabFragment item) {
                 //TabManager.get().select(item);
+                tabNavigator.select(item.getTag());
                 closeTabs();
             }
 
@@ -301,6 +318,7 @@ public class Drawers {
                 if (TabManager.get().getSize() < 1) {
                     activity.finish();
                 }*/
+                tabNavigator.close(item.getTag());
             }
 
             @Override
@@ -340,8 +358,8 @@ public class Drawers {
         new AlertDialog.Builder(activity)
                 .setMessage(R.string.ask_close_other_tabs)
                 .setPositiveButton(R.string.ok, (dialog, which) -> {
+                    tabNavigator.closeOthers();
                     closeTabs();
-                    router.exitOthers();
                 })
                 .setNegativeButton(R.string.no, null)
                 .show();

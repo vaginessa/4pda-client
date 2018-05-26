@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean currentThemeIsDark = App.get().isDarkTheme();
     private boolean checkWebView = true;
 
-    private TabNavigator tabNavigator = null;
+    private TabNavigator tabNavigator = new TabNavigator(this, R.id.fragments_container);
 
 
     public View.OnClickListener getToggleListener() {
@@ -68,11 +68,13 @@ public class MainActivity extends AppCompatActivity {
         webViewsProvider = new WebViewsProvider();
     }
 
+    public TabNavigator getTabNavigator() {
+        return tabNavigator;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        tabNavigator = new TabNavigator(this, R.id.fragments_container);
         if (EmptyActivity.empty(App.get().getPreferences().getString("auth.user.nick", ""))) {
             startActivity(new Intent(this, EmptyActivity.class));
             finish();

@@ -5,8 +5,10 @@ import android.content.Intent
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import android.util.Log
+import com.jakewharton.rxrelay2.BehaviorRelay
 import forpdateam.ru.forpda.presentation.Screen
 import forpdateam.ru.forpda.ui.fragments.TabFragment
+import io.reactivex.Observable
 import ru.terrakok.cicerone.Navigator
 import ru.terrakok.cicerone.commands.*
 
@@ -19,17 +21,94 @@ class TabNavigator(
         private const val TAG_PREFIX = "Tab_"
     }
 
-    private val tabHelper = TabHelper()
-    private val fragmentManager = activity.supportFragmentManager
-    private val tabController = TabController()
+    private val tabHelper by lazy { TabHelper() }
+    private val fragmentManager by lazy { activity.supportFragmentManager }
+    private val tabController by lazy { TabController() }
+
+    private val subscribers = mutableListOf<TabFragment>()
+    private val subscribersRelay = BehaviorRelay.createDefault(subscribers as List<TabFragment>)
+
+    fun subscribe(tab: TabFragment) {
+        Log.e("lalala", "subscribe $tab")
+        subscribers.add(tab)
+        subscribersRelay.accept(subscribers)
+    }
+
+    fun unsubscribe(tab: TabFragment) {
+        Log.e("lalala", "unsubscribe $tab")
+        subscribers.remove(tab)
+        subscribersRelay.accept(subscribers)
+    }
+
+    fun notifyUpdate(tab: TabFragment) {
+        Log.e("lalala", "notifyUpdate $tab")
+        subscribersRelay.accept(subscribers)
+    }
+
+    fun observeSubscribers(): Observable<List<TabFragment>> = subscribersRelay
+
+    fun select(tabTag: String?) {
+        if (tabTag == null) {
+            Log.e("lalala", "select CANCEL: tabTag==null")
+            return
+        }
+        val fragment = getByTag(tabTag)
+        Log.e("lalala", "select tag=$tabTag fr=$fragment")
+        tabController.setCurrent(tabTag)
+        updateFragmentsState()
+    }
+
+    fun close(tabTag: String?) {
+        if (tabTag == null) {
+            Log.e("lalala", "close CANCEL: tabTag==null")
+            return
+        }
+        val fragment = getByTag(tabTag)
+        Log.e("lalala", "close tag=$tabTag fr=$fragment")
+        fragmentManager
+                .beginTransaction()
+                .remove(fragment)
+                .commit()
+        tabController.remove(tabTag)
+        updateFragmentsState()
+    }
+
+    fun closeOthers() {
+        val transaction = fragmentManager.beginTransaction()
+        val itemTags = tabController.getList().map { it.tag }.filter { it != tabController.getCurrent()?.tag }
+        Log.e("lalala", "closeOthers")
+        itemTags.forEach { itemTag ->
+            getByTag(itemTag)?.also { fragment ->
+                Log.e("lalala", "closeOthers item=${itemTag} fr=$fragment")
+                transaction.remove(fragment)
+                tabController.remove(itemTag)
+            }
+        }
+        transaction.commit()
+        updateFragmentsState()
+    }
 
     private fun updateFragmentsState() {
-        tabController.getCurrent()?.tag?.let { getByTag(it) }?.also { fragment ->
+        /*tabController.getCurrent()?.tag?.let { getByTag(it) }?.also { fragment ->
             fragmentManager
                     .beginTransaction()
                     .show(fragment)
                     .commit()
+        }*/
+        tabController.printTabItems("lalala")
+        Log.e("lalala", "updateFragmentsState")
+        val transaction = fragmentManager.beginTransaction()
+        tabController.getList().forEach { item ->
+            getByTag(item.tag)?.also { fragment ->
+                Log.e("lalala", "updateFragmentsState item=${item.tag} ct=${tabController.getCurrent()?.tag} fr=${fragment} ")
+                if (item.tag == tabController.getCurrent()?.tag) {
+                    transaction.show(fragment)
+                } else {
+                    transaction.hide(fragment)
+                }
+            }
         }
+        transaction.commit()
     }
 
     private fun getByTag(tag: String): TabFragment? {
@@ -100,8 +179,8 @@ class TabNavigator(
                     .remove(fragment)
                     .add(containerId, newFragment, tag)
                     .commit()
-            updateFragmentsState()
             tabController.replace(tag, (command.transitionData as Screen).getKey())
+            updateFragmentsState()
         }
     }
 

@@ -6,6 +6,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.List;
+
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
@@ -22,6 +24,8 @@ public class TabAdapter extends BaseAdapter<TabFragment, TabAdapter.TabHolder> {
     private BaseAdapter.OnItemClickListener<TabFragment> itemClickListener;
     private BaseAdapter.OnItemClickListener<TabFragment> closeClickListener;
 
+    private List<TabFragment> tabFragments;
+
     public void setItemClickListener(BaseAdapter.OnItemClickListener<TabFragment> itemClickListener) {
         this.itemClickListener = itemClickListener;
     }
@@ -30,17 +34,22 @@ public class TabAdapter extends BaseAdapter<TabFragment, TabAdapter.TabHolder> {
         this.closeClickListener = closeClickListener;
     }
 
+    public void setItems(List<TabFragment> tabs) {
+        tabFragments = tabs;
+        notifyDataSetChanged();
+    }
+
     public TabFragment getItem(int position) {
         //todo fix it
         //return TabManager.get().get(position);
-        return null;
+        return tabFragments.get(position);
     }
 
     @Override
     public int getItemCount() {
         //todo fix it
         //return TabManager.get().getSize();
-        return 0;
+        return tabFragments.size();
     }
 
     @Override

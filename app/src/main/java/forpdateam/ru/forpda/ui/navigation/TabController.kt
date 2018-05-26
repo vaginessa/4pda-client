@@ -3,10 +3,38 @@ package forpdateam.ru.forpda.ui.navigation
 import android.util.Log
 
 class TabController {
-    private var currentTag = ""
+
+    companion object {
+        private const val EMPTY_TAG = ""
+    }
+
+    private var currentTag = EMPTY_TAG
     private val tabs = mutableListOf<TabItem>()
 
     fun getCurrent() = findTabItem(currentTag)
+    fun setCurrent(tag: String) {
+        val item = findTabItem(tag)
+                ?: throw Exception("You want to do the impossible. You want set current tag: \"$tag\", but this tag does not exist!")
+        currentTag = item.tag
+    }
+
+    fun getList(): List<TabItem> {
+        val result = mutableListOf<TabItem>()
+        tabs.forEach {
+            result.add(it)
+            result.addAll(getListTree(it))
+        }
+        return result
+    }
+
+    private fun getListTree(item: TabItem): List<TabItem> {
+        val result = mutableListOf<TabItem>()
+        item.children.forEach {
+            result.add(it)
+            result.addAll(getListTree(it))
+        }
+        return result
+    }
 
     fun addNew(tag: String, screen: String): TabItem {
         val item = findTabItem(currentTag)
@@ -29,16 +57,15 @@ class TabController {
 
     fun remove(tag: String, print: Boolean = true) {
         findTabItem(tag)?.also { item ->
-            item.parent?.also { parent ->
-                val index = parent.children.indexOf(item)
-                parent.children.removeAt(index)
-                parent.children.addAll(index, item.children)
-                item.children.forEach { child ->
-                    child.parent = parent
-                }
-                item.children.clear()
-                currentTag = parent.tag
+            val parentList = item.parent?.children ?: tabs
+            val index = parentList.indexOf(item)
+            parentList.removeAt(index)
+            parentList.addAll(index, item.children)
+            item.children.forEach { child ->
+                child.parent = item.parent
             }
+            item.children.clear()
+            currentTag = item.parent?.tag ?: getNearest(index, parentList)?.tag ?: EMPTY_TAG
             item.parent = null
         }
         Log.e("TabController", "remove t=$tag")
@@ -54,18 +81,17 @@ class TabController {
                 it.tag = tag
                 it.screen = screen
             }
-            item.parent?.also { parent ->
-                val index = parent.children.indexOf(item)
-                parent.children.removeAt(index)
-                parent.children.addAll(index, item.children)
-                parent.children.add(index, newItem.also {
-                    it.parent = parent
-                })
-                item.children.forEach { child ->
-                    child.parent = parent
-                }
-                item.children.clear()
+            val parentList = item.parent?.children ?: tabs
+            val index = parentList.indexOf(item)
+            parentList.removeAt(index)
+            parentList.addAll(index, item.children)
+            parentList.add(index, newItem.also {
+                it.parent = item.parent
+            })
+            item.children.forEach { child ->
+                child.parent = item.parent
             }
+            item.children.clear()
             item.parent = null
         }
         currentTag = tag
@@ -89,6 +115,22 @@ class TabController {
         Log.e("TabController", "backTo s=$screen")
         printTabItems()
         return tagsRemove
+    }
+
+    private fun getNearest(index: Int, list: List<TabItem>): TabItem? {
+        if (list.isEmpty()) {
+            return null
+        }
+        if (index >= 0 && index < list.size) {
+            return list[index]
+        }
+        if (index < 0) {
+            return list[0]
+        }
+        if (index >= list.size) {
+            return list[list.size - 1]
+        }
+        return null
     }
 
     private fun findTabItem(tag: String): TabItem? {
@@ -115,14 +157,14 @@ class TabController {
         return null
     }
 
-    private fun printTabItems() {
+    fun printTabItems(logTag: String = "TabController") {
         var lal = ""
         tabs.forEach {
             lal += "root->TabItem(${it.tag}, ${it.screen}, ${it.parent?.tag}, ${it.children.size})${if (currentTag == it.tag) " <-- current" else ""}\n"
             lal += printTabItemsTree(it, 1)
         }
         System.out.print(lal)
-        Log.e("TabController", "tree:\n$lal")
+        Log.e(logTag, "tree:\n$lal")
     }
 
     private fun printTabItemsTree(tab: TabItem, level: Int): String {

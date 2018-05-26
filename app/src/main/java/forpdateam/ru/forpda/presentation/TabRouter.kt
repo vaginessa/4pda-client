@@ -7,10 +7,6 @@ class TabRouter : Router() {
         private const val errorMessage = "Use methods with class Screen instead screenKey"
     }
 
-    fun exitOthers(){
-        throw Exception("Hey, ti sho, zabil pro menya?")
-    }
-
     fun newScreenChain(screen: Screen) {
         super.newScreenChain(screen.getKey(), screen)
     }
