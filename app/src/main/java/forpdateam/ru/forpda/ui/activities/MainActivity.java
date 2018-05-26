@@ -29,8 +29,9 @@ import forpdateam.ru.forpda.common.webview.WebViewsProvider;
 import forpdateam.ru.forpda.notifications.NotificationsService;
 import forpdateam.ru.forpda.presentation.Screen;
 import forpdateam.ru.forpda.presentation.TabRouter;
-import forpdateam.ru.forpda.ui.navigation.TabNavigator;
 import forpdateam.ru.forpda.ui.activities.updatechecker.SimpleUpdateChecker;
+import forpdateam.ru.forpda.ui.fragments.TabFragment;
+import forpdateam.ru.forpda.ui.navigation.TabNavigator;
 import forpdateam.ru.forpda.ui.views.KeyboardUtil;
 import forpdateam.ru.forpda.ui.views.drawers.DrawerHeader;
 import forpdateam.ru.forpda.ui.views.drawers.Drawers;
@@ -282,29 +283,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void backHandler(boolean fromToolbar) {
-        /*if (TabManager.get().getSize() <= 1) {
-            super.onBackPressed();
-        } else {
-            if (fromToolbar || !TabManager.get().getActive().onBackPressed()) {
-                hideKeyboard();
-                TabManager.get().remove(TabManager.get().getActive());
-            }
-        }*/
-
-        //todo fix it
-        /*TabFragment active = tabManager.getActive();
+        TabFragment active = tabNavigator.getCurrentFragment();
         if (active == null) {
-            finish();
+            App.get().Di().getRouter().exit();
             return;
         }
         if (fromToolbar || !active.onBackPressed()) {
             hideKeyboard();
-            tabManager.remove(active);
-            if (tabManager.getSize() < 1) {
-                finish();
-            }
-        }*/
-        App.get().Di().getRouter().exit();
+            tabNavigator.close(active.getTag());
+        }
     }
 
     public WebViewsProvider getWebViewsProvider() {

@@ -2,7 +2,6 @@ package forpdateam.ru.forpda.ui.fragments.auth;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -35,11 +34,8 @@ import forpdateam.ru.forpda.entity.remote.profile.ProfileModel;
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
 import forpdateam.ru.forpda.presentation.auth.AuthPresenter;
 import forpdateam.ru.forpda.presentation.auth.AuthView;
-import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.activities.EmptyActivity;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
-import forpdateam.ru.forpda.ui.fragments.news.main.NewsMainFragment;
-import forpdateam.ru.forpda.ui.views.drawers.Drawers;
 
 /**
  * Created by radiationx on 29.07.16.
@@ -67,7 +63,8 @@ public class AuthFragment extends TabFragment implements AuthView {
         return new AuthPresenter(
                 App.get().Di().getAuthRepository(),
                 App.get().Di().getProfileRepository(),
-                App.get().Di().getRouter()
+                App.get().Di().getRouter(),
+                App.get().Di().getSchedulers()
         );
     }
 

@@ -4,6 +4,7 @@ import com.arellomobile.mvp.InjectViewState
 import forpdateam.ru.forpda.client.ClientHelper
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.remote.auth.AuthForm
+import forpdateam.ru.forpda.model.SchedulersProvider
 import forpdateam.ru.forpda.model.repository.auth.AuthRepository
 import forpdateam.ru.forpda.model.repository.profile.ProfileRepository
 import forpdateam.ru.forpda.presentation.Screen
@@ -19,7 +20,8 @@ import java.util.concurrent.TimeUnit
 class AuthPresenter(
         private val authRepository: AuthRepository,
         private val profileRepository: ProfileRepository,
-        private val router: TabRouter
+        private val router: TabRouter,
+        private val schedulers: SchedulersProvider
 ) : BasePresenter<AuthView>() {
 
     override fun onFirstViewAttach() {
@@ -75,9 +77,11 @@ class AuthPresenter(
         Observable
                 .just(false)
                 .delay(2000L, TimeUnit.MILLISECONDS)
+                .subscribeOn(schedulers.io())
+                .observeOn(schedulers.ui())
                 .subscribe {
                     ClientHelper.get().notifyAuthChanged(ClientHelper.AUTH_STATE_LOGIN)
-                    router.exit()
+                    router.replaceScreen(Screen.Favorites())
                 }
                 .addToDisposable()
     }

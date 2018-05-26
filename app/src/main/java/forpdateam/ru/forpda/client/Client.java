@@ -2,7 +2,6 @@ package forpdateam.ru.forpda.client;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -24,8 +23,6 @@ import forpdateam.ru.forpda.model.data.remote.IWebClient;
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkRequest;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
-import forpdateam.ru.forpda.ui.TabManager;
-import forpdateam.ru.forpda.ui.fragments.other.GoogleCaptchaFragment;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.FormBody;

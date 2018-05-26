@@ -18,6 +18,8 @@ class TabController {
         currentTag = item.tag
     }
 
+    fun isCurrent(tag: String?): Boolean = currentTag == tag
+
     fun getList(): List<TabItem> {
         val result = mutableListOf<TabItem>()
         tabs.forEach {

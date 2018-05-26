@@ -1,6 +1,7 @@
 package forpdateam.ru.forpda.ui.views.drawers.adapters;
 
 import android.graphics.Color;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -9,7 +10,6 @@ import android.widget.TextView;
 import java.util.List;
 
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import forpdateam.ru.forpda.ui.views.adapters.BaseAdapter;
 import forpdateam.ru.forpda.ui.views.adapters.BaseViewHolder;
@@ -40,15 +40,11 @@ public class TabAdapter extends BaseAdapter<TabFragment, TabAdapter.TabHolder> {
     }
 
     public TabFragment getItem(int position) {
-        //todo fix it
-        //return TabManager.get().get(position);
         return tabFragments.get(position);
     }
 
     @Override
     public int getItemCount() {
-        //todo fix it
-        //return TabManager.get().getSize();
         return tabFragments.size();
     }
 
@@ -82,13 +78,12 @@ public class TabAdapter extends BaseAdapter<TabFragment, TabAdapter.TabHolder> {
 
         @Override
         public void bind(TabFragment item, int position) {
-            //todo fix it
-            /*if (position == TabManager.getActiveIndex())
+            Log.d("lalala", "TabAdapter bind " + item + " : " + item.isActiveTab() + " : " + position);
+            if (item.isActiveTab())
                 itemView.setBackgroundColor(color);
             else
-                itemView.setBackgroundColor(Color.TRANSPARENT);*/
+                itemView.setBackgroundColor(Color.TRANSPARENT);
 
-            itemView.setBackgroundColor(Color.TRANSPARENT);
             text.setText(item.getTabTitle());
         }
 

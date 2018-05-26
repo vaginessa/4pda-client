@@ -23,7 +23,7 @@ class TabNavigator(
 
     private val tabHelper by lazy { TabHelper() }
     private val fragmentManager by lazy { activity.supportFragmentManager }
-    private val tabController by lazy { TabController() }
+    val tabController by lazy { TabController() }
 
     private val subscribers = mutableListOf<TabFragment>()
     private val subscribersRelay = BehaviorRelay.createDefault(subscribers as List<TabFragment>)
@@ -46,6 +46,12 @@ class TabNavigator(
     }
 
     fun observeSubscribers(): Observable<List<TabFragment>> = subscribersRelay
+
+    fun getCurrentFragment(): TabFragment? {
+        return tabController.getCurrent()?.let {
+            getByTag(it.tag)
+        }
+    }
 
     fun select(tabTag: String?) {
         if (tabTag == null) {
@@ -71,6 +77,9 @@ class TabNavigator(
                 .commit()
         tabController.remove(tabTag)
         updateFragmentsState()
+        if (tabController.getList().isEmpty()) {
+            exit()
+        }
     }
 
     fun closeOthers() {
@@ -109,6 +118,7 @@ class TabNavigator(
             }
         }
         transaction.commit()
+        subscribersRelay.accept(subscribers)
     }
 
     private fun getByTag(tag: String): TabFragment? {

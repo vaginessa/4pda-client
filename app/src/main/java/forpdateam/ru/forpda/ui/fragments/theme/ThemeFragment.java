@@ -58,7 +58,6 @@ import forpdateam.ru.forpda.model.data.remote.api.RequestFile;
 import forpdateam.ru.forpda.model.data.remote.api.favorites.FavoritesApi;
 import forpdateam.ru.forpda.presentation.theme.ThemePresenter;
 import forpdateam.ru.forpda.presentation.theme.ThemeView;
-import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import forpdateam.ru.forpda.ui.fragments.favorites.FavoritesFragment;
 import forpdateam.ru.forpda.ui.fragments.notes.NotesAddPopup;

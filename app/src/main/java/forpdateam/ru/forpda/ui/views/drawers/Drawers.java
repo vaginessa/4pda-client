@@ -13,7 +13,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Observer;
 
 import forpdateam.ru.forpda.App;
@@ -22,22 +21,15 @@ import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.Preferences;
 import forpdateam.ru.forpda.presentation.Screen;
 import forpdateam.ru.forpda.presentation.TabRouter;
-import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.activities.MainActivity;
 import forpdateam.ru.forpda.ui.activities.SettingsActivity;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
-import forpdateam.ru.forpda.ui.fragments.auth.AuthFragment;
-import forpdateam.ru.forpda.ui.fragments.favorites.FavoritesFragment;
-import forpdateam.ru.forpda.ui.fragments.mentions.MentionsFragment;
-import forpdateam.ru.forpda.ui.fragments.profile.ProfileFragment;
-import forpdateam.ru.forpda.ui.fragments.qms.QmsContactsFragment;
 import forpdateam.ru.forpda.ui.navigation.TabNavigator;
 import forpdateam.ru.forpda.ui.views.adapters.BaseAdapter;
 import forpdateam.ru.forpda.ui.views.drawers.adapters.MenuAdapter;
 import forpdateam.ru.forpda.ui.views.drawers.adapters.TabAdapter;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 
 /**
  * Created by radiationx on 02.05.17.
@@ -75,11 +67,6 @@ public class Drawers {
         menuItems.clear();
         fillMenuItems();
         menuAdapter.notifyDataSetChanged();
-        //todo fix this
-        /*if ((boolean) o && TabManager.get().getSize() <= 1) {
-            //select(findByClassName(NewsTimelineFragment.class.getSimpleName()));
-            selectMenuItem(findMenuItem(Screen.Favorites.class));
-        }*/
         if (!(boolean) o) {
             ClientHelper.setQmsCount(0);
             ClientHelper.setFavoritesCount(0);
@@ -296,11 +283,9 @@ public class Drawers {
     }
 
     private void initTabs(Bundle savedInstanceState) {
-        //todo fix it
         tabAdapter.setItemClickListener(new BaseAdapter.OnItemClickListener<TabFragment>() {
             @Override
             public void onItemClick(TabFragment item) {
-                //TabManager.get().select(item);
                 tabNavigator.select(item.getTag());
                 closeTabs();
             }
@@ -314,10 +299,6 @@ public class Drawers {
         tabAdapter.setCloseClickListener(new BaseAdapter.OnItemClickListener<TabFragment>() {
             @Override
             public void onItemClick(TabFragment item) {
-                /*TabManager.get().remove(item);
-                if (TabManager.get().getSize() < 1) {
-                    activity.finish();
-                }*/
                 tabNavigator.close(item.getTag());
             }
 
@@ -326,8 +307,6 @@ public class Drawers {
                 return false;
             }
         });
-        //TabManager.get().loadState(savedInstanceState);
-        //TabManager.get().updateFragmentList();
     }
 
     public void notifyTabsChanged() {

@@ -40,7 +40,6 @@ import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.ErrorHandler;
 import forpdateam.ru.forpda.common.Preferences;
 import forpdateam.ru.forpda.model.NetworkStateProvider;
-import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.activities.MainActivity;
 import forpdateam.ru.forpda.ui.views.ContentController;
 import forpdateam.ru.forpda.ui.views.ExtendedWebView;
@@ -64,7 +63,6 @@ public class TabFragment extends MvpAppCompatFragment {
     private final static String BUNDLE_TITLE = "title";
     private final static String BUNDLE_TAB_TITLE = "tab_title";
     private final static String BUNDLE_SUBTITLE = "subtitle";
-    private final static String BUNDLE_PARENT_TAG = "parent_tag";
 
     public final static int REQUEST_PICK_FILE = 1228;
     public final static int REQUEST_SAVE_FILE = 1117;
@@ -75,7 +73,7 @@ public class TabFragment extends MvpAppCompatFragment {
 
     protected final TabConfiguration configuration = new TabConfiguration();
 
-    private String title = null, tabTitle = null, subtitle = null, parentTag = null;
+    private String title = null, tabTitle = null, subtitle = null;
 
     protected ProgressBar toolbarProgress;
     protected RelativeLayout fragmentContainer;
@@ -159,26 +157,17 @@ public class TabFragment extends MvpAppCompatFragment {
         }
     };
 
-    public TabFragment() {
-        //parentTag = TabManager.getActiveTag();
-    }
-
-    public String getParentTag() {
-        return parentTag;
-    }
-
     public TabConfiguration getConfiguration() {
         return configuration;
     }
 
-    /* For TabManager etc */
     public String getTitle() {
         return title == null ? configuration.getDefaultTitle() : title;
     }
 
     public final void setTitle(String newTitle) {
         this.title = newTitle;
-        if (tabTitle == null){
+        if (tabTitle == null) {
             getMainActivity().getTabNavigator().notifyUpdate(this);
         }
         toolbarTitleView.setText(getTitle());
@@ -294,7 +283,6 @@ public class TabFragment extends MvpAppCompatFragment {
             title = savedInstanceState.getString(BUNDLE_PREFIX.concat(BUNDLE_TITLE));
             subtitle = savedInstanceState.getString(BUNDLE_PREFIX.concat(BUNDLE_SUBTITLE));
             tabTitle = savedInstanceState.getString(BUNDLE_PREFIX.concat(BUNDLE_TAB_TITLE));
-            parentTag = savedInstanceState.getString(BUNDLE_PREFIX.concat(BUNDLE_PARENT_TAG));
         }
         if (getArguments() != null) {
             title = getArguments().getString(ARG_TITLE);
@@ -472,7 +460,6 @@ public class TabFragment extends MvpAppCompatFragment {
         outState.putString(BUNDLE_PREFIX.concat(BUNDLE_TITLE), title);
         outState.putString(BUNDLE_PREFIX.concat(BUNDLE_SUBTITLE), subtitle);
         outState.putString(BUNDLE_PREFIX.concat(BUNDLE_TAB_TITLE), tabTitle);
-        outState.putString(BUNDLE_PREFIX.concat(BUNDLE_PARENT_TAG), parentTag);
     }
 
 
@@ -482,6 +469,10 @@ public class TabFragment extends MvpAppCompatFragment {
 
     public final MainActivity getMainActivity() {
         return (MainActivity) getActivity();
+    }
+
+    public final boolean isActiveTab() {
+        return getMainActivity().getTabNavigator().getTabController().isCurrent(getTag());
     }
 
     @Override

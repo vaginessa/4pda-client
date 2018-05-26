@@ -7,18 +7,6 @@ import java.util.ArrayList;
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.presentation.Screen;
-import forpdateam.ru.forpda.ui.fragments.TabFragment;
-import forpdateam.ru.forpda.ui.fragments.auth.AuthFragment;
-import forpdateam.ru.forpda.ui.fragments.devdb.brands.BrandsFragment;
-import forpdateam.ru.forpda.ui.fragments.favorites.FavoritesFragment;
-import forpdateam.ru.forpda.ui.fragments.forum.ForumFragment;
-import forpdateam.ru.forpda.ui.fragments.history.HistoryFragment;
-import forpdateam.ru.forpda.ui.fragments.mentions.MentionsFragment;
-import forpdateam.ru.forpda.ui.fragments.news.main.NewsMainFragment;
-import forpdateam.ru.forpda.ui.fragments.notes.NotesFragment;
-import forpdateam.ru.forpda.ui.fragments.other.ForumRulesFragment;
-import forpdateam.ru.forpda.ui.fragments.qms.QmsContactsFragment;
-import forpdateam.ru.forpda.ui.fragments.search.SearchFragment;
 
 /**
  * Created by radiationx on 02.05.17.

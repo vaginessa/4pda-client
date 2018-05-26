@@ -29,11 +29,9 @@ import forpdateam.ru.forpda.entity.app.TabNotification;
 import forpdateam.ru.forpda.entity.remote.qms.QmsContact;
 import forpdateam.ru.forpda.presentation.qms.contacts.QmsContactsPresenter;
 import forpdateam.ru.forpda.presentation.qms.contacts.QmsContactsView;
-import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.RecyclerFragment;
 import forpdateam.ru.forpda.ui.fragments.notes.NotesAddPopup;
 import forpdateam.ru.forpda.ui.fragments.qms.adapters.QmsContactsAdapter;
-import forpdateam.ru.forpda.ui.fragments.qms.chat.QmsChatFragment;
 import forpdateam.ru.forpda.ui.views.DynamicDialogMenu;
 import forpdateam.ru.forpda.ui.views.PauseOnScrollListener;
 

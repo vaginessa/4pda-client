@@ -27,9 +27,7 @@ import forpdateam.ru.forpda.entity.remote.theme.ThemePage;
 import forpdateam.ru.forpda.model.data.remote.api.RequestFile;
 import forpdateam.ru.forpda.presentation.editpost.EditPostPresenter;
 import forpdateam.ru.forpda.presentation.editpost.EditPostView;
-import forpdateam.ru.forpda.ui.TabManager;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
-import forpdateam.ru.forpda.ui.fragments.theme.ThemeFragment;
 import forpdateam.ru.forpda.ui.views.messagepanel.MessagePanel;
 import forpdateam.ru.forpda.ui.views.messagepanel.attachments.AttachmentsPopup;
 
