@@ -34,7 +34,8 @@ import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import forpdateam.ru.forpda.ui.navigation.TabNavigator;
 import forpdateam.ru.forpda.ui.views.KeyboardUtil;
 import forpdateam.ru.forpda.ui.views.drawers.DrawerHeader;
-import forpdateam.ru.forpda.ui.views.drawers.Drawers;
+import forpdateam.ru.forpda.ui.views.drawers.MenuDrawer;
+import forpdateam.ru.forpda.ui.views.drawers.TabsDrawer;
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -46,9 +47,10 @@ public class MainActivity extends AppCompatActivity {
     public final static String DEF_TITLE = "ForPDA";
     public final static String ARG_CHECK_WEBVIEW = "CHECK_WEBVIEW";
     private WebViewsProvider webViewsProvider;
-    private Drawers drawers;
+    private MenuDrawer menuDrawer;
+    private TabsDrawer tabsDrawer;
     private DrawerHeader drawerHeader;
-    private final View.OnClickListener toggleListener = view -> drawers.toggleMenu();
+    private final View.OnClickListener toggleListener = view -> menuDrawer.toggleMenu();
     private final View.OnClickListener removeTabListener = view -> backHandler(true);
     private List<SimpleTooltip> tooltips = new ArrayList<>();
     private boolean currentThemeIsDark = App.get().isDarkTheme();
@@ -113,9 +115,12 @@ public class MainActivity extends AppCompatActivity {
          * P.S.S. Первая вьюха - контейнер фрагментов, вторая - view_for_measure
          * */
         drawerLayout.setScrimColor(0x4C000000);
-        drawers = new Drawers(this, drawerLayout);
-        drawers.init(savedInstanceState);
-        drawerHeader = new DrawerHeader(this, drawerLayout);
+        menuDrawer = new MenuDrawer(this, drawerLayout, tabNavigator);
+        tabsDrawer = new TabsDrawer(this, drawerLayout, tabNavigator);
+        drawerHeader = new DrawerHeader(this, drawerLayout, v -> {
+            menuDrawer.closeMenu();
+            tabsDrawer.closeTabs();
+        });
         drawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
@@ -151,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
                 if (drawerView.getId() == R.id.menu_drawer) {
                     if (App.get().getPreferences().getBoolean("drawers.tooltip.tabs_drawer", true)) {
                         SimpleTooltip tooltip = new SimpleTooltip.Builder(MainActivity.this)
-                                .anchorView(drawers.getTabDrawer())
+                                .anchorView(tabsDrawer.getTabDrawer())
                                 .text(R.string.tooltip_tabs)
                                 .gravity(Gravity.START)
                                 .animated(false)
@@ -216,10 +221,6 @@ public class MainActivity extends AppCompatActivity {
         NotificationsService.startAndCheck();
     }
 
-    public Drawers getDrawers() {
-        return drawers;
-    }
-
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
@@ -253,12 +254,12 @@ public class MainActivity extends AppCompatActivity {
             tooltips.get(tooltips.size() - 1).dismiss();
             return;
         }
-        if (drawers.isMenuOpen()) {
-            drawers.closeMenu();
+        if (menuDrawer.isMenuOpen()) {
+            menuDrawer.closeMenu();
             return;
         }
-        if (drawers.isTabsOpen()) {
-            drawers.closeTabs();
+        if (tabsDrawer.isTabsOpen()) {
+            tabsDrawer.closeTabs();
             return;
         }
         backHandler(false);
@@ -358,8 +359,11 @@ public class MainActivity extends AppCompatActivity {
         Log.d(LOG_TAG, "onDestroy");
         super.onDestroy();
 
-        if (drawers != null) {
-            drawers.destroy();
+        if (menuDrawer != null) {
+            menuDrawer.destroy();
+        }
+        if (tabsDrawer != null) {
+            tabsDrawer.destroy();
         }
         if (drawerHeader != null) {
             drawerHeader.destroy();

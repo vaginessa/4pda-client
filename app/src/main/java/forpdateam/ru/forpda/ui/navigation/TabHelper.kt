@@ -29,7 +29,7 @@ import forpdateam.ru.forpda.ui.fragments.search.SearchFragment
 import forpdateam.ru.forpda.ui.fragments.theme.ThemeFragmentWeb
 import forpdateam.ru.forpda.ui.fragments.topics.TopicsFragment
 
-class TabHelper {
+object TabHelper {
 
     private fun createFragment(tabClass: Class<out TabFragment>, args: Bundle? = null): TabFragment {
         return tabClass.newInstance().apply {

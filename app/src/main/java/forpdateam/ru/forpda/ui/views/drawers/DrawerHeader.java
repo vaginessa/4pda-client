@@ -39,6 +39,7 @@ public class DrawerHeader {
     private View headerLayout;
     private ImageButton openLinkButton;
     private MainActivity activity;
+    private View.OnClickListener closeListener;
 
     private CompositeDisposable disposables = new CompositeDisposable();
 
@@ -53,8 +54,7 @@ public class DrawerHeader {
 
     private View.OnClickListener headerClickListener = v -> {
         router.navigateTo(new Screen.Profile());
-        activity.getDrawers().closeMenu();
-        activity.getDrawers().closeTabs();
+        closeListener.onClick(v);
     };
 
     private Observer loginObserver = (observable, o) -> {
@@ -73,15 +73,15 @@ public class DrawerHeader {
         ClientHelper.get().removeLoginObserver(loginObserver);
     }
 
-    public DrawerHeader(MainActivity activity, DrawerLayout drawerLayout) {
+    public DrawerHeader(MainActivity activity, DrawerLayout drawerLayout, View.OnClickListener closeListener) {
         this.activity = activity;
+        this.closeListener = closeListener;
         headerLayout = drawerLayout.findViewById(R.id.drawer_header_container);
         avatar = (ImageView) headerLayout.findViewById(R.id.drawer_header_avatar);
         nick = (TextView) headerLayout.findViewById(R.id.drawer_header_nick);
         openLinkButton = (ImageButton) headerLayout.findViewById(R.id.drawer_header_open_link);
         openLinkButton.setOnClickListener(v -> {
-            activity.getDrawers().closeMenu();
-            activity.getDrawers().closeTabs();
+            closeListener.onClick(v);
             String url;
             url = Utils.readFromClipboard();
             if (url == null) url = "";

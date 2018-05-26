@@ -24,28 +24,12 @@ public class TabAdapter extends BaseAdapter<TabFragment, TabAdapter.TabHolder> {
     private BaseAdapter.OnItemClickListener<TabFragment> itemClickListener;
     private BaseAdapter.OnItemClickListener<TabFragment> closeClickListener;
 
-    private List<TabFragment> tabFragments;
-
     public void setItemClickListener(BaseAdapter.OnItemClickListener<TabFragment> itemClickListener) {
         this.itemClickListener = itemClickListener;
     }
 
     public void setCloseClickListener(BaseAdapter.OnItemClickListener<TabFragment> closeClickListener) {
         this.closeClickListener = closeClickListener;
-    }
-
-    public void setItems(List<TabFragment> tabs) {
-        tabFragments = tabs;
-        notifyDataSetChanged();
-    }
-
-    public TabFragment getItem(int position) {
-        return tabFragments.get(position);
-    }
-
-    @Override
-    public int getItemCount() {
-        return tabFragments.size();
     }
 
     @Override

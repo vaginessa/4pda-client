@@ -6,9 +6,11 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import android.util.Log
 import com.jakewharton.rxrelay2.BehaviorRelay
+import forpdateam.ru.forpda.App
 import forpdateam.ru.forpda.presentation.Screen
 import forpdateam.ru.forpda.ui.fragments.TabFragment
 import io.reactivex.Observable
+import io.reactivex.disposables.CompositeDisposable
 import ru.terrakok.cicerone.Navigator
 import ru.terrakok.cicerone.commands.*
 
@@ -21,9 +23,10 @@ class TabNavigator(
         private const val TAG_PREFIX = "Tab_"
     }
 
-    private val tabHelper by lazy { TabHelper() }
     private val fragmentManager by lazy { activity.supportFragmentManager }
     val tabController by lazy { TabController() }
+    private val compositeDisposable = CompositeDisposable()
+    private val schedulers = App.get().Di().schedulers
 
     private val subscribers = mutableListOf<TabFragment>()
     private val subscribersRelay = BehaviorRelay.createDefault(subscribers as List<TabFragment>)
@@ -46,6 +49,11 @@ class TabNavigator(
     }
 
     fun observeSubscribers(): Observable<List<TabFragment>> = subscribersRelay
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.ui())
+            .doOnNext {
+                Log.e("lalala", "SUKA TI CHO OHUEL SHOLE")
+            }
 
     fun getCurrentFragment(): TabFragment? {
         return tabController.getCurrent()?.let {
@@ -221,6 +229,6 @@ class TabNavigator(
     }
 
     private fun createFragment(screenKey: String?, data: Any?): Fragment? {
-        return data?.let { tabHelper.createTab(it as Screen) }
+        return data?.let { TabHelper.createTab(it as Screen) }
     }
 }
