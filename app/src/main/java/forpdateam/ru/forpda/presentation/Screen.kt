@@ -6,13 +6,13 @@ sealed class Screen {
     companion object {
         const val ARG_TITLE = "arg_title"
         const val ARG_SUBTITLE = "arg_subtitle"
-        const val ARG_FROM_MENU = "arg_subtitle"
         private val NO_ID = -1
     }
 
-    var screenTitle: String? = null
-    var screenSubTitle: String? = null
-    var fromMenu: Boolean = false
+    open var screenTitle: String? = null
+    open var screenSubTitle: String? = null
+    open var fromMenu: Boolean = false
+    open var isAlone: Boolean = false
 
     fun getKey(): String = this::class.java.simpleName
 
@@ -37,7 +37,9 @@ sealed class Screen {
     }
 
     /* Fragments */
-    class Auth : Screen()
+    class Auth : Screen() {
+        override var isAlone: Boolean = true
+    }
 
     class DevDbDevices : Screen() {
         var brandId: String? = null
@@ -45,6 +47,7 @@ sealed class Screen {
     }
 
     class DevDbBrands : Screen() {
+        override var isAlone: Boolean = true
         var categoryId: String? = null
     }
 
@@ -63,17 +66,26 @@ sealed class Screen {
         var themeName: String? = null
     }
 
-    class Favorites : Screen()
+    class Favorites : Screen() {
+        override var isAlone: Boolean = true
+    }
 
     class Forum : Screen() {
         var forumId: Int = NO_ID
     }
 
-    class History : Screen()
+    class History : Screen() {
+        override var isAlone: Boolean = true
+    }
 
-    class Mentions : Screen()
+    class Mentions : Screen() {
+        override var isAlone: Boolean = true
+    }
 
-    class ArticleList : Screen()
+    class ArticleList : Screen() {
+        override var isAlone: Boolean = true
+    }
+
     class ArticleDetail : Screen() {
         var articleId: Int = NO_ID
         var commentId: Int = NO_ID
@@ -85,21 +97,29 @@ sealed class Screen {
         var articleCommentsCount: Int = 0
     }
 
-    class Notes : Screen()
+    class Notes : Screen() {
+        override var isAlone: Boolean = true
+    }
 
     class Announce : Screen() {
         var forumId: Int = NO_ID
         var announceId: Int = NO_ID
     }
 
-    class ForumRules : Screen()
+    class ForumRules : Screen() {
+        override var isAlone: Boolean = true
+    }
+
     class GoogleCaptcha : Screen()
 
     class Profile : Screen() {
         var profileUrl: String? = null
     }
 
-    class QmsContacts : Screen()
+    class QmsContacts : Screen() {
+        override var isAlone: Boolean = true
+    }
+
     class QmsBlackList : Screen()
     class QmsThemes : Screen() {
         var userId: Int = NO_ID

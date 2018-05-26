@@ -48,7 +48,6 @@ public class NewsMainFragment extends RecyclerFragment implements NewsListAdapte
 
     public NewsMainFragment() {
         configuration.setDefaultTitle(App.get().getString(R.string.fragment_title_news_list));
-        configuration.setAlone(true);
     }
 
     @Override

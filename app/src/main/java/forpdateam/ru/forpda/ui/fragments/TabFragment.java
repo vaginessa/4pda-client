@@ -551,36 +551,4 @@ public class TabFragment extends MvpAppCompatFragment {
         else
             stopRefreshing();
     }
-
-    /* Experiment */
-    public static class Builder<T extends TabFragment> {
-        private T tClass;
-
-        public Builder(Class<T> tClass) {
-            try {
-                this.tClass = tClass.newInstance();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        public Builder setArgs(Bundle args) {
-            tClass.setArguments(args);
-            return this;
-        }
-
-        public Builder setIsMenu() {
-            tClass.configuration.setMenu(true);
-            return this;
-        }
-
-        /*public Builder setTitle(String title) {
-            tClass.setTitle(title);
-            return this;
-        }*/
-
-        public T build() {
-            return tClass;
-        }
-    }
 }

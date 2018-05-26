@@ -53,7 +53,6 @@ public class MentionsFragment extends RecyclerFragment implements MentionsView {
     }
 
     public MentionsFragment() {
-        configuration.setAlone(true);
         configuration.setDefaultTitle(App.get().getString(R.string.fragment_title_mentions));
     }
 

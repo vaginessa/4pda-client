@@ -112,7 +112,6 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
     };
 
     public FavoritesFragment() {
-        configuration.setAlone(true);
         configuration.setDefaultTitle(App.get().getString(R.string.fragment_title_favorite));
     }
 

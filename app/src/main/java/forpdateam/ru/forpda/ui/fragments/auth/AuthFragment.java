@@ -70,7 +70,6 @@ public class AuthFragment extends TabFragment implements AuthView {
 
     public AuthFragment() {
         configuration.setDefaultTitle(App.get().getString(R.string.fragment_title_auth));
-        configuration.setAlone(true);
     }
 
     @Nullable

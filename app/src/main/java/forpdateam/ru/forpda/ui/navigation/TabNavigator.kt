@@ -58,9 +58,6 @@ class TabNavigator(
     fun observeSubscribers(): Observable<List<TabFragment>> = subscribersRelay
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
-            .doOnNext {
-                Log.e("lalala", "SUKA TI CHO OHUEL SHOLE")
-            }
 
     fun getCurrentFragment(): TabFragment? {
         return tabController.getCurrent()?.let {
@@ -166,6 +163,14 @@ class TabNavigator(
             checkAndStartActivity(command.screenKey, it)
             return
         }
+
+        val newScreen = command.transitionData as Screen
+        tabController.findAlone(newScreen)?.also {
+            tabController.setCurrent(it.tag)
+            updateFragmentsState()
+            return
+        }
+
         val newFragment = createFragment(command.screenKey, command.transitionData)
         if (newFragment != null) {
             val tag = genTag()
@@ -175,7 +180,7 @@ class TabNavigator(
                     .beginTransaction()
                     .add(containerId, newFragment, tag)
                     .commit()
-            tabController.addNew(tag, (command.transitionData as Screen).getKey())
+            tabController.addNew(tag, command.transitionData as Screen)
             updateFragmentsState()
         }
     }
@@ -213,7 +218,7 @@ class TabNavigator(
                     .remove(fragment)
                     .add(containerId, newFragment, tag)
                     .commit()
-            tabController.replace(tag, (command.transitionData as Screen).getKey())
+            tabController.replace(tag, command.transitionData as Screen)
             updateFragmentsState()
         }
     }

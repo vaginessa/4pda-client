@@ -57,8 +57,6 @@ public class ForumRulesFragment extends TabFragment implements ForumRulesView {
     }
 
     public ForumRulesFragment() {
-        configuration.setAlone(true);
-        configuration.setMenu(true);
         configuration.setDefaultTitle("Правила форума");
     }
 

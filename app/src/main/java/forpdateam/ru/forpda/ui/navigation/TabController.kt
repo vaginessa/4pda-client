@@ -1,6 +1,7 @@
 package forpdateam.ru.forpda.ui.navigation
 
 import android.util.Log
+import forpdateam.ru.forpda.presentation.Screen
 
 class TabController {
 
@@ -38,7 +39,14 @@ class TabController {
         return result
     }
 
-    fun addNew(tag: String, screen: String): TabItem {
+    fun findAlone(screen: Screen): TabItem? = getList().firstOrNull {
+        it.screen?.let {
+            it.getKey() == screen.getKey() && (it.isAlone && screen.isAlone || it.fromMenu && screen.fromMenu)
+        } == true
+    }
+
+
+    fun addNew(tag: String, screen: Screen): TabItem {
         val item = findTabItem(currentTag)
         val newItem = TabItem().also {
             it.tag = tag
@@ -77,7 +85,7 @@ class TabController {
         }
     }
 
-    fun replace(tag: String, screen: String) {
+    fun replace(tag: String, screen: Screen) {
         findTabItem(currentTag)?.also { item ->
             val newItem = TabItem().also {
                 it.tag = tag
@@ -106,7 +114,7 @@ class TabController {
         findTabItem(currentTag)?.let { item ->
             var parent: TabItem? = item
             while (parent != null) {
-                if (parent.screen == screen) {
+                if (parent.screen?.getKey() == screen) {
                     break
                 }
                 tagsRemove.add(parent.tag)

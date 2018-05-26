@@ -88,7 +88,6 @@ public class NewsDetailsFragment extends TabFragment implements ArticleDetailVie
     public NewsDetailsFragment() {
         configuration.setDefaultTitle(App.get().getString(R.string.fragment_title_news));
         configuration.setUseCache(false); // back
-        configuration.setAlone(false);
         configuration.setFitSystemWindow(true);
     }
 

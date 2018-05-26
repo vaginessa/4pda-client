@@ -155,6 +155,7 @@ object TabHelper {
             }
         }.apply {
             configuration.isMenu = screen.fromMenu
+            configuration.isAlone = screen.isAlone
         }
     }
 

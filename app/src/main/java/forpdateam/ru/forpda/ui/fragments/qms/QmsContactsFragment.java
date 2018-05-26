@@ -61,8 +61,6 @@ public class QmsContactsFragment extends RecyclerFragment implements QmsContacts
     }
 
     public QmsContactsFragment() {
-        configuration.setAlone(true);
-        configuration.setMenu(true);
         configuration.setDefaultTitle(App.get().getString(R.string.fragment_title_contacts));
     }
 
