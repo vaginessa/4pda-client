@@ -91,6 +91,7 @@ class MenuDrawer(
 
 
     init {
+        allItems.forEach { it.screen.fromMenu = true }
         drawerLayout.apply {
             menu_list.apply {
                 layoutManager = LinearLayoutManager(context)
@@ -100,7 +101,7 @@ class MenuDrawer(
 
         menuAdapter.setItemClickListener(object : BaseAdapter.OnItemClickListener<MenuItem> {
             override fun onItemClick(item: MenuItem) {
-                selectMenuItem(item)
+                openScreen(item)
                 closeMenu()
             }
 
@@ -122,7 +123,7 @@ class MenuDrawer(
                         Log.e("lalala", "Menu subscribe fr=$it, sc=$screen")
                         findMenuItem(screen)?.also {
                             Log.e("lalala", "Menu subscribe select=$it")
-                            selectMenuItem(it, false)
+                            selectMenuItem(it)
                         }
                     }
                 }, {
@@ -146,17 +147,14 @@ class MenuDrawer(
         menuAdapter.addAll(currentMenuItems)
     }
 
-    private fun selectMenuItem(item: MenuItem, withNavigation: Boolean = true) {
-        if (item.screen.javaClass == Screen.Settings::class.java) {
-            activity.startActivity(Intent(activity, SettingsActivity::class.java))
-        } else {
-            if (withNavigation) {
-                router.navigateTo(item.screen)
-            }
-            currentMenuItems.forEach { it.isActive = false }
-            item.isActive = true
-            menuAdapter.notifyDataSetChanged()
-        }
+    private fun selectMenuItem(item: MenuItem) {
+        currentMenuItems.forEach { it.isActive = false }
+        item.isActive = true
+        menuAdapter.notifyDataSetChanged()
+    }
+
+    private fun openScreen(item: MenuItem){
+        router.navigateTo(item.screen)
     }
 
     private fun findMenuItem(classObject: Class<out Screen>): MenuItem? {

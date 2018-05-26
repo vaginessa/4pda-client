@@ -240,7 +240,7 @@ public class NewsDetailsFragment extends TabFragment implements ArticleDetailVie
 
         FragmentPagerAdapter pagerAdapter = new FragmentPagerAdapter(getChildFragmentManager(), interactor);
         fragmentsPager.setAdapter(pagerAdapter);
-        if (data.getCommentId() != 0) {
+        if (data.getCommentId() > 0) {
             appBarLayout.setExpanded(false, true);
             fragmentsPager.setCurrentItem(1, true);
         }

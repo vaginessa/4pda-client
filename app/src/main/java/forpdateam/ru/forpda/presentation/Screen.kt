@@ -6,11 +6,13 @@ sealed class Screen {
     companion object {
         const val ARG_TITLE = "arg_title"
         const val ARG_SUBTITLE = "arg_subtitle"
+        const val ARG_FROM_MENU = "arg_subtitle"
         private val NO_ID = -1
     }
 
     var screenTitle: String? = null
     var screenSubTitle: String? = null
+    var fromMenu: Boolean = false
 
     fun getKey(): String = this::class.java.simpleName
 
@@ -125,6 +127,7 @@ sealed class Screen {
             const val CODE_RESULT_SYNC = 10
             const val CODE_RESULT_PAGE = 11
         }
+
         var themeUrl: String? = null
     }
 

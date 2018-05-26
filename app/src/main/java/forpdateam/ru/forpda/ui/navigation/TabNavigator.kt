@@ -2,12 +2,19 @@ package forpdateam.ru.forpda.ui.navigation
 
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import android.util.Log
+import android.widget.Toast
 import com.jakewharton.rxrelay2.BehaviorRelay
 import forpdateam.ru.forpda.App
 import forpdateam.ru.forpda.presentation.Screen
+import forpdateam.ru.forpda.ui.activities.MainActivity
+import forpdateam.ru.forpda.ui.activities.SettingsActivity
+import forpdateam.ru.forpda.ui.activities.WebVewNotFoundActivity
+import forpdateam.ru.forpda.ui.activities.imageviewer.ImageViewerActivity
+import forpdateam.ru.forpda.ui.activities.updatechecker.UpdateCheckerActivity
 import forpdateam.ru.forpda.ui.fragments.TabFragment
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
@@ -155,6 +162,10 @@ class TabNavigator(
     }
 
     private fun forward(command: Forward) {
+        createActivityIntent(activity, command.screenKey, command.transitionData)?.also {
+            checkAndStartActivity(command.screenKey, it)
+            return
+        }
         val newFragment = createFragment(command.screenKey, command.transitionData)
         if (newFragment != null) {
             val tag = genTag()
@@ -187,6 +198,11 @@ class TabNavigator(
     }
 
     private fun replace(command: Replace) {
+        createActivityIntent(activity, command.screenKey, command.transitionData)?.also {
+            checkAndStartActivity(command.screenKey, it)
+            activity.finish()
+            return
+        }
         val newFragment = createFragment(command.screenKey, command.transitionData)
         if (newFragment != null) {
             val tag = genTag()
@@ -220,12 +236,47 @@ class TabNavigator(
         activity.finish()
     }
 
-    fun showSystemMessage(message: String) {
-
+    private fun showSystemMessage(message: String) {
+        Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
     }
 
-    fun createActivityIntent(context: Context?, screenKey: String?, data: Any?): Intent? {
+    private fun createActivityIntent(context: Context?, screenKey: String?, data: Any?): Intent? {
+        val screen = data as Screen
+        when (screen) {
+            is Screen.Main -> {
+                return Intent(context, MainActivity::class.java).apply {
+                    putExtra(MainActivity.ARG_CHECK_WEBVIEW, screen.checkWebView)
+                }
+            }
+            is Screen.UpdateChecker -> {
+                return Intent(context, UpdateCheckerActivity::class.java).apply {
+                    putExtra(UpdateCheckerActivity.ARG_JSON_SOURCE, screen.jsonSource)
+                }
+            }
+            is Screen.WebViewNotFound -> {
+                return Intent(context, WebVewNotFoundActivity::class.java)
+            }
+            is Screen.ImageViewer -> {
+                return Intent(context, ImageViewerActivity::class.java).apply {
+                    putExtra(ImageViewerActivity.IMAGE_URLS_KEY, screen.urls.toTypedArray())
+                    putExtra(ImageViewerActivity.SELECTED_INDEX_KEY, screen.selected)
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+            }
+            is Screen.Settings -> {
+                return Intent(context, SettingsActivity::class.java).apply {
+                    putExtra(SettingsActivity.ARG_NEW_PREFERENCE_SCREEN, screen.fragment)
+                }
+            }
+        }
         return null
+    }
+
+    private fun checkAndStartActivity(screenKey: String, activityIntent: Intent) {
+        if (activityIntent.resolveActivity(activity.packageManager) != null) {
+            activity.startActivity(activityIntent)
+        }
     }
 
     private fun createFragment(screenKey: String?, data: Any?): Fragment? {

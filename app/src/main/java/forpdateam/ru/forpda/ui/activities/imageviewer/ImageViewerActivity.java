@@ -28,8 +28,8 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
  */
 
 public class ImageViewerActivity extends AppCompatActivity {
-    private static final String IMAGE_URLS_KEY = "IMAGE_URLS_KEY";
-    private static final String SELECTED_INDEX_KEY = "SELECTED_INDEX_KEY";
+    public static final String IMAGE_URLS_KEY = "IMAGE_URLS_KEY";
+    public static final String SELECTED_INDEX_KEY = "SELECTED_INDEX_KEY";
     private ArrayList<String> urls = new ArrayList<>();
     private ArrayList<String> names = new ArrayList<>();
     private boolean mVisible;

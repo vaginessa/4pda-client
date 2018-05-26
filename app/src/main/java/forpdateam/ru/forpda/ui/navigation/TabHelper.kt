@@ -153,6 +153,8 @@ object TabHelper {
             else -> {
                 throw Exception("What is screen: \"$screen\" bro? I don't know this screen. Look at this beautiful exception ))0)")
             }
+        }.apply {
+            configuration.isMenu = screen.fromMenu
         }
     }
 
