@@ -2,12 +2,12 @@ package forpdateam.ru.forpda.presentation.favorites
 
 import com.arellomobile.mvp.InjectViewState
 import forpdateam.ru.forpda.App
-import forpdateam.ru.forpda.client.ClientHelper
 import forpdateam.ru.forpda.common.Preferences
 import forpdateam.ru.forpda.common.Utils
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.app.TabNotification
 import forpdateam.ru.forpda.entity.remote.favorites.FavItem
+import forpdateam.ru.forpda.model.CountersHolder
 import forpdateam.ru.forpda.model.data.remote.api.favorites.Sorting
 import forpdateam.ru.forpda.model.repository.events.EventsRepository
 import forpdateam.ru.forpda.model.repository.faviorites.FavoritesRepository
@@ -26,7 +26,8 @@ class FavoritesPresenter(
         private val forumRepository: ForumRepository,
         private val eventsRepository: EventsRepository,
         private val router: TabRouter,
-        private val linkHandler: ILinkHandler
+        private val linkHandler: ILinkHandler,
+        private val countersHolder: CountersHolder
 ) : BasePresenter<FavoritesView>() {
 
 
@@ -71,6 +72,7 @@ class FavoritesPresenter(
                 .cache
                 .subscribe {
                     viewState.onShowFavorite(it)
+                    countersHolder.set(countersHolder.get())
                 }
                 .addToDisposable()
     }
@@ -90,9 +92,12 @@ class FavoritesPresenter(
         if (!Preferences.Notifications.Favorites.isLiveTab(App.getContext())) return
         if (event.isWebSocket && event.event.isNew) return
         favoritesRepository
-                .handleEvent(event, sorting, ClientHelper.getFavoritesCount())
+                .handleEvent(event, sorting, countersHolder.get().favorites)
                 .subscribe({
                     viewState.onHandleEvent(it)
+                    countersHolder.set(countersHolder.get().apply {
+                        favorites = it
+                    })
                 }, {
                     this.handleErrorRx(it)
                 })

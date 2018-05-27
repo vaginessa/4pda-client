@@ -14,7 +14,6 @@ import android.widget.Toast;
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.BuildConfig;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.Preferences;
 import forpdateam.ru.forpda.model.AuthHolder;
 import forpdateam.ru.forpda.model.repository.auth.AuthRepository;

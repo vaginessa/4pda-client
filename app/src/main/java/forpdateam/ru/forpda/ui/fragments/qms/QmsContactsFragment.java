@@ -24,7 +24,6 @@ import java.util.Observer;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.entity.app.TabNotification;
 import forpdateam.ru.forpda.entity.remote.qms.QmsContact;
 import forpdateam.ru.forpda.presentation.qms.contacts.QmsContactsPresenter;
@@ -56,7 +55,8 @@ public class QmsContactsFragment extends RecyclerFragment implements QmsContacts
         return new QmsContactsPresenter(
                 App.get().Di().getQmsRepository(),
                 App.get().Di().getRouter(),
-                App.get().Di().getLinkHandler()
+                App.get().Di().getLinkHandler(),
+                App.get().Di().getCountersHolder()
         );
     }
 
@@ -148,17 +148,6 @@ public class QmsContactsFragment extends RecyclerFragment implements QmsContacts
     @Override
     public void showContacts(@NotNull List<? extends QmsContact> items) {
         recyclerView.scrollToPosition(0);
-
-        int count = 0;
-        for (QmsContact contact : items) {
-            if (contact.getCount() > 0) {
-                count += contact.getCount();
-            }
-        }
-
-        ClientHelper.setQmsCount(count);
-        ClientHelper.get().notifyCountsChanged();
-
         adapter.addAll(items);
     }
 

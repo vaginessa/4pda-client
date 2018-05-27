@@ -24,7 +24,6 @@ import org.jetbrains.annotations.NotNull;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.entity.remote.reputation.RepData;
 import forpdateam.ru.forpda.entity.remote.reputation.RepItem;
 import forpdateam.ru.forpda.model.AuthHolder;

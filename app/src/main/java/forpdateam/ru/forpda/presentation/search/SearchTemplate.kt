@@ -1,6 +1,5 @@
 package forpdateam.ru.forpda.presentation.search
 
-import forpdateam.ru.forpda.client.ClientHelper
 import forpdateam.ru.forpda.common.Preferences
 import forpdateam.ru.forpda.entity.remote.search.SearchResult
 import forpdateam.ru.forpda.model.AuthHolder

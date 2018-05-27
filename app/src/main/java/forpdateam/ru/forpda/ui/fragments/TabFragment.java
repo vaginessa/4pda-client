@@ -36,9 +36,10 @@ import java.util.Observer;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.ErrorHandler;
 import forpdateam.ru.forpda.common.Preferences;
+import forpdateam.ru.forpda.entity.common.MessageCounters;
+import forpdateam.ru.forpda.model.CountersHolder;
 import forpdateam.ru.forpda.model.NetworkStateProvider;
 import forpdateam.ru.forpda.ui.activities.MainActivity;
 import forpdateam.ru.forpda.ui.views.ContentController;
@@ -99,8 +100,7 @@ public class TabFragment extends MvpAppCompatFragment {
 
     protected CompositeDisposable disposables = new CompositeDisposable();
     protected NetworkStateProvider networkState = App.get().Di().getNetworkState();
-
-    protected Observer countsObserver = (observable, o) -> updateNotifyDot();
+    private CountersHolder countersHolder = App.get().Di().getCountersHolder();
 
     protected Consumer<Boolean> networkObserver = state -> {
         if ((!configuration.isUseCache() || noNetwork.getVisibility() == View.VISIBLE) && state) {
@@ -200,10 +200,6 @@ public class TabFragment extends MvpAppCompatFragment {
 
     public Menu getMenu() {
         return toolbar.getMenu();
-    }
-
-    public CompositeDisposable getDisposables() {
-        return disposables;
     }
 
     public <T> void subscribe(@NonNull Observable<T> observable, @NonNull Consumer<T> onNext, @NonNull T onErrorReturn) {
@@ -358,8 +354,14 @@ public class TabFragment extends MvpAppCompatFragment {
         );
 
         App.get().addStatusBarSizeObserver(statusBarSizeObserver);
-        ClientHelper.get().addCountsObserver(countsObserver);
         App.get().addPreferenceChangeObserver(tabPreferenceObserver);
+        disposables.add(
+                countersHolder
+                .observe()
+                .subscribe(messageCounters -> {
+                    updateNotifyDot();
+                })
+        );
     }
 
     @Override
@@ -423,18 +425,8 @@ public class TabFragment extends MvpAppCompatFragment {
     }
 
     private boolean decideShowDot() {
-        if (ClientHelper.getAllCounts() > 0) {
-            if (ClientHelper.getFavoritesCount() > 0 && notifyDotFav) {
-                return true;
-            }
-            if (ClientHelper.getQmsCount() > 0 && notifyDotQms) {
-                return true;
-            }
-            if (ClientHelper.getMentionsCount() > 0 && notifyDotMentions) {
-                return true;
-            }
-        }
-        return false;
+        MessageCounters counters = countersHolder.get();
+        return counters.getAll() > 0 && (counters.getFavorites() > 0 && notifyDotFav || counters.getQms() > 0 && notifyDotQms || counters.getMentions() > 0 && notifyDotMentions);
     }
 
     protected void initFabBehavior() {
@@ -512,13 +504,13 @@ public class TabFragment extends MvpAppCompatFragment {
         getMainActivity().getTabNavigator().unsubscribe(this);
         attachedWebView = null;
         Log.d(LOG_TAG, "onDestroy " + this);
-        if (!disposables.isDisposed())
+        if (!disposables.isDisposed()){
             disposables.dispose();
+        }
         hidePopupWindows();
         if (contentController != null) {
             contentController.destroy();
         }
-        ClientHelper.get().removeCountsObserver(countsObserver);
         App.get().removePreferenceChangeObserver(tabPreferenceObserver);
         App.get().removeStatusBarSizeObserver(statusBarSizeObserver);
     }

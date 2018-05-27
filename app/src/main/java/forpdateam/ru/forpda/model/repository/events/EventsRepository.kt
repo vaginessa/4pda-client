@@ -5,7 +5,6 @@ import android.support.v4.util.ArraySet
 import android.util.Log
 import com.jakewharton.rxrelay2.PublishRelay
 import forpdateam.ru.forpda.App
-import forpdateam.ru.forpda.client.ClientHelper
 import forpdateam.ru.forpda.common.Preferences
 import forpdateam.ru.forpda.entity.app.TabNotification
 import forpdateam.ru.forpda.entity.remote.events.NotificationEvent

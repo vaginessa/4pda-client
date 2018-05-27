@@ -13,15 +13,10 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 
-import java.util.Observer;
-
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.common.Utils;
-import forpdateam.ru.forpda.entity.common.AuthData;
-import forpdateam.ru.forpda.entity.common.AuthState;
 import forpdateam.ru.forpda.entity.remote.profile.ProfileModel;
 import forpdateam.ru.forpda.model.AuthHolder;
 import forpdateam.ru.forpda.model.NetworkStateProvider;
@@ -31,7 +26,6 @@ import forpdateam.ru.forpda.presentation.TabRouter;
 import forpdateam.ru.forpda.ui.activities.MainActivity;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 
 /**
  * Created by radiationx on 16.03.17.

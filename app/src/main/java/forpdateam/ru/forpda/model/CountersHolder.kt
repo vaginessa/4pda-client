@@ -4,10 +4,14 @@ import com.jakewharton.rxrelay2.BehaviorRelay
 import forpdateam.ru.forpda.entity.common.MessageCounters
 import io.reactivex.Observable
 
-class CountersHolder {
-    private val relay = BehaviorRelay.create<MessageCounters>()
+class CountersHolder(
+        private val schedulers: SchedulersProvider
+) {
+    private val relay = BehaviorRelay.createDefault(MessageCounters())
 
     fun observe(): Observable<MessageCounters> = relay
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.ui());
 
     fun get(): MessageCounters = relay.value
 

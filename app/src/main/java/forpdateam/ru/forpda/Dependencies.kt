@@ -82,8 +82,8 @@ class Dependencies internal constructor(
     val schedulers: SchedulersProvider = AppSchedulers()
 
     val externalStorage: ExternalStorageProvider = ExternalStorage()
-    val authHolder: AuthHolder = AuthHolder()
-    val countersHolder: CountersHolder = CountersHolder()
+    val authHolder: AuthHolder = AuthHolder(schedulers)
+    val countersHolder: CountersHolder = CountersHolder(schedulers)
 
     val appTheme: AppThemeHolder = AppTheme(context)
     val templateManager = TemplateManager(context, appTheme)
@@ -94,7 +94,7 @@ class Dependencies internal constructor(
     val announceTemplate = AnnounceTemplate(templateManager)
     val qmsChatTemplate = QmsChatTemplate(templateManager)
 
-    val webClient: IWebClient = Client(context, authHolder)
+    val webClient: IWebClient = Client(context, authHolder, countersHolder)
 
     val authApi = AuthApi(webClient)
     val devDbApi = DevDbApi(webClient)
@@ -123,7 +123,7 @@ class Dependencies internal constructor(
     val favoritesRepository = FavoritesRepository(schedulers, favoritesApi, favoritesCache, authHolder)
     val historyRepository = HistoryRepository(schedulers, historyCache)
     val mentionsRepository = MentionsRepository(schedulers, mentionsApi)
-    val authRepository = AuthRepository(schedulers, authApi, authHolder)
+    val authRepository = AuthRepository(schedulers, authApi, authHolder, countersHolder)
     val profileRepository = ProfileRepository(schedulers, profileApi)
     val reputationRepository = ReputationRepository(schedulers, reputationApi)
     val forumRepository = ForumRepository(schedulers, forumApi, forumCache)

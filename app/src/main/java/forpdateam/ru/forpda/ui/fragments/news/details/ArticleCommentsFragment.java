@@ -25,11 +25,9 @@ import com.arellomobile.mvp.presenter.ProvidePresenter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Observer;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.simple.SimpleTextWatcher;
 import forpdateam.ru.forpda.entity.remote.news.Comment;
 import forpdateam.ru.forpda.model.AuthHolder;

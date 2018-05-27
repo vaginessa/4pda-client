@@ -12,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.entity.common.AuthData;
 import forpdateam.ru.forpda.entity.remote.IBaseForumPost;
 import forpdateam.ru.forpda.model.AuthHolder;

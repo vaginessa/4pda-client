@@ -3,6 +3,7 @@ package forpdateam.ru.forpda.presentation.qms.contacts
 import com.arellomobile.mvp.InjectViewState
 import forpdateam.ru.forpda.common.mvp.BasePresenter
 import forpdateam.ru.forpda.entity.remote.qms.QmsContact
+import forpdateam.ru.forpda.model.CountersHolder
 import forpdateam.ru.forpda.model.repository.qms.QmsRepository
 import forpdateam.ru.forpda.presentation.ILinkHandler
 import forpdateam.ru.forpda.presentation.Screen
@@ -16,7 +17,8 @@ import forpdateam.ru.forpda.presentation.TabRouter
 class QmsContactsPresenter(
         private val qmsRepository: QmsRepository,
         private val router: TabRouter,
-        private val linkHandler: ILinkHandler
+        private val linkHandler: ILinkHandler,
+        private val countersHolder: CountersHolder
 ) : BasePresenter<QmsContactsView>() {
 
     private val localItems = mutableListOf<QmsContact>()
@@ -45,6 +47,9 @@ class QmsContactsPresenter(
                     localItems.clear()
                     localItems.addAll(it)
                     viewState.showContacts(it)
+                    countersHolder.set(countersHolder.get().apply {
+                        qms = it.sumBy { it.count }
+                    })
                 }, {
                     it.printStackTrace()
                 })
@@ -60,6 +65,9 @@ class QmsContactsPresenter(
                     localItems.clear()
                     localItems.addAll(it)
                     viewState.showContacts(it)
+                    countersHolder.set(countersHolder.get().apply {
+                        qms = it.sumBy { it.count }
+                    })
                 }, {
                     it.printStackTrace()
                 })

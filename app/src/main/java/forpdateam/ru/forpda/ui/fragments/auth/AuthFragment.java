@@ -27,7 +27,6 @@ import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListene
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.simple.SimpleTextWatcher;
 import forpdateam.ru.forpda.entity.remote.auth.AuthForm;
 import forpdateam.ru.forpda.entity.remote.profile.ProfileModel;

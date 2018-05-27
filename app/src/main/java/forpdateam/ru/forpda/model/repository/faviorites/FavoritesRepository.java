@@ -3,7 +3,6 @@ package forpdateam.ru.forpda.model.repository.faviorites;
 import java.util.Collections;
 import java.util.List;
 
-import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.entity.app.TabNotification;
 import forpdateam.ru.forpda.entity.remote.events.NotificationEvent;
 import forpdateam.ru.forpda.entity.remote.favorites.FavData;

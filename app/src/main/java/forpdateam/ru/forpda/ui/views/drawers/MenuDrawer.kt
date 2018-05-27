@@ -1,6 +1,5 @@
 package forpdateam.ru.forpda.ui.views.drawers
 
-import android.content.Intent
 import android.support.v4.app.FragmentActivity
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.widget.LinearLayoutManager
@@ -8,9 +7,7 @@ import android.util.Log
 import android.view.View
 import forpdateam.ru.forpda.App
 import forpdateam.ru.forpda.R
-import forpdateam.ru.forpda.client.ClientHelper
 import forpdateam.ru.forpda.presentation.Screen
-import forpdateam.ru.forpda.ui.activities.SettingsActivity
 import forpdateam.ru.forpda.ui.navigation.TabHelper
 import forpdateam.ru.forpda.ui.navigation.TabNavigator
 import forpdateam.ru.forpda.ui.views.adapters.BaseAdapter
@@ -32,23 +29,8 @@ class MenuDrawer(
     private val currentMenuItems = mutableListOf<MenuItem>()
     private val router = App.get().Di().router
     private val authHolder = App.get().Di().authHolder
+    private val countersHolder = App.get().Di().countersHolder
     private val compositeDisposable = CompositeDisposable()
-
-    private val countsObserver = Observer { observable1, o ->
-        var item = findMenuItem(Screen.QmsContacts::class.java)
-        if (item != null) {
-            item.notifyCount = ClientHelper.getQmsCount()
-        }
-        item = findMenuItem(Screen.Mentions::class.java)
-        if (item != null) {
-            item.notifyCount = ClientHelper.getMentionsCount()
-        }
-        item = findMenuItem(Screen.Favorites::class.java)
-        if (item != null) {
-            item.notifyCount = ClientHelper.getFavoritesCount()
-        }
-        menuAdapter.notifyDataSetChanged()
-    }
 
     private val statusBarSizeObserver = Observer { observable1, o ->
         val height = App.getStatusBarHeight()
@@ -102,17 +84,22 @@ class MenuDrawer(
 
         App.get().addStatusBarSizeObserver(statusBarSizeObserver)
         App.get().subscribeForbidden(forbiddenObserver)
-        ClientHelper.get().addCountsObserver(countsObserver)
+        compositeDisposable.add(
+                countersHolder
+                        .observe()
+                        .subscribe {
+                            findMenuItem(Screen.QmsContacts::class.java)?.notifyCount = it.qms
+                            findMenuItem(Screen.Mentions::class.java)?.notifyCount = it.mentions
+                            findMenuItem(Screen.Favorites::class.java)?.notifyCount = it.favorites
+                            menuAdapter.notifyDataSetChanged()
+                        }
+        )
         compositeDisposable.add(
                 authHolder
                         .observe()
                         .subscribe {
                             fillMenuItems()
                             if (!it.isAuth()) {
-                                ClientHelper.setQmsCount(0)
-                                ClientHelper.setFavoritesCount(0)
-                                ClientHelper.setMentionsCount(0)
-                                ClientHelper.get().notifyCountsChanged()
                                 App.get().preferences.edit().remove("menu_drawer_last").apply()
                             }
                         }
@@ -157,7 +144,7 @@ class MenuDrawer(
         menuAdapter.notifyDataSetChanged()
     }
 
-    private fun openScreen(item: MenuItem){
+    private fun openScreen(item: MenuItem) {
         router.navigateTo(item.screen)
     }
 

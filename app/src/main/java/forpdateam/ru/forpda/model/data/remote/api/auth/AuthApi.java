@@ -5,7 +5,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import forpdateam.ru.forpda.App;
-import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.entity.remote.auth.AuthForm;
 import forpdateam.ru.forpda.model.data.remote.IWebClient;
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;

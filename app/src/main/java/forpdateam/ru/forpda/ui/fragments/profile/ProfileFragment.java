@@ -31,11 +31,8 @@ import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
-import java.util.regex.Pattern;
-
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.BitmapUtils;
 import forpdateam.ru.forpda.common.LinkMovementMethod;
 import forpdateam.ru.forpda.entity.remote.profile.ProfileModel;

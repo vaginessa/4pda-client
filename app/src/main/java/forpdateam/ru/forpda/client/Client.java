@@ -21,7 +21,9 @@ import javax.net.ssl.SSLContext;
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.entity.common.AuthData;
 import forpdateam.ru.forpda.entity.common.AuthState;
+import forpdateam.ru.forpda.entity.common.MessageCounters;
 import forpdateam.ru.forpda.model.AuthHolder;
+import forpdateam.ru.forpda.model.CountersHolder;
 import forpdateam.ru.forpda.model.data.remote.IWebClient;
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkRequest;
@@ -47,11 +49,13 @@ public class Client implements IWebClient {
     private List<String> privateHeaders = new ArrayList<>(Arrays.asList("pass_hash", "session_id", "auth_key", "password"));
     private final Cookie mobileCookie = Cookie.parse(HttpUrl.parse("https://4pda.ru/"), "ngx_mb=1;");
     private AuthHolder authHolder;
+    private CountersHolder countersHolder;
 
     //Контекст нужен, для чтения настроек
     //Не необходимо, но вдруг случится шо у App не будет контекста
-    public Client(Context context, AuthHolder authHolder) {
+    public Client(Context context, AuthHolder authHolder, CountersHolder countersHolder) {
         this.authHolder = authHolder;
+        this.countersHolder = countersHolder;
         AuthData authData = authHolder.get();
         SharedPreferences preferences = App.getPreferences(context);
         String member_id = preferences.getString("cookie_member_id", null);
@@ -321,20 +325,21 @@ public class Client implements IWebClient {
         Matcher countsMatcher = countsPattern.matcher(res);
 
         if (countsMatcher.find()) {
+            MessageCounters counters = countersHolder.get();
             try {
                 String tempGroup;
                 tempGroup = countsMatcher.group(1);
-                ClientHelper.setMentionsCount(tempGroup == null ? 0 : Integer.parseInt(tempGroup));
+                counters.setMentions(tempGroup == null ? 0 : Integer.parseInt(tempGroup));
 
                 tempGroup = countsMatcher.group(2);
-                ClientHelper.setFavoritesCount(tempGroup == null ? 0 : Integer.parseInt(tempGroup));
+                counters.setFavorites(tempGroup == null ? 0 : Integer.parseInt(tempGroup));
 
                 tempGroup = countsMatcher.group(3);
-                ClientHelper.setQmsCount(tempGroup == null ? 0 : Integer.parseInt(tempGroup));
+                counters.setQms(tempGroup == null ? 0 : Integer.parseInt(tempGroup));
             } catch (Exception exception) {
                 Log.d("WATAFUCK", res);
             }
-            observerHandler.post(() -> ClientHelper.get().notifyCountsChanged());
+            countersHolder.set(counters);
         }
     }
 

@@ -28,7 +28,6 @@ import java.util.Observer;
 
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
-import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.Preferences;
 import forpdateam.ru.forpda.entity.remote.favorites.FavData;
 import forpdateam.ru.forpda.entity.remote.favorites.FavItem;
@@ -80,7 +79,8 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
                 App.get().Di().getForumRepository(),
                 App.get().Di().getEventsRepository(),
                 App.get().Di().getRouter(),
-                App.get().Di().getLinkHandler()
+                App.get().Di().getLinkHandler(),
+                App.get().Di().getCountersHolder()
         );
     }
 
@@ -294,15 +294,10 @@ public class FavoritesFragment extends RecyclerFragment implements FavoritesView
         }
         adapter.addSection(getString(R.string.fav_themes), otherItems);
         adapter.notifyDataSetChanged();
-        if (!networkState.getState()) {
-            ClientHelper.get().notifyCountsChanged();
-        }
     }
 
     @Override
     public void onHandleEvent(int count) {
-        ClientHelper.setFavoritesCount(count);
-        ClientHelper.get().notifyCountsChanged();
         presenter.showFavorites();
     }
 

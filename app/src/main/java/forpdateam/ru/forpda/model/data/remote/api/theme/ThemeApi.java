@@ -4,7 +4,6 @@ import java.net.URLEncoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.entity.remote.others.pagination.Pagination;
 import forpdateam.ru.forpda.entity.remote.theme.Poll;
 import forpdateam.ru.forpda.entity.remote.theme.PollQuestion;

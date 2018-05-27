@@ -2,7 +2,6 @@ package forpdateam.ru.forpda.presentation.articles.detail.comments
 
 import com.arellomobile.mvp.InjectViewState
 import forpdateam.ru.forpda.common.mvp.BasePresenter
-import forpdateam.ru.forpda.entity.common.AuthState
 import forpdateam.ru.forpda.entity.remote.news.Comment
 import forpdateam.ru.forpda.model.AuthHolder
 import forpdateam.ru.forpda.model.interactors.news.ArticleInteractor
