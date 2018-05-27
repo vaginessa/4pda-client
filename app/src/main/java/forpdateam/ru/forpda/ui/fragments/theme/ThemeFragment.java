@@ -54,6 +54,7 @@ import forpdateam.ru.forpda.entity.remote.IBaseForumPost;
 import forpdateam.ru.forpda.entity.remote.editpost.AttachmentItem;
 import forpdateam.ru.forpda.entity.remote.others.pagination.Pagination;
 import forpdateam.ru.forpda.entity.remote.theme.ThemePage;
+import forpdateam.ru.forpda.model.AuthHolder;
 import forpdateam.ru.forpda.model.data.remote.api.RequestFile;
 import forpdateam.ru.forpda.model.data.remote.api.favorites.FavoritesApi;
 import forpdateam.ru.forpda.presentation.theme.ThemePresenter;
@@ -105,6 +106,8 @@ public abstract class ThemeFragment extends TabFragment implements ThemeView {
     private ImageButton notificationButton;
     private Handler notificationHandler = new Handler(Looper.getMainLooper());
     private Runnable notifyRunnable = () -> notificationView.setVisibility(View.VISIBLE);
+
+    private AuthHolder authHolder = App.get().Di().getAuthHolder();
 
     private Observer themePreferenceObserver = (observable, o) -> {
         if (o == null) return;
@@ -167,7 +170,7 @@ public abstract class ThemeFragment extends TabFragment implements ThemeView {
         if (getArguments() != null) {
             presenter.setThemeUrl(getArguments().getString(ARG_TAB, ""));
         }
-        dialogsHelper = new ThemeDialogsHelper_V2(getContext());
+        dialogsHelper = new ThemeDialogsHelper_V2(getContext(), authHolder);
     }
 
     @Override
@@ -386,8 +389,7 @@ public abstract class ThemeFragment extends TabFragment implements ThemeView {
     }
 
     protected void updateFavorites(ThemePage themePage) {
-        if (!ClientHelper.getAuthState()
-                || themePage.getPagination().getCurrent() < themePage.getPagination().getAll())
+        if (!authHolder.get().isAuth() || themePage.getPagination().getCurrent() < themePage.getPagination().getAll())
             return;
 
         int topicId = themePage.getId();
@@ -541,7 +543,7 @@ public abstract class ThemeFragment extends TabFragment implements ThemeView {
             addFavoritesMenuItem.setVisible(false);
             openForumMenuItem.setEnabled(false);
         }
-        if (!ClientHelper.getAuthState()) {
+        if (!authHolder.get().isAuth()) {
             toggleMessagePanelItem.setVisible(false);
             deleteFavoritesMenuItem.setVisible(false);
             addFavoritesMenuItem.setVisible(false);

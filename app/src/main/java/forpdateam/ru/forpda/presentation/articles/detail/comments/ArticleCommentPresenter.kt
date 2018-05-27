@@ -2,7 +2,9 @@ package forpdateam.ru.forpda.presentation.articles.detail.comments
 
 import com.arellomobile.mvp.InjectViewState
 import forpdateam.ru.forpda.common.mvp.BasePresenter
+import forpdateam.ru.forpda.entity.common.AuthState
 import forpdateam.ru.forpda.entity.remote.news.Comment
+import forpdateam.ru.forpda.model.AuthHolder
 import forpdateam.ru.forpda.model.interactors.news.ArticleInteractor
 import forpdateam.ru.forpda.presentation.ILinkHandler
 import forpdateam.ru.forpda.presentation.TabRouter
@@ -16,7 +18,8 @@ import java.util.*
 class ArticleCommentPresenter(
         private val articleInteractor: ArticleInteractor,
         private val router: TabRouter,
-        private val linkHandler: ILinkHandler
+        private val linkHandler: ILinkHandler,
+        private val authHolder: AuthHolder
 ) : BasePresenter<ArticleCommentView>() {
 
     private var firstShow: Boolean = true
@@ -37,6 +40,13 @@ class ArticleCommentPresenter(
                         firstShow = false
                     }
                 })
+                .addToDisposable()
+
+        authHolder
+                .observe()
+                .subscribe {
+                    viewState.setMessageFieldVisible(it.isAuth())
+                }
                 .addToDisposable()
     }
 

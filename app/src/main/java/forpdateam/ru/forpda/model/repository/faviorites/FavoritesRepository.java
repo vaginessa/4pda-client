@@ -8,6 +8,7 @@ import forpdateam.ru.forpda.entity.app.TabNotification;
 import forpdateam.ru.forpda.entity.remote.events.NotificationEvent;
 import forpdateam.ru.forpda.entity.remote.favorites.FavData;
 import forpdateam.ru.forpda.entity.remote.favorites.FavItem;
+import forpdateam.ru.forpda.model.AuthHolder;
 import forpdateam.ru.forpda.model.SchedulersProvider;
 import forpdateam.ru.forpda.model.data.cache.favorites.FavoritesCache;
 import forpdateam.ru.forpda.model.data.remote.api.favorites.FavoritesApi;
@@ -24,11 +25,18 @@ public class FavoritesRepository {
     private SchedulersProvider schedulers;
     private FavoritesApi favoritesApi;
     private FavoritesCache favoritesCache;
+    private AuthHolder authHolder;
 
-    public FavoritesRepository(SchedulersProvider schedulers, FavoritesApi favoritesApi, FavoritesCache favoritesCache) {
+    public FavoritesRepository(
+            SchedulersProvider schedulers,
+            FavoritesApi favoritesApi,
+            FavoritesCache favoritesCache,
+            AuthHolder authHolder
+    ) {
         this.schedulers = schedulers;
         this.favoritesApi = favoritesApi;
         this.favoritesCache = favoritesCache;
+        this.authHolder = authHolder;
     }
 
     public Observable<FavData> loadFavorites(int st, boolean all, Sorting sorting) {
@@ -105,7 +113,7 @@ public class FavoritesRepository {
             count = event.getLoadedEvents().size();
             for (FavItem item : favItems) {
                 if (item.getTopicId() == id) {
-                    if (item.getLastUserId() != ClientHelper.getUserId())
+                    if (item.getLastUserId() != authHolder.get().getUserId())
                         item.setNew(true);
                     item.setLastUserNick(loadedEvent.getUserNick());
                     item.setLastUserId(loadedEvent.getUserId());

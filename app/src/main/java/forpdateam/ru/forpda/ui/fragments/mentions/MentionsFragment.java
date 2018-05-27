@@ -18,6 +18,7 @@ import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.entity.remote.mentions.MentionItem;
 import forpdateam.ru.forpda.entity.remote.mentions.MentionsData;
+import forpdateam.ru.forpda.model.AuthHolder;
 import forpdateam.ru.forpda.model.data.remote.api.favorites.FavoritesApi;
 import forpdateam.ru.forpda.presentation.mentions.MentionsPresenter;
 import forpdateam.ru.forpda.presentation.mentions.MentionsView;
@@ -38,6 +39,7 @@ public class MentionsFragment extends RecyclerFragment implements MentionsView {
     private DynamicDialogMenu<MentionsFragment, MentionItem> dialogMenu;
     private MentionsAdapter adapter;
     private PaginationHelper paginationHelper;
+    private AuthHolder authHolder = App.get().Di().getAuthHolder();
 
     @InjectPresenter
     MentionsPresenter presenter;
@@ -115,7 +117,7 @@ public class MentionsFragment extends RecyclerFragment implements MentionsView {
     public void showItemDialogMenu(MentionItem item) {
         dialogMenu.disallowAll();
         dialogMenu.allow(0);
-        if (item.isTopic() && ClientHelper.getAuthState()) {
+        if (item.isTopic() && authHolder.get().isAuth()) {
             dialogMenu.allow(1);
         }
         dialogMenu.show(getContext(), MentionsFragment.this, item);

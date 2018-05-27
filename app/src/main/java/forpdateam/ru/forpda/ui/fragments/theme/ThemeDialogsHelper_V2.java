@@ -13,7 +13,9 @@ import org.jetbrains.annotations.NotNull;
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.client.ClientHelper;
+import forpdateam.ru.forpda.entity.common.AuthData;
 import forpdateam.ru.forpda.entity.remote.IBaseForumPost;
+import forpdateam.ru.forpda.model.AuthHolder;
 import forpdateam.ru.forpda.presentation.theme.IThemePresenter;
 import forpdateam.ru.forpda.ui.views.DynamicDialogMenu;
 
@@ -25,10 +27,12 @@ public class ThemeDialogsHelper_V2 {
     private final DynamicDialogMenu<IThemePresenter, IBaseForumPost> userMenu = new DynamicDialogMenu<>();
     private final DynamicDialogMenu<IThemePresenter, IBaseForumPost> reputationMenu = new DynamicDialogMenu<>();
     private final DynamicDialogMenu<IThemePresenter, IBaseForumPost> postMenu = new DynamicDialogMenu<>();
-    private Context context = null;
+    private Context context;
+    private AuthHolder authHolder;
 
-    public ThemeDialogsHelper_V2(Context context) {
+    public ThemeDialogsHelper_V2(Context context, AuthHolder authHolder) {
         this.context = context;
+        this.authHolder = authHolder;
 
         userMenu.addItem(App.get().getString(R.string.profile), (context1, data) -> context1.openProfile(data.getId()));
         userMenu.addItem(App.get().getString(R.string.reputation), (context1, data) -> context1.onReputationMenuClick(data.getId()));
@@ -56,8 +60,8 @@ public class ThemeDialogsHelper_V2 {
         userMenu.disallowAll();
         userMenu.allow(0);
         userMenu.allow(1);
-        if (ClientHelper.getAuthState() == ClientHelper.AUTH_STATE_LOGIN
-                && post.getUserId() != ClientHelper.getUserId()) {
+        AuthData authData = authHolder.get();
+        if (authData.isAuth() && post.getUserId() != authData.getUserId()) {
             userMenu.allow(2);
         }
         userMenu.allow(3);
@@ -68,7 +72,7 @@ public class ThemeDialogsHelper_V2 {
 
     public void showReputationMenu(IThemePresenter presenter, IBaseForumPost post) {
         reputationMenu.disallowAll();
-        if (ClientHelper.getAuthState() == ClientHelper.AUTH_STATE_LOGIN) {
+        if (authHolder.get().isAuth()) {
             if (post.canPlusRep()) {
                 reputationMenu.allow(0);
             }
@@ -83,7 +87,7 @@ public class ThemeDialogsHelper_V2 {
 
     public void showPostMenu(IThemePresenter presenter, IBaseForumPost post) {
         postMenu.disallowAll();
-        if (ClientHelper.getAuthState() == ClientHelper.AUTH_STATE_LOGIN) {
+        if (authHolder.get().isAuth()) {
             if (post.canQuote()) {
                 postMenu.allow(0);
                 postMenu.allow(1);

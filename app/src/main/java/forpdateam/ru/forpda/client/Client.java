@@ -19,6 +19,9 @@ import java.util.regex.Matcher;
 import javax.net.ssl.SSLContext;
 
 import forpdateam.ru.forpda.App;
+import forpdateam.ru.forpda.entity.common.AuthData;
+import forpdateam.ru.forpda.entity.common.AuthState;
+import forpdateam.ru.forpda.model.AuthHolder;
 import forpdateam.ru.forpda.model.data.remote.IWebClient;
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkRequest;
@@ -43,28 +46,31 @@ public class Client implements IWebClient {
     private Handler observerHandler = new Handler(Looper.getMainLooper());
     private List<String> privateHeaders = new ArrayList<>(Arrays.asList("pass_hash", "session_id", "auth_key", "password"));
     private final Cookie mobileCookie = Cookie.parse(HttpUrl.parse("https://4pda.ru/"), "ngx_mb=1;");
+    private AuthHolder authHolder;
 
     //Контекст нужен, для чтения настроек
     //Не необходимо, но вдруг случится шо у App не будет контекста
-    public Client(Context context) {
-        if (context == null) {
-            context = App.getContext();
-        }
-        String member_id = App.getPreferences(context).getString("cookie_member_id", null);
-        String pass_hash = App.getPreferences(context).getString("cookie_pass_hash", null);
-        String session_id = App.getPreferences(context).getString("cookie_session_id", null);
-        String anonymous = App.getPreferences(context).getString("cookie_anonymous", null);
-        String clearance = App.getPreferences(context).getString("cookie_cf_clearance", null);
-        ClientHelper.setUserId(App.getPreferences(context).getString("member_id", null));
-        //Log.d("FORPDA_LOG", "INIT AUTH DATA " + member_id + " : " + pass_hash + " : " + session_id + " : " + App.get().getPreferences().getString("member_id", null));
+    public Client(Context context, AuthHolder authHolder) {
+        this.authHolder = authHolder;
+        AuthData authData = authHolder.get();
+        SharedPreferences preferences = App.getPreferences(context);
+        String member_id = preferences.getString("cookie_member_id", null);
+        String pass_hash = preferences.getString("cookie_pass_hash", null);
+        String session_id = preferences.getString("cookie_session_id", null);
+        String anonymous = preferences.getString("cookie_anonymous", null);
+        String clearance = preferences.getString("cookie_cf_clearance", null);
 
+        int userId = Integer.parseInt(preferences.getString("member_id", "0"));
+        authData.setUserId(userId);
 
         clientCookies.put("ngx_mb", mobileCookie);
         if (clearance != null) {
             clientCookies.put("cf_clearance", parseCookie(clearance));
         }
+
         if (member_id != null && pass_hash != null) {
-            ClientHelper.setAuthState(ClientHelper.AUTH_STATE_LOGIN);
+            authData.setState(AuthState.AUTH);
+
             //Первичная загрузка кукисов
             clientCookies.put("member_id", parseCookie(member_id));
             clientCookies.put("pass_hash", parseCookie(pass_hash));
@@ -73,9 +79,10 @@ public class Client implements IWebClient {
             if (anonymous != null) {
                 clientCookies.put("anonymous", parseCookie(anonymous));
             }
-        }else {
-            ClientHelper.setAuthState(ClientHelper.AUTH_STATE_LOGOUT);
+        } else {
+            authData.setState(AuthState.NO_AUTH);
         }
+        authHolder.set(authData);
     }
 
     public String getAuthKey() {
@@ -112,7 +119,9 @@ public class Client implements IWebClient {
                     editor.putString("cookie_".concat(cookie.name()), cookieToPref(url.toString(), cookie));
                     if (cookie.name().equals("member_id")) {
                         editor.putString("member_id", cookie.value());
-                        ClientHelper.setUserId(cookie.value());
+                        AuthData authData = authHolder.get();
+                        authData.setUserId(Integer.parseInt(cookie.value()));
+                        authHolder.set(authData);
                     }
                     if (!clientCookies.containsKey(cookie.name())) {
                         clientCookies.remove(cookie.name());

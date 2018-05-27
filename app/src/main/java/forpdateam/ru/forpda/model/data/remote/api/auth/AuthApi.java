@@ -87,7 +87,6 @@ public class AuthApi {
 
         webClient.clearCookies();
         App.get().getPreferences().edit().remove("cookie_member_id").remove("cookie_pass_hash").apply();
-        ClientHelper.setAuthState(ClientHelper.AUTH_STATE_LOGOUT);
 
         return !checkLogin(webClient.get(IWebClient.MINIMAL_PAGE).getBody());
     }

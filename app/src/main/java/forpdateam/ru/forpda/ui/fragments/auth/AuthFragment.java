@@ -64,7 +64,8 @@ public class AuthFragment extends TabFragment implements AuthView {
                 App.get().Di().getAuthRepository(),
                 App.get().Di().getProfileRepository(),
                 App.get().Di().getRouter(),
-                App.get().Di().getSchedulers()
+                App.get().Di().getSchedulers(),
+                App.get().Di().getAuthHolder()
         );
     }
 
@@ -163,7 +164,6 @@ public class AuthFragment extends TabFragment implements AuthView {
     }
 
     public void loadProfile() {
-
         AlphaAnimation animation = new AlphaAnimation(1.0f, 0.0f);
         animation.setDuration(225);
         animation.setAnimationListener(new Animation.AnimationListener() {
@@ -187,7 +187,6 @@ public class AuthFragment extends TabFragment implements AuthView {
         AlphaAnimation animation1 = new AlphaAnimation(0.0f, 1.0f);
         animation1.setDuration(375);
         complete.startAnimation(animation1);
-        presenter.loadProfile("https://4pda.ru/forum/index.php?showuser=" + ClientHelper.getUserId());
     }
 
     @Override

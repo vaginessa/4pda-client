@@ -9,6 +9,7 @@ import forpdateam.ru.forpda.client.ClientHelper
 import forpdateam.ru.forpda.common.Preferences
 import forpdateam.ru.forpda.entity.app.TabNotification
 import forpdateam.ru.forpda.entity.remote.events.NotificationEvent
+import forpdateam.ru.forpda.model.AuthHolder
 import forpdateam.ru.forpda.model.NetworkStateProvider
 import forpdateam.ru.forpda.model.SchedulersProvider
 import forpdateam.ru.forpda.model.data.remote.IWebClient
@@ -28,7 +29,8 @@ class EventsRepository(
         private val webClient: IWebClient,
         private val eventsApi: NotificationEventsApi,
         private val schedulers: SchedulersProvider,
-        private val networkStateProvider: NetworkStateProvider
+        private val networkStateProvider: NetworkStateProvider,
+        private val authHolder: AuthHolder
 ) {
     companion object {
         private const val LOG_TAG = "EventsRepository"
@@ -65,7 +67,7 @@ class EventsRepository(
             Log.d(LOG_TAG, "WSListener onOpen: " + response.toString())
             connected = true
             webSocket.send("""[0, "sv"]""")
-            webSocket.send("""[0, "ea", "u${ClientHelper.getUserId()}"]""")
+            webSocket.send("""[0, "ea", "u${authHolder.get().userId}"]""")
         }
 
         override fun onMessage(webSocket: WebSocket?, text: String?) {
@@ -184,7 +186,7 @@ class EventsRepository(
     }
 
     private fun sendNotification(event: NotificationEvent) {
-        if (event.userId == ClientHelper.getUserId()) {
+        if (event.userId == authHolder.get().userId) {
             return
         }
         if (!checkNotify(event, event.source)) {

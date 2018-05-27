@@ -31,18 +31,8 @@ class MenuDrawer(
     private val forbiddenError by lazy { drawerLayout.forbidden_error }
     private val currentMenuItems = mutableListOf<MenuItem>()
     private val router = App.get().Di().router
+    private val authHolder = App.get().Di().authHolder
     private val compositeDisposable = CompositeDisposable()
-
-    private val loginObserver = Observer { observable, o ->
-        fillMenuItems()
-        if (!(o as Boolean)) {
-            ClientHelper.setQmsCount(0)
-            ClientHelper.setFavoritesCount(0)
-            ClientHelper.setMentionsCount(0)
-            ClientHelper.get().notifyCountsChanged()
-            App.get().preferences.edit().remove("menu_drawer_last").apply()
-        }
-    }
 
     private val countsObserver = Observer { observable1, o ->
         var item = findMenuItem(Screen.QmsContacts::class.java)
@@ -112,30 +102,44 @@ class MenuDrawer(
 
         App.get().addStatusBarSizeObserver(statusBarSizeObserver)
         App.get().subscribeForbidden(forbiddenObserver)
-        ClientHelper.get().addLoginObserver(loginObserver)
         ClientHelper.get().addCountsObserver(countsObserver)
-        val disposable = tabNavigator
-                .observeSubscribers()
-                .subscribe({
-                    Log.e("lalala", "Menu subscribe")
-                    it.firstOrNull { it.isActiveTab }?.also {
-                        val screen = TabHelper.findScreenByFragment(it)
-                        Log.e("lalala", "Menu subscribe fr=$it, sc=$screen")
-                        findMenuItem(screen)?.also {
-                            Log.e("lalala", "Menu subscribe select=$it")
-                            selectMenuItem(it)
+        compositeDisposable.add(
+                authHolder
+                        .observe()
+                        .subscribe {
+                            fillMenuItems()
+                            if (!it.isAuth()) {
+                                ClientHelper.setQmsCount(0)
+                                ClientHelper.setFavoritesCount(0)
+                                ClientHelper.setMentionsCount(0)
+                                ClientHelper.get().notifyCountsChanged()
+                                App.get().preferences.edit().remove("menu_drawer_last").apply()
+                            }
                         }
-                    }
-                }, {
-                    Log.d("lalala", "menu error: ${it.message}")
-                })
-        compositeDisposable.add(disposable)
+        )
+        compositeDisposable.add(
+                tabNavigator
+                        .observeSubscribers()
+                        .subscribe({
+                            Log.e("lalala", "Menu subscribe")
+                            it.firstOrNull { it.isActiveTab }?.also {
+                                val screen = TabHelper.findScreenByFragment(it)
+                                Log.e("lalala", "Menu subscribe fr=$it, sc=$screen")
+                                findMenuItem(screen)?.also {
+                                    Log.e("lalala", "Menu subscribe select=$it")
+                                    selectMenuItem(it)
+                                }
+                            }
+                        }, {
+                            Log.d("lalala", "menu error: ${it.message}")
+                        })
+        )
         fillMenuItems()
     }
 
     private fun fillMenuItems() {
         currentMenuItems.clear()
-        val isAuth = ClientHelper.getAuthState() == ClientHelper.AUTH_STATE_LOGIN
+        val isAuth = authHolder.get().isAuth()
         currentMenuItems.addAll(allItems.filter {
             val screen = it.screen
             if (isAuth) {
@@ -188,7 +192,6 @@ class MenuDrawer(
     fun destroy() {
         App.get().removeStatusBarSizeObserver(statusBarSizeObserver)
         App.get().unSubscribeForbidden(forbiddenObserver)
-        ClientHelper.get().removeLoginObserver(loginObserver)
         compositeDisposable.dispose()
     }
 }

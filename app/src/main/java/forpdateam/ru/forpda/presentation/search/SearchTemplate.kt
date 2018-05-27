@@ -3,6 +3,7 @@ package forpdateam.ru.forpda.presentation.search
 import forpdateam.ru.forpda.client.ClientHelper
 import forpdateam.ru.forpda.common.Preferences
 import forpdateam.ru.forpda.entity.remote.search.SearchResult
+import forpdateam.ru.forpda.model.AuthHolder
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils
 import forpdateam.ru.forpda.model.repository.temp.TempHelper
 import forpdateam.ru.forpda.ui.TemplateManager
@@ -10,7 +11,8 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 class SearchTemplate(
-        private val templateManager: TemplateManager
+        private val templateManager: TemplateManager,
+        private val authHolder: AuthHolder
 ) {
 
     private val firstLetter = Pattern.compile("([a-zA-Zа-яА-Я])")
@@ -18,12 +20,11 @@ class SearchTemplate(
     fun mapEntity(page: SearchResult): SearchResult = page.apply { html = mapString(page) }
 
     private fun mapString(page: SearchResult): String {
-        val memberId = ClientHelper.getUserId()
         val template = templateManager.getTemplate(TemplateManager.TEMPLATE_SEARCH)
 
+        val authData = authHolder.get()
         template.apply {
             templateManager.fillStaticStrings(template)
-            val authorized = ClientHelper.getAuthState()
             val prevDisabled = page.pagination.current <= 1
             val nextDisabled = page.pagination.current == page.pagination.all
 
@@ -32,8 +33,8 @@ class SearchTemplate(
             setVariableOpt("all_pages_int", page.pagination.all)
             setVariableOpt("posts_on_page_int", page.pagination.perPage)
             setVariableOpt("current_page_int", page.pagination.current)
-            setVariableOpt("authorized_bool", java.lang.Boolean.toString(authorized))
-            setVariableOpt("member_id_int", ClientHelper.getUserId())
+            setVariableOpt("authorized_bool", java.lang.Boolean.toString(authData.isAuth()))
+            setVariableOpt("member_id_int", authData.userId)
 
 
             setVariableOpt("body_type", "search")

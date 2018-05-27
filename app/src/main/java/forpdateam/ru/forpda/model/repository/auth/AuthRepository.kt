@@ -1,9 +1,12 @@
 package forpdateam.ru.forpda.model.repository.auth
 
+import forpdateam.ru.forpda.entity.common.AuthState
 import forpdateam.ru.forpda.entity.remote.auth.AuthForm
+import forpdateam.ru.forpda.model.AuthHolder
 import forpdateam.ru.forpda.model.SchedulersProvider
 import forpdateam.ru.forpda.model.data.remote.api.auth.AuthApi
 import io.reactivex.Observable
+import io.reactivex.Single
 
 /**
  * Created by radiationx on 02.01.18.
@@ -11,7 +14,8 @@ import io.reactivex.Observable
 
 class AuthRepository(
         private val schedulers: SchedulersProvider,
-        private val authApi: AuthApi
+        private val authApi: AuthApi,
+        private val authHolder: AuthHolder
 ) {
 
     fun loadForm(): Observable<AuthForm> = Observable
@@ -24,8 +28,14 @@ class AuthRepository(
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 
-    fun signOut(): Observable<Boolean> = Observable
+    fun signOut(): Single<Boolean> = Single
             .fromCallable { authApi.logout() }
+            .doOnSuccess {
+                authHolder.set(authHolder.get().apply {
+                    userId = 0
+                    state = AuthState.NO_AUTH
+                })
+            }
             .subscribeOn(schedulers.io())
             .observeOn(schedulers.ui())
 

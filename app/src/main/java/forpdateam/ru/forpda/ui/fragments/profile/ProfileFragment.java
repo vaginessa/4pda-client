@@ -39,6 +39,7 @@ import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.BitmapUtils;
 import forpdateam.ru.forpda.common.LinkMovementMethod;
 import forpdateam.ru.forpda.entity.remote.profile.ProfileModel;
+import forpdateam.ru.forpda.model.AuthHolder;
 import forpdateam.ru.forpda.presentation.profile.ProfilePresenter;
 import forpdateam.ru.forpda.presentation.profile.ProfileView;
 import forpdateam.ru.forpda.ui.fragments.TabFragment;
@@ -60,6 +61,8 @@ public class ProfileFragment extends TabFragment implements ProfileAdapter.Click
     private MenuItem writeMenuItem;
 
     private ProfileAdapter adapter;
+
+    private AuthHolder authHolder = App.get().Di().getAuthHolder();
 
     @InjectPresenter
     ProfilePresenter presenter;
@@ -85,7 +88,7 @@ public class ProfileFragment extends TabFragment implements ProfileAdapter.Click
             profileUrl = getArguments().getString(ARG_TAB);
         }
         if (profileUrl == null || profileUrl.isEmpty()) {
-            profileUrl = "https://4pda.ru/forum/index.php?showuser=" + ClientHelper.getUserId();
+            profileUrl = "https://4pda.ru/forum/index.php?showuser=" + authHolder.get().getUserId();
         }
         presenter.setProfileUrl(profileUrl);
     }
@@ -172,7 +175,7 @@ public class ProfileFragment extends TabFragment implements ProfileAdapter.Click
     @Override
     public void setRefreshing(boolean isRefreshing) {
         super.setRefreshing(isRefreshing);
-        if(isRefreshing){
+        if (isRefreshing) {
             refreshToolbarMenuItems(false);
         }
     }
@@ -234,10 +237,7 @@ public class ProfileFragment extends TabFragment implements ProfileAdapter.Click
         }
 
         if (!data.getContacts().isEmpty()) {
-            boolean isMe = Pattern
-                    .compile("showuser=" + ClientHelper.getUserId())
-                    .matcher(presenter.getProfileUrl())
-                    .find();
+            boolean isMe = data.getId() == authHolder.get().getUserId();
             writeMenuItem.setVisible(!isMe);
         }
     }

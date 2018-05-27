@@ -32,6 +32,7 @@ import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.simple.SimpleTextWatcher;
 import forpdateam.ru.forpda.entity.remote.news.Comment;
+import forpdateam.ru.forpda.model.AuthHolder;
 import forpdateam.ru.forpda.model.interactors.news.ArticleInteractor;
 import forpdateam.ru.forpda.presentation.articles.detail.comments.ArticleCommentPresenter;
 import forpdateam.ru.forpda.presentation.articles.detail.comments.ArticleCommentView;
@@ -50,21 +51,10 @@ public class ArticleCommentsFragment extends MvpAppCompatFragment implements Art
     private AppCompatImageButton buttonSend;
     private ProgressBar progressBarSend;
     private RelativeLayout writePanel;
-    private ArticleCommentsAdapter adapter;
+    private AuthHolder authHolder = App.get().Di().getAuthHolder();
+    private ArticleCommentsAdapter adapter = new ArticleCommentsAdapter(authHolder);
     private Comment currentReplyComment;
     private ContentController contentController;
-
-    private Observer loginObserver = (observable, o) -> {
-        if (o == null) o = false;
-        if (ClientHelper.getAuthState()) {
-            writePanel.setVisibility(View.VISIBLE);
-        } else {
-            writePanel.setVisibility(View.GONE);
-        }
-        if (adapter != null) {
-            adapter.notifyDataSetChanged();
-        }
-    };
 
     private ArticleInteractor interactor;
 
@@ -76,7 +66,8 @@ public class ArticleCommentsFragment extends MvpAppCompatFragment implements Art
         return new ArticleCommentPresenter(
                 interactor,
                 App.get().Di().getRouter(),
-                App.get().Di().getLinkHandler()
+                App.get().Di().getLinkHandler(),
+                App.get().Di().getAuthHolder()
         );
     }
 
@@ -107,7 +98,6 @@ public class ArticleCommentsFragment extends MvpAppCompatFragment implements Art
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setHasFixedSize(true);
         recyclerView.addItemDecoration(new DevicesFragment.SpacingItemDecoration(App.px12, false));
-        adapter = new ArticleCommentsAdapter();
         adapter.setClickListener(this);
         recyclerView.setAdapter(adapter);
 
@@ -122,14 +112,6 @@ public class ArticleCommentsFragment extends MvpAppCompatFragment implements Art
         });
 
         buttonSend.setOnClickListener(v -> sendComment());
-
-        if (ClientHelper.getAuthState()) {
-            writePanel.setVisibility(View.VISIBLE);
-        } else {
-            writePanel.setVisibility(View.GONE);
-        }
-
-        ClientHelper.get().addLoginObserver(loginObserver);
         return view;
     }
 
@@ -145,6 +127,16 @@ public class ArticleCommentsFragment extends MvpAppCompatFragment implements Art
         } else {
             contentController.hideContent(ContentController.TAG_NO_DATA);
         }
+    }
+
+    @Override
+    public void setMessageFieldVisible(boolean isVisible) {
+        if (isVisible) {
+            writePanel.setVisibility(View.VISIBLE);
+        } else {
+            writePanel.setVisibility(View.GONE);
+        }
+        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -187,12 +179,6 @@ public class ArticleCommentsFragment extends MvpAppCompatFragment implements Art
     private void sendComment() {
         int commentId = currentReplyComment == null ? 0 : currentReplyComment.getId();
         presenter.replyComment(commentId, messageField.getText().toString());
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        ClientHelper.get().removeLoginObserver(loginObserver);
     }
 
     @Override

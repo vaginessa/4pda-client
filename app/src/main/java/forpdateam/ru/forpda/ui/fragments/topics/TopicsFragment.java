@@ -24,6 +24,7 @@ import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.Utils;
 import forpdateam.ru.forpda.entity.remote.topics.TopicItem;
 import forpdateam.ru.forpda.entity.remote.topics.TopicsData;
+import forpdateam.ru.forpda.model.AuthHolder;
 import forpdateam.ru.forpda.model.data.remote.api.favorites.FavoritesApi;
 import forpdateam.ru.forpda.presentation.topics.TopicsPresenter;
 import forpdateam.ru.forpda.presentation.topics.TopicsView;
@@ -42,6 +43,7 @@ public class TopicsFragment extends RecyclerFragment implements TopicsView {
     private TopicsAdapter adapter;
     private PaginationHelper paginationHelper;
     private DynamicDialogMenu<TopicsFragment, TopicItem> dialogMenu;
+    private AuthHolder authHolder = App.get().Di().getAuthHolder();
 
     @InjectPresenter
     TopicsPresenter presenter;
@@ -148,7 +150,7 @@ public class TopicsFragment extends RecyclerFragment implements TopicsView {
                     presenter.openForum();
                     return true;
                 });
-        if (ClientHelper.getAuthState()) {
+        if (authHolder.get().isAuth()) {
             menu
                     .add(R.string.mark_read)
                     .setOnMenuItemClickListener(item -> {
@@ -215,7 +217,7 @@ public class TopicsFragment extends RecyclerFragment implements TopicsView {
         dialogMenu.allow(0);
         if (!item.isAnnounce()) {
             dialogMenu.allow(1);
-            if (ClientHelper.getAuthState()) {
+            if (authHolder.get().isAuth()) {
                 dialogMenu.allow(2);
             }
         }

@@ -2,6 +2,8 @@ package forpdateam.ru.forpda
 
 import android.content.Context
 import forpdateam.ru.forpda.client.Client
+import forpdateam.ru.forpda.model.AuthHolder
+import forpdateam.ru.forpda.model.CountersHolder
 import forpdateam.ru.forpda.model.NetworkStateProvider
 import forpdateam.ru.forpda.model.SchedulersProvider
 import forpdateam.ru.forpda.model.data.cache.favorites.FavoritesCache
@@ -79,18 +81,20 @@ class Dependencies internal constructor(
 
     val schedulers: SchedulersProvider = AppSchedulers()
 
-    val webClient: IWebClient = Client(context)
-
     val externalStorage: ExternalStorageProvider = ExternalStorage()
+    val authHolder: AuthHolder = AuthHolder()
+    val countersHolder: CountersHolder = CountersHolder()
 
     val appTheme: AppThemeHolder = AppTheme(context)
     val templateManager = TemplateManager(context, appTheme)
-    val themeTemplate = ThemeTemplate(templateManager)
+    val themeTemplate = ThemeTemplate(templateManager, authHolder)
     val articleTemplate = ArticleTemplate(templateManager)
-    val searchTemplate = SearchTemplate(templateManager)
+    val searchTemplate = SearchTemplate(templateManager, authHolder)
     val forumRulesTemplate = ForumRulesTemplate(templateManager)
     val announceTemplate = AnnounceTemplate(templateManager)
     val qmsChatTemplate = QmsChatTemplate(templateManager)
+
+    val webClient: IWebClient = Client(context, authHolder)
 
     val authApi = AuthApi(webClient)
     val devDbApi = DevDbApi(webClient)
@@ -116,10 +120,10 @@ class Dependencies internal constructor(
     val notesCache = NotesCache()
 
     val avatarRepository = AvatarRepository(forumUsersCache, schedulers)
-    val favoritesRepository = FavoritesRepository(schedulers, favoritesApi, favoritesCache)
+    val favoritesRepository = FavoritesRepository(schedulers, favoritesApi, favoritesCache, authHolder)
     val historyRepository = HistoryRepository(schedulers, historyCache)
     val mentionsRepository = MentionsRepository(schedulers, mentionsApi)
-    val authRepository = AuthRepository(schedulers, authApi)
+    val authRepository = AuthRepository(schedulers, authApi, authHolder)
     val profileRepository = ProfileRepository(schedulers, profileApi)
     val reputationRepository = ReputationRepository(schedulers, reputationApi)
     val forumRepository = ForumRepository(schedulers, forumApi, forumCache)
@@ -131,5 +135,5 @@ class Dependencies internal constructor(
     val devDbRepository = DevDbRepository(schedulers, devDbApi)
     val editPostRepository = PostEditorRepository(schedulers, editPostApi, forumUsersCache)
     val notesRepository = NotesRepository(schedulers, notesCache, externalStorage)
-    val eventsRepository = EventsRepository(context, webClient, eventsApi, schedulers, networkState)
+    val eventsRepository = EventsRepository(context, webClient, eventsApi, schedulers, networkState, authHolder)
 }

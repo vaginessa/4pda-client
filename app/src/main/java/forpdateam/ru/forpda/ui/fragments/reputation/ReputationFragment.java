@@ -27,6 +27,7 @@ import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.entity.remote.reputation.RepData;
 import forpdateam.ru.forpda.entity.remote.reputation.RepItem;
+import forpdateam.ru.forpda.model.AuthHolder;
 import forpdateam.ru.forpda.model.data.remote.api.reputation.ReputationApi;
 import forpdateam.ru.forpda.presentation.reputation.ReputationPresenter;
 import forpdateam.ru.forpda.presentation.reputation.ReputationView;
@@ -52,6 +53,8 @@ public class ReputationFragment extends RecyclerFragment implements ReputationVi
     private MenuItem repModeMenuItem;
     private MenuItem upRepMenuItem;
     private MenuItem downRepMenuItem;
+
+    private AuthHolder authHolder = App.get().Di().getAuthHolder();
 
 
     @InjectPresenter
@@ -155,7 +158,7 @@ public class ReputationFragment extends RecyclerFragment implements ReputationVi
             ascSortMenuItem.setEnabled(true);
             repModeMenuItem.setEnabled(true);
             repModeMenuItem.setTitle(getString(presenter.getCurrentData().getMode().equals(ReputationApi.MODE_FROM) ? R.string.reputation_mode_from : R.string.reputation_mode_to));
-            if (presenter.getCurrentData().getId() != ClientHelper.getUserId()) {
+            if (presenter.getCurrentData().getId() != authHolder.get().getUserId()) {
                 upRepMenuItem.setEnabled(true);
                 upRepMenuItem.setVisible(true);
                 downRepMenuItem.setEnabled(true);

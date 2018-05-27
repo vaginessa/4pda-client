@@ -16,6 +16,7 @@ import forpdateam.ru.forpda.BuildConfig;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.Preferences;
+import forpdateam.ru.forpda.model.AuthHolder;
 import forpdateam.ru.forpda.model.repository.auth.AuthRepository;
 import forpdateam.ru.forpda.ui.activities.SettingsActivity;
 import forpdateam.ru.forpda.ui.activities.updatechecker.UpdateCheckerActivity;
@@ -27,13 +28,14 @@ import io.reactivex.disposables.Disposable;
 
 public class SettingsFragment extends BaseSettingFragment {
     private AuthRepository authRepository = App.get().Di().getAuthRepository();
+    private AuthHolder authHolder = App.get().Di().getAuthHolder();
     private Disposable disposable = null;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
-        if (ClientHelper.getAuthState()) {
+        if (authHolder.get().isAuth()) {
             findPreference("auth.action.logout")
                     .setOnPreferenceClickListener(preference -> {
                         new AlertDialog.Builder(getActivity())
@@ -137,7 +139,6 @@ public class SettingsFragment extends BaseSettingFragment {
                 .subscribe(result -> {
                     if (result) {
                         Toast.makeText(App.getContext(), "Logout complete", Toast.LENGTH_LONG).show();
-                        ClientHelper.get().notifyAuthChanged(ClientHelper.AUTH_STATE_LOGOUT);
                     } else {
                         Toast.makeText(App.getContext(), "Logout error", Toast.LENGTH_LONG).show();
                     }

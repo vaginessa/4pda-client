@@ -20,8 +20,12 @@ import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.common.Utils;
+import forpdateam.ru.forpda.entity.common.AuthData;
+import forpdateam.ru.forpda.entity.common.AuthState;
 import forpdateam.ru.forpda.entity.remote.profile.ProfileModel;
+import forpdateam.ru.forpda.model.AuthHolder;
 import forpdateam.ru.forpda.model.NetworkStateProvider;
+import forpdateam.ru.forpda.model.repository.profile.ProfileRepository;
 import forpdateam.ru.forpda.presentation.Screen;
 import forpdateam.ru.forpda.presentation.TabRouter;
 import forpdateam.ru.forpda.ui.activities.MainActivity;
@@ -44,22 +48,14 @@ public class DrawerHeader {
     private CompositeDisposable disposables = new CompositeDisposable();
 
     private NetworkStateProvider networkState = App.get().Di().getNetworkState();
+    private ProfileRepository profileRepository = App.get().Di().getProfileRepository();
     private TabRouter router = App.get().Di().getRouter();
+    private AuthHolder authHolder = App.get().Di().getAuthHolder();
 
-    private Consumer<Boolean> networkObserver = state -> {
-        if (state) {
-            state(ClientHelper.getAuthState() == ClientHelper.AUTH_STATE_LOGIN);
-        }
-    };
 
     private View.OnClickListener headerClickListener = v -> {
         router.navigateTo(new Screen.Profile());
         closeListener.onClick(v);
-    };
-
-    private Observer loginObserver = (observable, o) -> {
-        if (o == null) o = false;
-        state((boolean) o);
     };
 
     private void addToDisposable(Disposable disposable) {
@@ -70,7 +66,6 @@ public class DrawerHeader {
         activity = null;
         if (!disposables.isDisposed())
             disposables.dispose();
-        ClientHelper.get().removeLoginObserver(loginObserver);
     }
 
     public DrawerHeader(MainActivity activity, DrawerLayout drawerLayout, View.OnClickListener closeListener) {
@@ -100,13 +95,22 @@ public class DrawerHeader {
                     .setNegativeButton(R.string.cancel, null)
                     .show();
         });
-        ClientHelper.get().addLoginObserver(loginObserver);
         addToDisposable(
                 networkState
                         .observeState()
-                        .subscribe(networkObserver)
+                        .subscribe(aBoolean -> {
+                            if (aBoolean) {
+                                state(authHolder.get().isAuth());
+                            }
+                        })
         );
-        state(ClientHelper.getAuthState() == ClientHelper.AUTH_STATE_LOGIN);
+        addToDisposable(
+                authHolder
+                        .observe()
+                        .subscribe(authData -> {
+                            state(authData.isAuth());
+                        })
+        );
     }
 
     private void state(boolean b) {
@@ -122,10 +126,12 @@ public class DrawerHeader {
     }
 
     private void load() {
-        String url = "https://4pda.ru/forum/index.php?showuser=".concat(Integer.toString(ClientHelper.getUserId() == 0 ? 2556269 : ClientHelper.getUserId()));
-        Disposable disposable = App.get().Di().getProfileRepository()
-                .loadProfile(url)
-                .subscribe(this::onLoad, Throwable::printStackTrace);
+        String url = "https://4pda.ru/forum/index.php?showuser=" + authHolder.get().getUserId();
+        addToDisposable(
+                profileRepository
+                        .loadProfile(url)
+                        .subscribe(this::onLoad, Throwable::printStackTrace)
+        );
     }
 
     private void onLoad(ProfileModel profileModel) {

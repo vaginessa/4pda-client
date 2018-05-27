@@ -25,6 +25,7 @@ import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.client.ClientHelper;
 import forpdateam.ru.forpda.common.IntentHandler;
 import forpdateam.ru.forpda.common.LocaleHelper;
+import forpdateam.ru.forpda.model.AuthHolder;
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils;
 import forpdateam.ru.forpda.model.data.remote.api.NetworkResponse;
 import forpdateam.ru.forpda.ui.views.DynamicDialogMenu;
@@ -48,6 +49,7 @@ public class UpdateCheckerActivity extends AppCompatActivity {
     private LinearLayout updateContent;
     private View divider;
     private ProgressBar progressBar;
+    private AuthHolder authHolder = App.get().Di().getAuthHolder();
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -168,7 +170,7 @@ public class UpdateCheckerActivity extends AppCompatActivity {
             updateButton.setOnClickListener(v -> {
                 DynamicDialogMenu<UpdateCheckerActivity, Object> dialogMenu = new DynamicDialogMenu<>();
                 dialogMenu.addItem("github.com", (context, data) -> IntentHandler.handleDownload(linkGit));
-                if (ClientHelper.getAuthState()) {
+                if (authHolder.get().isAuth()) {
                     dialogMenu.addItem("4pda.ru", (context, data) -> IntentHandler.handleDownload(link4pda));
                 }
                 dialogMenu.addItem("Google Play", (context, data) -> IntentHandler.handle(GOOGLE_PLAY_LINK));

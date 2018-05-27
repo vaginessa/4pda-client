@@ -24,6 +24,7 @@ public class ProfileModel {
         POSITIVE, NEGATIVE;
     }
 
+    private int id = 0;
     private Spanned sign, about;
     private String avatar, nick, status, group, note;
     private ArrayList<Contact> contacts = new ArrayList<>();
@@ -31,6 +32,14 @@ public class ProfileModel {
     private ArrayList<Stat> stats = new ArrayList<>();
     private ArrayList<Device> devices = new ArrayList<>();
     private ArrayList<Warning> warnings = new ArrayList<>();
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public void addInfo(InfoType type, String value) {
         Info info = new Info();

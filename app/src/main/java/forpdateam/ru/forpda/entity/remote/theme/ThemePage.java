@@ -65,13 +65,13 @@ public class ThemePage implements IThemePage {
         this.id = id;
     }
 
-    public boolean isCurator() {
+    /*public boolean isCurator() {
         return curator;
     }
 
     public void setCurator(boolean curator) {
         this.curator = curator;
-    }
+    }*/
 
     public int getScrollY() {
         return scrollY;

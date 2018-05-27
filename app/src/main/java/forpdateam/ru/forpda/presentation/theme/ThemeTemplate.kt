@@ -5,6 +5,7 @@ import forpdateam.ru.forpda.R
 import forpdateam.ru.forpda.client.ClientHelper
 import forpdateam.ru.forpda.common.Preferences
 import forpdateam.ru.forpda.entity.remote.theme.ThemePage
+import forpdateam.ru.forpda.model.AuthHolder
 import forpdateam.ru.forpda.model.data.remote.api.ApiUtils
 import forpdateam.ru.forpda.model.repository.temp.TempHelper
 import forpdateam.ru.forpda.ui.TemplateManager
@@ -12,7 +13,8 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 class ThemeTemplate(
-        private val templateManager: TemplateManager
+        private val templateManager: TemplateManager,
+        private val authHolder: AuthHolder
 ) {
 
     private val firstLetter = Pattern.compile("([a-zA-Zа-яА-Я])")
@@ -20,12 +22,13 @@ class ThemeTemplate(
     fun mapEntity(page: ThemePage): ThemePage = page.apply { html = mapString(page) }
 
     fun mapString(page: ThemePage): String {
-        val memberId = ClientHelper.getUserId()
         val template = templateManager.getTemplate(TemplateManager.TEMPLATE_THEME)
 
+        val authData = authHolder.get()
+        val authorized = authData.isAuth()
+        val memberId = authData.userId
         template.apply {
             templateManager.fillStaticStrings(this)
-            val authorized = ClientHelper.getAuthState()
             val prevDisabled = page.pagination.current <= 1
             val nextDisabled = page.pagination.current == page.pagination.all
 
@@ -40,8 +43,9 @@ class ThemeTemplate(
             setVariableOpt("current_page_int", page.pagination.current)
 
             setVariableOpt("authorized_bool", java.lang.Boolean.toString(authorized))
-            setVariableOpt("is_curator_bool", java.lang.Boolean.toString(page.isCurator))
-            setVariableOpt("member_id_int", ClientHelper.getUserId())
+            //todo fix it
+            //setVariableOpt("is_curator_bool", java.lang.Boolean.toString(page.isCurator))
+            setVariableOpt("member_id_int", memberId)
             setVariableOpt("elem_to_scroll", page.anchor)
             setVariableOpt("body_type", "topic")
 

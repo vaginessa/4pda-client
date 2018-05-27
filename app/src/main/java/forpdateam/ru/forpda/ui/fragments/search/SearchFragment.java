@@ -55,6 +55,7 @@ import forpdateam.ru.forpda.entity.remote.IBaseForumPost;
 import forpdateam.ru.forpda.entity.remote.search.SearchItem;
 import forpdateam.ru.forpda.entity.remote.search.SearchResult;
 import forpdateam.ru.forpda.entity.remote.search.SearchSettings;
+import forpdateam.ru.forpda.model.AuthHolder;
 import forpdateam.ru.forpda.model.data.remote.api.favorites.FavoritesApi;
 import forpdateam.ru.forpda.presentation.search.SearchPresenter;
 import forpdateam.ru.forpda.presentation.search.SearchSiteView;
@@ -112,6 +113,8 @@ public class SearchFragment extends TabFragment implements SearchSiteView, Exten
 
     private ThemeJsInterface jsInterface;
     private ThemeDialogsHelper_V2 dialogsHelper;
+
+    private AuthHolder authHolder = App.get().Di().getAuthHolder();
 
 
     private Observer searchPreferenceObserver = (observable, o) -> {
@@ -183,7 +186,7 @@ public class SearchFragment extends TabFragment implements SearchSiteView, Exten
             searchUrl = getArguments().getString(TabFragment.ARG_TAB);
         }
         presenter.initSearchSettings(searchUrl);
-        dialogsHelper = new ThemeDialogsHelper_V2(getContext());
+        dialogsHelper = new ThemeDialogsHelper_V2(getContext(), authHolder);
     }
 
     @Override

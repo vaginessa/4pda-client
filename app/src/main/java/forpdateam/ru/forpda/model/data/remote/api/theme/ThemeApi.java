@@ -120,8 +120,8 @@ public class ThemeApi {
             while (attachMatcher.find()) {
                 item.addAttachImage(attachMatcher.group(1), attachMatcher.group(2));
             }
-            if (item.isCurator() && item.getUserId() == ClientHelper.getUserId())
-                page.setCurator(true);
+            /*if (item.isCurator() && item.getUserId() == ClientHelper.getUserId())
+                page.setCurator(true);*/
             page.addPost(item);
         }
         matcher = pollMainPattern.matcher(response.getBody());

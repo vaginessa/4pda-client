@@ -3,7 +3,11 @@ package forpdateam.ru.forpda.presentation.auth
 import com.arellomobile.mvp.InjectViewState
 import forpdateam.ru.forpda.client.ClientHelper
 import forpdateam.ru.forpda.common.mvp.BasePresenter
+import forpdateam.ru.forpda.entity.common.AuthData
+import forpdateam.ru.forpda.entity.common.AuthState
 import forpdateam.ru.forpda.entity.remote.auth.AuthForm
+import forpdateam.ru.forpda.entity.remote.profile.ProfileModel
+import forpdateam.ru.forpda.model.AuthHolder
 import forpdateam.ru.forpda.model.SchedulersProvider
 import forpdateam.ru.forpda.model.repository.auth.AuthRepository
 import forpdateam.ru.forpda.model.repository.profile.ProfileRepository
@@ -21,7 +25,8 @@ class AuthPresenter(
         private val authRepository: AuthRepository,
         private val profileRepository: ProfileRepository,
         private val router: TabRouter,
-        private val schedulers: SchedulersProvider
+        private val schedulers: SchedulersProvider,
+        private val authHolder: AuthHolder
 ) : BasePresenter<AuthView>() {
 
     override fun onFirstViewAttach() {
@@ -49,6 +54,9 @@ class AuthPresenter(
                 .doAfterTerminate { viewState.setRefreshing(false) }
                 .subscribe({
                     viewState.showLoginResult(it)
+                    if(it){
+                        loadProfile("https://4pda.ru/forum/index.php?showuser=${authHolder.get().userId}")
+                    }
                 }, {
                     this.handleErrorRx(it)
                 })
@@ -62,7 +70,7 @@ class AuthPresenter(
                 .doAfterTerminate { viewState.setRefreshing(false) }
                 .subscribe({
                     viewState.showProfile(it)
-                    delayedExit()
+                    delayedExit(it)
                 }, {
                     this.handleErrorRx(it)
                 })
@@ -73,14 +81,17 @@ class AuthPresenter(
         router.replaceScreen(Screen.ArticleList())
     }
 
-    private fun delayedExit(){
+    private fun delayedExit(profile: ProfileModel) {
         Observable
                 .just(false)
                 .delay(2000L, TimeUnit.MILLISECONDS)
                 .subscribeOn(schedulers.io())
                 .observeOn(schedulers.ui())
                 .subscribe {
-                    ClientHelper.get().notifyAuthChanged(ClientHelper.AUTH_STATE_LOGIN)
+                    authHolder.set(authHolder.get().apply {
+                        userId = profile.id
+                        state = AuthState.AUTH
+                    })
                     router.replaceScreen(Screen.Favorites())
                 }
                 .addToDisposable()

@@ -23,7 +23,7 @@ public class ProfileApi {
     private static final Pattern note = Pattern.compile("<textarea[^>]*?profile-textarea\"[^>]*?>([\\s\\S]*?)</textarea>");
     private static final Pattern about = Pattern.compile("<div[^>]*?div-custom-about[^>]*?>([\\s\\S]*?)</div>");
     private static final Pattern warnings = Pattern.compile("<li class=\"wlog-([^\"]*?)\"[^>]*?>[\\s\\S]*?<span class=\"date\">([^<]*?)<\\/span>[\\s\\S]*?<span style[^>]*?>([^<]*?)<\\/span>[\\s\\S]*?<div class=\"a-content\">([\\s\\S]*?)<div class=\"profile-edit-links");
-    
+
     private IWebClient webClient;
 
     public ProfileApi(IWebClient webClient) {
@@ -32,6 +32,10 @@ public class ProfileApi {
 
     public ProfileModel getProfile(String url) throws Exception {
         ProfileModel profile = new ProfileModel();
+        Matcher idMatcher = Pattern.compile("showuser=(\\d+)").matcher(url);
+        if (idMatcher.find()) {
+            profile.setId(Integer.parseInt(idMatcher.group(1)));
+        }
         NetworkResponse response = webClient.get(url);
 
 

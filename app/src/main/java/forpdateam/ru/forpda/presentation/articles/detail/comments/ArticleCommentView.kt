@@ -12,4 +12,5 @@ interface ArticleCommentView : IBaseView {
     fun showComments(comments: List<Comment>)
     fun setSendRefreshing(isRefreshing: Boolean)
     fun scrollToComment(position: Int)
+    fun setMessageFieldVisible(isVisible: Boolean)
 }
