@@ -95,7 +95,6 @@ public class TabFragment extends MvpAppCompatFragment {
     private boolean notifyDotFav = false;
     private boolean notifyDotQms = false;
     private boolean notifyDotMentions = false;
-    private boolean alreadyCallLoad = false;
     protected ContentController contentController;
 
     protected CompositeDisposable disposables = new CompositeDisposable();
@@ -202,27 +201,6 @@ public class TabFragment extends MvpAppCompatFragment {
         return toolbar.getMenu();
     }
 
-    public <T> void subscribe(@NonNull Observable<T> observable, @NonNull Consumer<T> onNext, @NonNull T onErrorReturn) {
-        subscribe(observable, onNext, onErrorReturn, null);
-    }
-
-    public <T> void subscribe(@NonNull Observable<T> observable, @NonNull Consumer<T> onNext, @NonNull T onErrorReturn, View.OnClickListener onErrorAction) {
-        Disposable disposable = observable
-                .onErrorReturn(throwable -> {
-                    handleErrorRx(throwable, onErrorAction);
-                    return onErrorReturn;
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(onNext, throwable -> handleErrorRx(throwable, onErrorAction));
-
-        this.disposables.add(disposable);
-    }
-
-    private void handleErrorRx(Throwable throwable, View.OnClickListener listener) {
-        ErrorHandler.handle(this, throwable, listener);
-    }
-
     protected void addToDisposable(Disposable disposable) {
         disposables.add(disposable);
     }
@@ -238,23 +216,6 @@ public class TabFragment extends MvpAppCompatFragment {
     public void hidePopupWindows() {
         getMainActivity().hideKeyboard();
     }
-
-    //Загрузка каких-то данных, выполняется только при наличии сети
-    /*@CallSuper
-    public boolean loadData() {
-        Log.e("SUKA", "loadData " + networkState.getState() + " : " + this);
-        if (!networkState.getState()) {
-            setRefreshing(false);
-            return false;
-        }
-        alreadyCallLoad = true;
-        return true;
-    }
-
-    @CallSuper
-    public void loadCacheData() {
-
-    }*/
 
     public CoordinatorLayout getCoordinatorLayout() {
         return coordinatorLayout;
@@ -290,34 +251,34 @@ public class TabFragment extends MvpAppCompatFragment {
     @CallSuper
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_base, container, false);
         //Осторожно! Чувствительно к структуре разметки! (по идеи так должно работать чуть быстрее)
         fragmentContainer = (RelativeLayout) findViewById(R.id.fragment_container);
-        coordinatorLayout = (CoordinatorLayout) fragmentContainer.findViewById(R.id.coordinator_layout);
-        appBarLayout = (AppBarLayout) coordinatorLayout.findViewById(R.id.appbar_layout);
-        toolbarLayout = (CollapsingToolbarLayout) appBarLayout.findViewById(R.id.toolbar_layout);
-        toolbarBackground = (ImageView) toolbarLayout.findViewById(R.id.toolbar_image_background);
-        toolbar = (Toolbar) toolbarLayout.findViewById(R.id.toolbar);
-        toolbarImageView = (ImageView) toolbar.findViewById(R.id.toolbar_image_icon);
-        toolbarTitleView = (TextView) toolbar.findViewById(R.id.toolbar_title);
-        toolbarSubtitleView = (TextView) toolbar.findViewById(R.id.toolbar_subtitle);
-        toolbarProgress = (ProgressBar) toolbar.findViewById(R.id.toolbar_progress);
-        titlesWrapper = (LinearLayout) toolbar.findViewById(R.id.toolbar_titles_wrapper);
-        toolbarSpinner = (Spinner) toolbar.findViewById(R.id.toolbar_spinner);
+        coordinatorLayout = fragmentContainer.findViewById(R.id.coordinator_layout);
+        appBarLayout = coordinatorLayout.findViewById(R.id.appbar_layout);
+        toolbarLayout = appBarLayout.findViewById(R.id.toolbar_layout);
+        toolbarBackground = toolbarLayout.findViewById(R.id.toolbar_image_background);
+        toolbar = toolbarLayout.findViewById(R.id.toolbar);
+        toolbarImageView = toolbar.findViewById(R.id.toolbar_image_icon);
+        toolbarTitleView = toolbar.findViewById(R.id.toolbar_title);
+        toolbarSubtitleView = toolbar.findViewById(R.id.toolbar_subtitle);
+        toolbarProgress = toolbar.findViewById(R.id.toolbar_progress);
+        titlesWrapper = toolbar.findViewById(R.id.toolbar_titles_wrapper);
+        toolbarSpinner = toolbar.findViewById(R.id.toolbar_spinner);
         notifyDot = findViewById(R.id.notify_dot);
-        fragmentContent = (ViewGroup) coordinatorLayout.findViewById(R.id.fragment_content);
-        additionalContent = (ViewGroup) coordinatorLayout.findViewById(R.id.additional_content);
-        contentProgress = (ProgressBar) additionalContent.findViewById(R.id.content_progress);
-        noNetwork = (LinearLayout) coordinatorLayout.findViewById(R.id.no_network);
+        fragmentContent = coordinatorLayout.findViewById(R.id.fragment_content);
+        additionalContent = coordinatorLayout.findViewById(R.id.additional_content);
+        contentProgress = additionalContent.findViewById(R.id.content_progress);
+        noNetwork = coordinatorLayout.findViewById(R.id.no_network);
         //// TODO: 20.03.17 удалить и юзать только там, где нужно
-        fab = (FloatingActionButton) coordinatorLayout.findViewById(R.id.fab);
+        fab = coordinatorLayout.findViewById(R.id.fab);
         contentController = new ContentController(contentProgress, additionalContent, fragmentContent);
         return view;
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
 
@@ -346,7 +307,7 @@ public class TabFragment extends MvpAppCompatFragment {
         setTitle(title);
         setSubtitle(subtitle);
         updateNotifyDot();
-        viewsReady();
+        addBaseToolbarMenu(getMenu());
         addToDisposable(
                 networkState
                         .observeState()
@@ -358,16 +319,8 @@ public class TabFragment extends MvpAppCompatFragment {
         disposables.add(
                 countersHolder
                 .observe()
-                .subscribe(messageCounters -> {
-                    updateNotifyDot();
-                })
+                .subscribe(messageCounters -> updateNotifyDot())
         );
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
     }
 
     protected void baseInflateFragment(LayoutInflater inflater, @LayoutRes int res) {
@@ -389,18 +342,6 @@ public class TabFragment extends MvpAppCompatFragment {
     protected void setCardsBackground() {
         setCardsBackground(fragmentContainer);
     }
-
-
-    private void viewsReady() {
-        addBaseToolbarMenu(getMenu());
-        /*if (networkState.getState() && !configuration.isUseCache()) {
-            if (!alreadyCallLoad)
-                loadData();
-        } else {
-            loadCacheData();
-        }*/
-    }
-
 
     @CallSuper
     protected void addBaseToolbarMenu(Menu menu) {
@@ -485,16 +426,6 @@ public class TabFragment extends MvpAppCompatFragment {
         if (attachedWebView != null) {
             attachedWebView.onPause();
         }
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
     }
 
     @Override

@@ -10,6 +10,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -31,6 +32,8 @@ import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
+import java.util.function.Consumer;
+
 import forpdateam.ru.forpda.App;
 import forpdateam.ru.forpda.R;
 import forpdateam.ru.forpda.common.BitmapUtils;
@@ -43,6 +46,9 @@ import forpdateam.ru.forpda.ui.fragments.TabFragment;
 import forpdateam.ru.forpda.ui.fragments.profile.adapters.ProfileAdapter;
 import forpdateam.ru.forpda.ui.views.ScrimHelper;
 import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by radiationx on 03.08.16.
@@ -92,7 +98,7 @@ public class ProfileFragment extends TabFragment implements ProfileAdapter.Click
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         baseInflateFragment(inflater, R.layout.fragment_profile);
         ViewStub viewStub = (ViewStub) findViewById(R.id.toolbar_content);
@@ -112,7 +118,7 @@ public class ProfileFragment extends TabFragment implements ProfileAdapter.Click
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
@@ -243,18 +249,23 @@ public class ProfileFragment extends TabFragment implements ProfileAdapter.Click
     private void blur(Bitmap bkg) {
         float scaleFactor = 3;
         int radius = 4;
-        Observable<Bitmap> observable = Observable
+        Disposable disposable = Observable
                 .fromCallable(() -> {
                     Bitmap overlay = BitmapUtils.centerCrop(bkg, toolbarBackground.getWidth(), toolbarBackground.getHeight(), scaleFactor);
                     BitmapUtils.fastBlur(overlay, radius, true);
                     return overlay;
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(bitmap -> {
+                    AlphaAnimation animation1 = new AlphaAnimation(0, 1);
+                    animation1.setDuration(500);
+                    animation1.setFillAfter(true);
+                    toolbarBackground.setBackground(new BitmapDrawable(getResources(), bitmap));
+                    toolbarBackground.startAnimation(animation1);
+                }, throwable -> {
+                    Toast.makeText(App.getContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
                 });
-        subscribe(observable, bitmap -> {
-            AlphaAnimation animation1 = new AlphaAnimation(0, 1);
-            animation1.setDuration(500);
-            animation1.setFillAfter(true);
-            toolbarBackground.setBackground(new BitmapDrawable(getResources(), bitmap));
-            toolbarBackground.startAnimation(animation1);
-        }, bkg);
+        addToDisposable(disposable);
     }
 }

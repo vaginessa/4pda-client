@@ -1,6 +1,7 @@
 package forpdateam.ru.forpda.ui.fragments.history;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.Menu;
@@ -52,7 +53,7 @@ public class HistoryFragment extends RecyclerFragment implements HistoryView {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         dialogMenu = new DynamicDialogMenu<>();

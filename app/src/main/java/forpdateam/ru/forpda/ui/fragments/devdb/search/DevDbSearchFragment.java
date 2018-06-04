@@ -3,6 +3,7 @@ package forpdateam.ru.forpda.ui.fragments.devdb.search;
 import android.app.SearchManager;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
@@ -63,7 +64,7 @@ public class DevDbSearchFragment extends TabFragment implements SearchDevicesVie
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         baseInflateFragment(inflater, R.layout.fragment_brand);
         refreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_list);
@@ -73,7 +74,7 @@ public class DevDbSearchFragment extends TabFragment implements SearchDevicesVie
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setCardsBackground();
         refreshLayoutStyle(refreshLayout);

@@ -2,6 +2,7 @@ package forpdateam.ru.forpda.ui.fragments.reputation;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AlertDialog;
@@ -86,7 +87,7 @@ public class ReputationFragment extends RecyclerFragment implements ReputationVi
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         paginationHelper = new PaginationHelper(getActivity());
         paginationHelper.addInToolbar(inflater, toolbarLayout, configuration.isFitSystemWindow());
@@ -94,7 +95,7 @@ public class ReputationFragment extends RecyclerFragment implements ReputationVi
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         dialogMenu = new DynamicDialogMenu<>();

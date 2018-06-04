@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.Menu;
@@ -49,7 +50,7 @@ public class ThemeFragmentWeb extends ThemeFragment implements ExtendedWebView.J
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         jsInterface = new ThemeJsInterface(presenter);
         messagePanel.setHeightChangeListener(newHeight -> {
             webView.setPaddingBottom(newHeight);

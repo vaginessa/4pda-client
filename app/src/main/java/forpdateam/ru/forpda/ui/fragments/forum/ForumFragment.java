@@ -1,6 +1,7 @@
 package forpdateam.ru.forpda.ui.fragments.forum;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
@@ -70,7 +71,7 @@ public class ForumFragment extends TabFragment implements ForumView {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         baseInflateFragment(inflater, R.layout.fragment_forum);
         treeContainer = (NestedScrollView) findViewById(R.id.nested_scroll_view);
@@ -78,7 +79,7 @@ public class ForumFragment extends TabFragment implements ForumView {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setListsBackground();
 

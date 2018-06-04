@@ -3,6 +3,7 @@ package forpdateam.ru.forpda.ui.fragments.other;
 import android.app.SearchManager;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatImageButton;
@@ -62,7 +63,7 @@ public class ForumRulesFragment extends TabFragment implements ForumRulesView {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         webView = getMainActivity().getWebViewsProvider().pull(getContext());
         attachWebView(webView);
@@ -71,7 +72,7 @@ public class ForumRulesFragment extends TabFragment implements ForumRulesView {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         webView.addJavascriptInterface(this, JS_INTERFACE);
         webView.setWebViewClient(new CustomWebViewClient());

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -123,7 +124,7 @@ public class QmsChatFragment extends TabFragment implements ChatThemeCreator.The
     @SuppressLint({"SetJavaScriptEnabled", "JavascriptInterface"})
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         baseInflateFragment(inflater, R.layout.fragment_qms_chat);
         chatContainer = (FrameLayout) findViewById(R.id.qms_chat_container);
@@ -137,7 +138,7 @@ public class QmsChatFragment extends TabFragment implements ChatThemeCreator.The
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         jsInterface = new QmsChatJsInterface(presenter);
         webView.setJsLifeCycleListener(this);
